@@ -7,8 +7,11 @@ import sys
 import datetime
 import socket
 import argparse
+from typing import List
 
-from src.attacks import ATTACK_LIST, DEFENSES_LIST
+from src.attacks import (
+        ATTACK_LIST, DEFENSES_LIST, prompt_injection, obfuscation, indirect, manipulation, llm_attack
+    )
 from src.colors import TColors
 
 # paste the key into the key.txt file and put into the root directory
@@ -24,12 +27,13 @@ except FileNotFoundError:
     sys.exit(1)
 
 
-def main(attack_type: str, defense_type: str) -> None:
+def main(attacks: List[str], defense: str) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
 
     Parameters: 
-        attack_type: str - specifies the attack type
+        attack: List[str] - specifies a list of attacks against the LLM
+        defense: str - specifies the defense type
 
     Returns:
         None
@@ -37,17 +41,45 @@ def main(attack_type: str, defense_type: str) -> None:
     print("\n\n\n"+"#"*60)
     print("## " + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
     print(f"## System: {os.cpu_count()} CPU cores on {socket.gethostname()}")
-    print(f"## Attack type: {attack_type}")
-    print(f"## Defense type: {defense_type}")
+    print(f"## Attack type: {attacks}")
+    print(f"## Defense type: {defense}")
     print("#"*60+"\n")
 
+
+    success: int = 0
+    for attack in attacks:
+        opponent_llm = None
+
+        match attack:
+            case "prompt_injection":
+                if prompt_injection():
+                    success += 1
+
+            case "obfuscation":
+                if obfuscation():
+                    success += 1
+
+            case "indirect":
+                if indirect():
+                    success += 1
+
+            case "manipulation":
+                if manipulation():
+                    success += 1
+
+            case "llm":
+                if llm_attack():
+                    success += 1
+
+            case _:
+                print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
-    parser.add_argument("--attack_type", type=str, default="prompt_injection",
-                        help="specifies the attack type", choices=ATTACK_LIST)
-    parser.add_argument("--defense_type", type=str, default="sanitization",
+    parser.add_argument("--attack", type=str, default="prompt_injection",
+                        help="specifies the attack types", nargs="+", choices=ATTACK_LIST)
+    parser.add_argument("--defense", type=str, default="sanitization",
                         help="specifies the defense type", choices=DEFENSES_LIST)
     args = parser.parse_args()
 

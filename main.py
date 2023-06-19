@@ -3,11 +3,26 @@
 # !/usr/bin/env python3
 
 import os
+import sys
 import datetime
 import socket
 import argparse
 
 from src.attacks import ATTACK_LIST, DEFENSES_LIST
+from src.colors import TColors
+
+# paste the key into the key.txt file and put into the root directory
+try:
+    with open(file="key.txt", mode="r", encoding="utf-8") as f:
+        os.environ["OPENAI_API_KEY"] = f.read()
+        assert os.environ["OPENAI_API_KEY"] != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
+        print(f"{TColors.OKGREEN}OpenAI API key loaded.{TColors.ENDC}")
+
+except FileNotFoundError:
+    print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt " \
+          f"file and put into the root directoryf{TColors.ENDC}")
+    sys.exit(1)
+
 
 def main(attack_type: str, defense_type: str) -> None:
     """
@@ -25,6 +40,7 @@ def main(attack_type: str, defense_type: str) -> None:
     print(f"## Attack type: {attack_type}")
     print(f"## Defense type: {defense_type}")
     print("#"*60+"\n")
+
 
 
 if __name__ == "__main__":

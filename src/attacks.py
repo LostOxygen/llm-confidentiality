@@ -6,7 +6,7 @@ ATTACK_LIST: Final[List[str]] = ["prompt_injection", "obfuscation", "indirect",
                                  "manipulation", "llm"]
 
 DEFENSES_LIST: Final[List[str]] = ["prompt_based", "sanitization", "advs_training",
-                                   "sandboxin"]
+                                   "sandboxing"]
 
 
 def prompt_injection() -> bool:

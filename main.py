@@ -10,9 +10,11 @@ import argparse
 from typing import List
 
 from src.attacks import (
-        ATTACK_LIST, DEFENSES_LIST, prompt_injection, obfuscation, indirect, manipulation, llm_attack
+        ATTACK_LIST, DEFENSES_LIST, prompt_injection, obfuscation,
+        indirect, manipulation, llm_attack
     )
 from src.colors import TColors
+
 
 # paste the key into the key.txt file and put into the root directory
 try:
@@ -45,41 +47,44 @@ def main(attacks: List[str], defense: str) -> None:
     print(f"## Defense type: {defense}")
     print("#"*60+"\n")
 
+    total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
-    success: int = 0
     for attack in attacks:
         opponent_llm = None
 
         match attack:
             case "prompt_injection":
                 if prompt_injection():
-                    success += 1
+                    total_successes[attack] += 1
 
             case "obfuscation":
                 if obfuscation():
-                    success += 1
+                    total_successes[attack] += 1
 
             case "indirect":
                 if indirect():
-                    success += 1
+                    total_successes[attack] += 1
 
             case "manipulation":
                 if manipulation():
-                    success += 1
+                    total_successes[attack] += 1
 
             case "llm":
                 if llm_attack():
-                    success += 1
+                    total_successes[attack] += 1
 
             case _:
                 print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
 
+    print(f"{TColors.OKCYAN}Total successes: {total_successes}{TColors.ENDC}")
+    return 0
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
-    parser.add_argument("--attack", type=str, default="prompt_injection",
+    parser.add_argument("--attacks", "-a", type=str, default=["prompt_injection"],
                         help="specifies the attack types", nargs="+", choices=ATTACK_LIST)
-    parser.add_argument("--defense", type=str, default="sanitization",
+    parser.add_argument("--defense", "-d", type=str, default="sanitization",
                         help="specifies the defense type", choices=DEFENSES_LIST)
     args = parser.parse_args()
 

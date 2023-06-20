@@ -14,8 +14,11 @@ python main.py --attacks "prompt_injection" "obfuscation" --defense "sanitizatio
 ## Arguments
 | Argument | Type | Description |
 |----------|------|-------------|
-| -a, --attacks | List[str] | specifies the attacks which will be utilized against the LLM |
-| -d, --defense | str | specifies the defense for the LLM |
+| -h, --help | | show this help message and exit |
+| -a, --attacks | List[str] | specifies the attacks which will be utilized against the LLM (default: "payload_splitting")|
+| -d, --defense | str | specifies the defense for the LLM (default: None)|
+| -o, --opponent_type | str | specifies the type of opponent (default: "gpt-3.5-turbo") |
+
 
 ## Supported Attacks and Defenses
 | Attack | Defense |

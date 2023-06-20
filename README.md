@@ -28,3 +28,4 @@ python main.py --attacks "prompt_injection" "obfuscation" --defense "sanitizatio
 |indirect | advs_training |
 |manipulation | sandboxing |
 |llm |  |
+| translation | |

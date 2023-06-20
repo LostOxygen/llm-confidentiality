@@ -14,7 +14,7 @@ from langchain.chat_models import ChatOpenAI
 
 from src.attacks import (
         ATTACK_LIST, DEFENSES_LIST, payload_splitting, obfuscation,
-        indirect, manipulation, llm_attack
+        indirect, manipulation, llm_attack, translation
     )
 from src.prompts import SYSTEM_PROMPTS
 from src.colors import TColors
@@ -65,6 +65,10 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
 
             case "obfuscation":
                 attack_successes = obfuscation(opponent_llm)
+                total_successes[attack] += attack_successes
+
+            case "translation":
+                attack_successes = translation(opponent_llm)
                 total_successes[attack] += attack_successes
 
             case "indirect":

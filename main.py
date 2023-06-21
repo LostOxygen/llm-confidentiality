@@ -45,6 +45,9 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
     Returns:
         None
     """
+    if "all" in attacks:
+        attacks = ATTACK_LIST
+
     print("\n"+"#"*60)
     print("## " + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
     print(f"## System: {os.cpu_count()} CPU cores on {socket.gethostname()}")
@@ -85,14 +88,15 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
 
             case _:
                 print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
+                print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
 
         del opponent_llm
 
     # print the results
     print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
     for attack, successes in total_successes.items():
-        print(f"{TColors.OKCYAN}Attack: {attack} - Successes: {successes}/" \
-              f"{len(SYSTEM_PROMPTS)}{TColors.ENDC}")
+        print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
+              f"{len(SYSTEM_PROMPTS)}")
 
     return 0
 
@@ -100,7 +104,7 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
     parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
-                        help="specifies the attack types", nargs="+", choices=ATTACK_LIST)
+                        help="specifies the attack types", nargs="+")
     parser.add_argument("--defense", "-d", type=str, default="sanitization",
                         help="specifies the defense type", choices=DEFENSES_LIST)
     parser.add_argument("--opponent_type", "-o", type=str, default="gpt-3.5-turbo",

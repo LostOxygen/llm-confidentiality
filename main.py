@@ -10,7 +10,8 @@ import argparse
 from typing import List
 
 # from langchain.llms import OpenAI
-from langchain.chat_models import ChatOpenAI
+# from langchain.chat_models import ChatOpenAI
+import openai
 
 from src.attacks import (
         ATTACK_LIST, DEFENSES_LIST, payload_splitting, obfuscation,
@@ -18,19 +19,6 @@ from src.attacks import (
     )
 from src.prompts import SYSTEM_PROMPTS
 from src.colors import TColors
-
-
-# paste the key into the key.txt file and put into the root directory
-try:
-    with open(file="key.txt", mode="r", encoding="utf-8") as f:
-        os.environ["OPENAI_API_KEY"] = f.read()
-        assert os.environ["OPENAI_API_KEY"] != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
-        print(f"{TColors.OKGREEN}OpenAI API key loaded.{TColors.ENDC}")
-
-except FileNotFoundError:
-    print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt " \
-          f"file and put into the root directoryf{TColors.ENDC}")
-    sys.exit(1)
 
 
 def main(attacks: List[str], defense: str, opponent_type: str) -> None:
@@ -45,6 +33,22 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
     Returns:
         None
     """
+    # paste the key into the key.txt file and put into the root directory
+    try:
+        with open(file="key.txt", mode="r", encoding="utf-8") as f:
+            key = f.read()
+            assert key != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
+
+            os.environ["OPENAI_API_KEY"] = key
+            openai.api_key = key
+            print(f"{TColors.OKGREEN}OpenAI API key loaded.{TColors.ENDC}")
+
+    except FileNotFoundError:
+        print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
+            f"file and put into the root directoryf{TColors.ENDC}")
+        sys.exit(1)
+
+
     if "all" in attacks:
         attacks = ATTACK_LIST
 
@@ -59,19 +63,19 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
     for attack in attacks:
-        opponent_llm = ChatOpenAI(temperature=0.7, model_name=opponent_type)
+        #opponent_llm = ChatOpenAI(temperature=0.7, model_name=opponent_type)
 
         match attack:
             case "payload_splitting":
-                attack_successes = payload_splitting(opponent_llm)
+                attack_successes = payload_splitting(opponent_type)
                 total_successes[attack] += attack_successes
 
             case "obfuscation":
-                attack_successes = obfuscation(opponent_llm)
+                attack_successes = obfuscation(opponent_type)
                 total_successes[attack] += attack_successes
 
             case "translation":
-                attack_successes = translation(opponent_llm)
+                attack_successes = translation(opponent_type)
                 total_successes[attack] += attack_successes
 
             case "indirect":
@@ -90,7 +94,7 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
                 print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
                 print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
 
-        del opponent_llm
+        # del opponent_llm
 
     # print the results
     print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")

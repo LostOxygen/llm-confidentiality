@@ -1,8 +1,10 @@
 """library for attack implementations and helper functions"""
 from typing import List, Final
 
-from langchain.chat_models import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
+import openai
+from openai import ChatCompletion, Completion
+# from langchain.chat_models import ChatOpenAI
+# from langchain.schema import HumanMessage, SystemMessage
 
 from src.utils import evaluate_response
 from src.prompts import SYSTEM_PROMPTS
@@ -15,12 +17,12 @@ DEFENSES_LIST: Final[List[str]] = ["prompt_based", "sanitization", "advs_trainin
                                    "sandboxing"]
 
 
-def payload_splitting(opponent_llm: ChatOpenAI) -> bool:
+def payload_splitting(llm_type: str) -> bool:
     """
     Implementation of a payload splitting attack
 
     Parameters:
-        opponent_llm: ChatOpenAI - the opponent LLM
+        llm_type: str - the type of the opponent LLM
     
     Returns:
         total_successes: int - the number of successful attacks (based on the different levels)
@@ -40,11 +42,14 @@ def payload_splitting(opponent_llm: ChatOpenAI) -> bool:
 
     for level_id in range(0, len(SYSTEM_PROMPTS)):
         messages = [
-            SystemMessage(content=SYSTEM_PROMPTS[f"level_{level_id}"]),
-            HumanMessage(content=malicious_prompt),
+            {"role": "system", "content": SYSTEM_PROMPTS[f"level_{level_id}"]},
+            {"role": "user", "content": malicious_prompt},
         ]
 
-        response = opponent_llm(messages).content
+        if llm_type == "gpt-3.5-turbo":
+            completion = ChatCompletion.create(model=llm_type, messages=messages)
+
+        response = completion.choices[0].message.content
 
         if evaluate_response(response):
             print(f"Level {level_id}: {TColors.OKGREEN}OK{TColors.ENDC}")
@@ -55,12 +60,12 @@ def payload_splitting(opponent_llm: ChatOpenAI) -> bool:
     return total_successes
 
 
-def obfuscation(opponent_llm: ChatOpenAI) -> bool:
+def obfuscation(llm_type: str) -> bool:
     """
     Implementation of an obfuscation attack
 
     Parameters:
-        opponent_llm: ChatOpenAI - the opponent LLM
+        llm_type: str - the type of the opponent LLM
     
     Returns:
         total_successes: int - the number of successful attacks (based on the different levels)
@@ -75,12 +80,14 @@ def obfuscation(opponent_llm: ChatOpenAI) -> bool:
 
     for level_id in range(0, len(SYSTEM_PROMPTS)):
         messages = [
-            SystemMessage(content=SYSTEM_PROMPTS[f"level_{level_id}"]),
-            HumanMessage(content=malicious_prompt),
+            {"role": "system", "content": SYSTEM_PROMPTS[f"level_{level_id}"]},
+            {"role": "user", "content": malicious_prompt},
         ]
 
-        response = opponent_llm(messages).content
+        if llm_type == "gpt-3.5-turbo":
+            completion = ChatCompletion.create(model=llm_type, messages=messages)
 
+        response = completion.choices[0].message.content
 
         if evaluate_response(response):
             print(f"Level {level_id}: {TColors.OKGREEN}OK{TColors.ENDC}")
@@ -91,12 +98,12 @@ def obfuscation(opponent_llm: ChatOpenAI) -> bool:
     return total_successes
 
 
-def translation(opponent_llm: ChatOpenAI) -> bool:
+def translation(llm_type: str) -> bool:
     """
     Implementation of an translation attack
 
     Parameters:
-        opponent_llm: ChatOpenAI - the opponent LLM
+        llm_type: str - the opponent LLM
     
     Returns:
         total_successes: int - the number of successful attacks (based on the different levels)
@@ -110,12 +117,14 @@ def translation(opponent_llm: ChatOpenAI) -> bool:
 
     for level_id in range(0, len(SYSTEM_PROMPTS)):
         messages = [
-            SystemMessage(content=SYSTEM_PROMPTS[f"level_{level_id}"]),
-            HumanMessage(content=malicious_prompt),
+            {"role": "system", "content": SYSTEM_PROMPTS[f"level_{level_id}"]},
+            {"role": "user", "content": malicious_prompt},
         ]
 
-        response = opponent_llm(messages).content
+        if llm_type == "gpt-3.5-turbo":
+            completion = ChatCompletion.create(model=llm_type, messages=messages)
 
+        response = completion.choices[0].message.content
 
         if evaluate_response(response):
             print(f"Level {level_id}: {TColors.OKGREEN}OK{TColors.ENDC}")

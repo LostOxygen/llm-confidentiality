@@ -15,7 +15,7 @@ import openai
 
 from src.attacks import (
         ATTACK_LIST, DEFENSES_LIST, payload_splitting, obfuscation,
-        indirect, manipulation, llm_attack, translation
+        indirect, manipulation, llm_attack, translation, chatml_abuse
     )
 from src.prompts import SYSTEM_PROMPTS
 from src.colors import TColors
@@ -78,6 +78,10 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
                 attack_successes = translation(opponent_type)
                 total_successes[attack] += attack_successes
 
+            case "chatml_abuse":
+                attack_successes = chatml_abuse(opponent_type)
+                total_successes[attack] += attack_successes
+
             case "indirect":
                 if indirect():
                     total_successes[attack] += 1
@@ -109,9 +113,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
     parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
                         help="specifies the attack types", nargs="+")
-    parser.add_argument("--defense", "-d", type=str, default="sanitization",
+    parser.add_argument("--defense", "-d", type=str, default="None",
                         help="specifies the defense type", choices=DEFENSES_LIST)
-    parser.add_argument("--opponent_type", "-o", type=str, default="gpt-3.5-turbo",
+    parser.add_argument("--opponent_type", "-o", type=str, default="gpt-3.5-turbo-0301",
                         help="specifies the opponent LLM type")
     args = parser.parse_args()
 

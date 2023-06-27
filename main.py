@@ -94,8 +94,8 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
                     total_successes[attack] += 1
 
             case "manipulation":
-                if manipulation():
-                    total_successes[attack] += 1
+                attack_successes = manipulation(opponent_type, temperature)
+                total_successes[attack] += attack_successes
 
             case "llm":
                 if llm_attack():

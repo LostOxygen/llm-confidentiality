@@ -21,7 +21,7 @@ from src.prompts import SYSTEM_PROMPTS
 from src.colors import TColors
 
 
-def main(attacks: List[str], defense: str, opponent_type: str) -> None:
+def main(attacks: List[str], defense: str, opponent_type: str, temperature: float) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
 
@@ -29,6 +29,7 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
         attack: List[str] - specifies a list of attacks against the LLM
         defense: str - specifies the defense type
         opponent_type: str - specifies the opponent LLM type
+        temperature: float - specifies the opponent LLM temperature to control randomness
 
     Returns:
         None
@@ -58,6 +59,7 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
     print(f"## Attack type: {attacks}")
     print(f"## Defense type: {defense}")
     print(f"## Opponent LLM: {opponent_type}")
+    print(f"## Temperature: {temperature}")
     print("#"*60+"\n")
 
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
@@ -67,19 +69,19 @@ def main(attacks: List[str], defense: str, opponent_type: str) -> None:
 
         match attack:
             case "payload_splitting":
-                attack_successes = payload_splitting(opponent_type)
+                attack_successes = payload_splitting(opponent_type, temperature)
                 total_successes[attack] += attack_successes
 
             case "obfuscation":
-                attack_successes = obfuscation(opponent_type)
+                attack_successes = obfuscation(opponent_type, temperature)
                 total_successes[attack] += attack_successes
 
             case "translation":
-                attack_successes = translation(opponent_type)
+                attack_successes = translation(opponent_type, temperature)
                 total_successes[attack] += attack_successes
 
             case "chatml_abuse":
-                attack_successes = chatml_abuse(opponent_type)
+                attack_successes = chatml_abuse(opponent_type, temperature)
                 total_successes[attack] += attack_successes
 
             case "indirect":
@@ -117,6 +119,8 @@ if __name__ == "__main__":
                         help="specifies the defense type", choices=DEFENSES_LIST)
     parser.add_argument("--opponent_type", "-o", type=str, default="gpt-3.5-turbo-0301",
                         help="specifies the opponent LLM type")
+    parser.add_argument("--temperature", "-t", type=float, default=0.0,
+                        help="specifies the opponent LLM temperature")
     args = parser.parse_args()
 
     main(**vars(args))

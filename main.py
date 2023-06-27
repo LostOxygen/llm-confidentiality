@@ -15,7 +15,8 @@ import openai
 
 from src.attacks import (
         ATTACK_LIST, DEFENSES_LIST, payload_splitting, obfuscation,
-        indirect, manipulation, llm_attack, translation, chatml_abuse
+        indirect, manipulation, llm_attack, translation, chatml_abuse,
+        masking
     )
 from src.prompts import SYSTEM_PROMPTS
 from src.colors import TColors
@@ -82,6 +83,10 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
 
             case "chatml_abuse":
                 attack_successes = chatml_abuse(opponent_type, temperature)
+                total_successes[attack] += attack_successes
+
+            case "masking":
+                attack_successes = masking(opponent_type, temperature)
                 total_successes[attack] += attack_successes
 
             case "indirect":

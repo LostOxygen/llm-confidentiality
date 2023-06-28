@@ -268,7 +268,7 @@ def indirect() -> bool:
 
 def manipulation(llm_type: str, temperature: float) -> bool:
     """
-    Implementation of an manipulation jailbreaking attack
+    Implementation of an manipulation jailbreaking attack (using DAN)
 
     Parameters:
         llm_type: str - the opponent LLM

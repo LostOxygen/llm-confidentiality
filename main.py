@@ -9,8 +9,6 @@ import socket
 import argparse
 from typing import List
 
-# from langchain.llms import OpenAI
-# from langchain.chat_models import ChatOpenAI
 import openai
 
 from src.attacks import (
@@ -66,7 +64,6 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
     for attack in attacks:
-        #opponent_llm = ChatOpenAI(temperature=0.7, model_name=opponent_type)
 
         match attack:
             case "payload_splitting":
@@ -104,8 +101,6 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
             case _:
                 print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
                 print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
-
-        # del opponent_llm
 
     # print the results
     print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")

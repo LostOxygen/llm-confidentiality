@@ -3,8 +3,6 @@ from typing import List, Final
 import base64
 
 from openai import ChatCompletion
-# from langchain.chat_models import ChatOpenAI
-# from langchain.schema import HumanMessage, SystemMessage
 
 from src.utils import evaluate_response
 from src.prompts import SYSTEM_PROMPTS

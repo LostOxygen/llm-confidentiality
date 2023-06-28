@@ -12,9 +12,13 @@ from typing import List
 import openai
 
 from src.attacks import (
-        ATTACK_LIST, DEFENSES_LIST, payload_splitting, obfuscation,
+        ATTACK_LIST, payload_splitting, obfuscation,
         indirect, manipulation, llm_attack, translation, chatml_abuse,
         masking
+    )
+from src.defenses import (
+        DEFENSES_LIST, seq_enclosure, xml_tagging, heuristic_defense,
+        sandwiching, llm_eval, identity_prompt
     )
 from src.prompts import SYSTEM_PROMPTS
 from src.colors import TColors
@@ -63,27 +67,45 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
 
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
-    for attack in attacks:
+    # set the defense function
+    match defense:
+        case "seq_enclosure": defense_func = seq_enclosure
+        case "xml_tagging": defense_func = xml_tagging
+        case "heuristic_defense": defense_func = heuristic_defense
+        case "sandwiching": defense_func = sandwiching
+        case "llm_eval": defense_func = llm_eval
+        case "None": defense_func = identity_prompt
 
+    for attack in attacks:
         match attack:
             case "payload_splitting":
-                attack_successes = payload_splitting(opponent_type, temperature)
+                attack_successes = payload_splitting(opponent_type,
+                                                     temperature,
+                                                     defense_func)
                 total_successes[attack] += attack_successes
 
             case "obfuscation":
-                attack_successes = obfuscation(opponent_type, temperature)
+                attack_successes = obfuscation(opponent_type,
+                                               temperature,
+                                               defense_func)
                 total_successes[attack] += attack_successes
 
             case "translation":
-                attack_successes = translation(opponent_type, temperature)
+                attack_successes = translation(opponent_type,
+                                               temperature,
+                                               defense_func)
                 total_successes[attack] += attack_successes
 
             case "chatml_abuse":
-                attack_successes = chatml_abuse(opponent_type, temperature)
+                attack_successes = chatml_abuse(opponent_type,
+                                                temperature,
+                                                defense_func)
                 total_successes[attack] += attack_successes
 
             case "masking":
-                attack_successes = masking(opponent_type, temperature)
+                attack_successes = masking(opponent_type,
+                                           temperature,
+                                           defense_func)
                 total_successes[attack] += attack_successes
 
             case "indirect":
@@ -91,7 +113,9 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
                     total_successes[attack] += 1
 
             case "manipulation":
-                attack_successes = manipulation(opponent_type, temperature)
+                attack_successes = manipulation(opponent_type,
+                                                temperature,
+                                                defense_func)
                 total_successes[attack] += attack_successes
 
             case "llm":

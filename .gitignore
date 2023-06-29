@@ -1,4 +1,5 @@
 # project specific ignores
+logs/
 key.txt
 
 # Byte-compiled / optimized / DLL files

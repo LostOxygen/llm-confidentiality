@@ -4,7 +4,7 @@ import base64
 
 from openai import ChatCompletion
 
-from src.utils import evaluate_response
+from src.utils import evaluate_response, log_conversation
 from src.prompts import SYSTEM_PROMPTS
 from src.colors import TColors
 
@@ -56,6 +56,9 @@ def payload_splitting(llm_type: str, temperature: float, defense: Callable[[str]
         else:
             print(f"Level {level_id}: {TColors.FAIL}FAIL{TColors.ENDC}")
 
+        log_conversation("payload_splitting", defense.__name__, level_id,
+                         malicious_prompt, response, evaluate_response(response))
+
     return total_successes
 
 
@@ -100,6 +103,9 @@ def obfuscation(llm_type: str, temperature: float, defense: Callable[[str], str]
         else:
             print(f"Level {level_id}: {TColors.FAIL}FAIL{TColors.ENDC}")
 
+        log_conversation("base64_obfuscation", defense.__name__, level_id,
+                         malicious_prompt, response, evaluate_response(response))
+
     return total_successes
 
 
@@ -138,6 +144,9 @@ def translation(llm_type: str, temperature: float, defense: Callable[[str], str]
             total_successes += 1
         else:
             print(f"Level {level_id}: {TColors.FAIL}FAIL{TColors.ENDC}")
+
+        log_conversation("translation", defense.__name__, level_id,
+                         malicious_prompt, response, evaluate_response(response))
 
     return total_successes
 
@@ -198,6 +207,9 @@ def chatml_abuse(llm_type: str, temperature: float, defense: Callable[[str], str
         else:
             print(f"Level {level_id}: {TColors.FAIL}FAIL{TColors.ENDC}")
 
+        log_conversation("chatml_abuse", defense.__name__, level_id,
+                         malicious_prompt, response, evaluate_response(response))
+
     return total_successes
 
 
@@ -244,6 +256,9 @@ def masking(llm_type: str, temperature: float, defense: Callable[[str], str]) ->
             total_successes += 1
         else:
             print(f"Level {level_id}: {TColors.FAIL}FAIL{TColors.ENDC}")
+
+        log_conversation("masking", defense.__name__, level_id,
+                         malicious_prompt, response, evaluate_response(response))
 
     return total_successes
 
@@ -297,6 +312,9 @@ def manipulation(llm_type: str, temperature: float, defense: Callable[[str], str
             total_successes += 1
         else:
             print(f"Level {level_id}: {TColors.FAIL}FAIL{TColors.ENDC}")
+
+        log_conversation("manipulation", defense.__name__, level_id,
+                         malicious_prompt, response, evaluate_response(response))
 
     return total_successes
 

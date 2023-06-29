@@ -1,12 +1,19 @@
 # Attacks and Defenses against the Confidentiality of Large Language Models
 Framework for Testing Attacks and Defenses against the Confidentiality of Large Language Models (LLMs) 
 
-## Usage:
+## Setup
+Before running the code, please install the requirements:
+```
+pip install -r requirements.txt
+```
+and also create a ```key.txt``` file containing your OpenAI API key in the root directory of the project.
+
+## Usage
 ```
 python main.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFENSE] [-o | --opponent_type OPPONENT_TYPE] [-t | --temperature TEMPERATURE]
 ```
 
-## Example Usage:
+## Example Usage
 ```python
 python main.py --attacks "prompt_injection" "obfuscation" --defense "sanitization"
 ```
@@ -24,9 +31,10 @@ python main.py --attacks "prompt_injection" "obfuscation" --defense "sanitizatio
 ## Supported Attacks and Defenses
 | Attack | Defense |
 |--------|---------|
-|prompt_injection | sanitization |
-|obfuscation | prompt_based |
-|indirect | advs_training |
-|manipulation | sandboxing |
-|llm |  |
-| translation | |
+|payload_splitting | seq_enclosure |
+|obfuscation | xml_tagging |
+|manipulation | heuristic_defense |
+|translation | sandwiching |
+|llm | llm_eval |
+|chatml_abuse | identity_prompt |
+|masking| |

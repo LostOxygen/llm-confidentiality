@@ -9,6 +9,7 @@ DEFENSES_LIST: Final[List[str]] = ["seq_enclosure", "xml_tagging", "heuristic_de
 def identity_prompt(prompt: str) -> None:
     """
     Uses the prompt as is without any modifications.
+    (This is used when defense is set to 'None')
     """
     return prompt
 

@@ -11,3 +11,15 @@ class TColors:
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
+
+
+ATTACK_NAMES: dict[str, str] = {
+    "payload_splitting": "Payload Splitting",
+    "obfuscation": "Base64 Obfuscation",
+    "indirect": "Indirect",
+    "manipulation": "Manipulation",
+    "llm": "LLM",
+    "translation": "Translation",
+    "chatml_abuse": "ChatML-Abuse",
+    "masking": "Masking"
+}

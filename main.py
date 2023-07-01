@@ -11,6 +11,7 @@ from typing import List
 
 import openai
 
+from src.strategy import Strategy
 from src.attacks import (
         ATTACK_LIST, payload_splitting, obfuscation,
         indirect, manipulation, llm_attack, translation, chatml_abuse,
@@ -75,56 +76,31 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
         case "sandwiching": defense_func = sandwiching
         case "llm_eval": defense_func = llm_eval
         case "None": defense_func = identity_prompt
+        case _: defense_func = identity_prompt
 
     for attack in attacks:
+        # set the attack function
         match attack:
-            case "payload_splitting":
-                attack_successes = payload_splitting(opponent_type,
-                                                     temperature,
-                                                     defense_func)
-                total_successes[attack] += attack_successes
-
-            case "obfuscation":
-                attack_successes = obfuscation(opponent_type,
-                                               temperature,
-                                               defense_func)
-                total_successes[attack] += attack_successes
-
-            case "translation":
-                attack_successes = translation(opponent_type,
-                                               temperature,
-                                               defense_func)
-                total_successes[attack] += attack_successes
-
-            case "chatml_abuse":
-                attack_successes = chatml_abuse(opponent_type,
-                                                temperature,
-                                                defense_func)
-                total_successes[attack] += attack_successes
-
-            case "masking":
-                attack_successes = masking(opponent_type,
-                                           temperature,
-                                           defense_func)
-                total_successes[attack] += attack_successes
-
-            case "indirect":
-                if indirect():
-                    total_successes[attack] += 1
-
-            case "manipulation":
-                attack_successes = manipulation(opponent_type,
-                                                temperature,
-                                                defense_func)
-                total_successes[attack] += attack_successes
-
-            case "llm":
-                if llm_attack():
-                    total_successes[attack] += 1
-
+            case "payload_splitting": attack_func = payload_splitting
+            case "obfuscation": attack_func = obfuscation
+            case "indirect": attack_func = indirect
+            case "manipulation": attack_func = manipulation
+            case "llm": attack_func = llm_attack
+            case "translation": attack_func = translation
+            case "chatml_abuse": attack_func = chatml_abuse
+            case "masking": attack_func = masking
             case _:
                 print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
                 print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
+                sys.exit(1)
+
+        # initialize the strategy
+        strategy = Strategy(attack_func=attack_func, defense_func=defense_func,
+                            llm_type=opponent_type, temperature=temperature)
+
+        # run the attack
+        total_successes[attack] = strategy.execute()
+
 
     # print the results
     print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")

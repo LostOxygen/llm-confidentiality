@@ -49,7 +49,7 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
 
     except FileNotFoundError:
         print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
-            f"file and put into the root directoryf{TColors.ENDC}")
+              f"file and put it into the root directory.{TColors.ENDC}")
         sys.exit(1)
 
 

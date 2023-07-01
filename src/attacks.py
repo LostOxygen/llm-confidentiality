@@ -4,8 +4,6 @@ import base64
 
 from openai import ChatCompletion
 
-from src.colors import TColors
-
 ATTACK_LIST: Final[List[str]] = ["payload_splitting", "obfuscation", "indirect",
                                  "manipulation", "llm", "translation", "chatml_abuse",
                                  "masking"]

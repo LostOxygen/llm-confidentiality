@@ -19,7 +19,7 @@ class Strategy:
         """Executes the strategy and returns the number of successes"""
         num_successes: int = 0
         print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
-              f" {ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
+              f"{ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
 
         for level_id in range(0, len(SYSTEM_PROMPTS)):
             sys_prompt = SYSTEM_PROMPTS[f"level_{level_id}"]

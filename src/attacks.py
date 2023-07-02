@@ -4,9 +4,8 @@ import base64
 
 from openai import ChatCompletion
 
-ATTACK_LIST: Final[List[str]] = ["payload_splitting", "obfuscation", "indirect",
-                                 "manipulation", "llm", "translation", "chatml_abuse",
-                                 "masking"]
+ATTACK_LIST: Final[List[str]] = ["payload_splitting", "obfuscation", "manipulation",
+                                 "translation", "chatml_abuse", "masking"]
 
 
 def payload_splitting(system_prompt: str, llm_type: str,

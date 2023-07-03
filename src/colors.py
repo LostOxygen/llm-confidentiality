@@ -1,6 +1,7 @@
 """helper library for printing colored text"""
+from enum import Enum
 
-class TColors:
+class TColors(Enum):
     """Color class with ANSI escape codes for colored text"""
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"

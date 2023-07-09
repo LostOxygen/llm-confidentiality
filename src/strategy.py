@@ -4,6 +4,7 @@ from typing import Callable
 from src.utils import log_conversation
 from src.colors import TColors, ATTACK_NAMES
 from src.prompts import SECRET_KEY, SYSTEM_PROMPTS
+from src.api import ChatAPI
 
 class Strategy:
     """Strategy pattern interface"""
@@ -14,6 +15,8 @@ class Strategy:
         self.defense_func: Callable = defense_func
         self.llm_type: str = llm_type
         self.temperature: float = temperature
+        self.chat_api: ChatAPI = ChatAPI()
+
 
     def execute(self) -> int:
         """Executes the strategy and returns the number of successes"""
@@ -23,11 +26,15 @@ class Strategy:
 
         for level_id in range(0, len(SYSTEM_PROMPTS)):
             sys_prompt = SYSTEM_PROMPTS[f"level_{level_id}"]
+            self.chat_api.add_message("system", sys_prompt)
 
             prompt, response = self.attack_func(system_prompt=sys_prompt,
                                                 llm_type=self.llm_type,
                                                 temp=self.temperature,
                                                 defense=self.defense_func)
+
+            self.chat_api.add_message("user", prompt)
+            self.chat_api.add_message("assistant", response)
 
             if self._evaluate_response(response):
                 print(f"Level {level_id}: {TColors.OKGREEN}SUCCESS{TColors.ENDC}")

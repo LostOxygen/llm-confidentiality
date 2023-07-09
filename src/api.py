@@ -16,8 +16,7 @@ class ChatAPI:
     def add_message(self, user: str, message: str):
         """adds messages to the chat visualization"""
         timestamp = datetime.now().strftime("%d. %B %Y %I:%M%p")
-        message = message.replace("\n", "")
-        final_msg = f"MSG:{user}:{message}:{timestamp}\n"
+        final_msg = f"MSG|{user}|{message}|{timestamp}@"
         final_msg.encode("utf-8")
 
         with open(PATH+"chat_log.txt", "a", encoding="utf-8") as chat_file:

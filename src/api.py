@@ -8,13 +8,15 @@ PATH: Final[str] = "/tmp/llm_chat/"
 class ChatAPI:
     """socket API class to interact with ChatVisualization class"""
     def __init__(self):
+        pass
+
+    @staticmethod
+    def add_message(user: str, message: str):
+        """adds messages to the chat visualization"""
         # check if the paths are valid
         if not os.path.exists(PATH):
             os.makedirs(PATH)
 
-
-    def add_message(self, user: str, message: str):
-        """adds messages to the chat visualization"""
         timestamp = datetime.now().strftime("%d. %B %Y %I:%M%p")
         final_msg = f"MSG|{user}|{message}|{timestamp}@"
         final_msg.encode("utf-8")

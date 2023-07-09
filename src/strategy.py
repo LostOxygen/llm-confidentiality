@@ -15,7 +15,7 @@ class Strategy:
         self.defense_func: Callable = defense_func
         self.llm_type: str = llm_type
         self.temperature: float = temperature
-        self.chat_api: ChatAPI = ChatAPI()
+        self.chat_api_add_messages: ChatAPI = ChatAPI.add_message
 
 
     def execute(self) -> int:
@@ -26,15 +26,15 @@ class Strategy:
 
         for level_id in range(0, len(SYSTEM_PROMPTS)):
             sys_prompt = SYSTEM_PROMPTS[f"level_{level_id}"]
-            self.chat_api.add_message("system", sys_prompt)
+            self.chat_api_add_messages("system", sys_prompt)
 
             prompt, response = self.attack_func(system_prompt=sys_prompt,
                                                 llm_type=self.llm_type,
                                                 temp=self.temperature,
                                                 defense=self.defense_func)
 
-            self.chat_api.add_message("user", prompt)
-            self.chat_api.add_message("assistant", response)
+            self.chat_api_add_messages("user", prompt)
+            self.chat_api_add_messages("assistant", response)
 
             if self._evaluate_response(response):
                 print(f"Level {level_id}: {TColors.OKGREEN}SUCCESS{TColors.ENDC}")

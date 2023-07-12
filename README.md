@@ -15,7 +15,7 @@ python main.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFE
 
 ## Example Usage
 ```python
-python main.py --attacks "prompt_injection" "obfuscation" --defense "sanitization"
+python main.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 ```
 
 ## Arguments
@@ -36,5 +36,5 @@ python main.py --attacks "prompt_injection" "obfuscation" --defense "sanitizatio
 |manipulation | heuristic_defense |
 |translation | sandwiching |
 |llm | llm_eval |
-|chatml_abuse | identity_prompt |
+|chatml_abuse | |
 |masking| |

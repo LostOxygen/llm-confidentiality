@@ -10,11 +10,12 @@ class Strategy:
     """Strategy pattern interface"""
 
     def __init__(self, attack_func: Callable, defense_func: Callable,
-                 llm_type: str, temperature: float):
+                 llm_type: str, temperature: float, max_level: int):
         self.attack_func: Callable = attack_func
         self.defense_func: Callable = defense_func
         self.llm_type: str = llm_type
         self.temperature: float = temperature
+        self.max_level: int = max_level
         self.chat_api_add_messages: Callable = ChatAPI.add_message
 
 
@@ -24,7 +25,7 @@ class Strategy:
         print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
               f"{ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
 
-        for level_id in range(0, len(SYSTEM_PROMPTS)):
+        for level_id in range(0, self.max_level):
             sys_prompt = SYSTEM_PROMPTS[f"level_{level_id}"]
 
             prompt, response = self.attack_func(system_prompt=sys_prompt,

@@ -25,7 +25,9 @@ from src.prompts import SYSTEM_PROMPTS
 from src.colors import TColors
 
 
-def main(attacks: List[str], defense: str, opponent_type: str, temperature: float) -> None:
+def main(attacks: List[str], defense: str, opponent_type: str,
+         temperature: float, max_level: int,
+         ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
 
@@ -34,6 +36,7 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
         defense: str - specifies the defense type
         opponent_type: str - specifies the opponent LLM type
         temperature: float - specifies the opponent LLM temperature to control randomness
+        max_level: int - max. system prompt level upon which to test the attacks to
 
     Returns:
         None
@@ -57,12 +60,16 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
     if "all" in attacks:
         attacks = ATTACK_LIST
 
+    if max_level > len(SYSTEM_PROMPTS):
+        max_level = len(SYSTEM_PROMPTS)
+
     print("\n"+"#"*60)
     print("## " + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
     print(f"## System: {os.cpu_count()} CPU cores on {socket.gethostname()}")
     print(f"## Attack type: {attacks}")
     print(f"## Defense type: {defense}")
     print(f"## Opponent LLM: {opponent_type}")
+    print(f"## Testing Level 0-{max_level}")
     print(f"## Temperature: {temperature}")
     print("#"*60+"\n")
 
@@ -96,7 +103,8 @@ def main(attacks: List[str], defense: str, opponent_type: str, temperature: floa
 
         # initialize the strategy
         strategy = Strategy(attack_func=attack_func, defense_func=defense_func,
-                            llm_type=opponent_type, temperature=temperature)
+                            llm_type=opponent_type, temperature=temperature,
+                            max_level=max_level)
 
         # run the attack
         total_successes[attack] = strategy.execute()
@@ -121,6 +129,8 @@ if __name__ == "__main__":
                         help="specifies the opponent LLM type")
     parser.add_argument("--temperature", "-t", type=float, default=0.0,
                         help="specifies the opponent LLM temperature")
+    parser.add_argument("--max_level", "-m", type=int, default=10,
+                        help="specifies the max system prompt level to test against")
     args = parser.parse_args()
 
     main(**vars(args))

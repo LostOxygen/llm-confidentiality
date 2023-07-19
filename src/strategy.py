@@ -38,11 +38,18 @@ class Strategy:
             self.chat_api_add_messages("user", prompt)
             self.chat_api_add_messages("assistant", response)
 
+            if level_id < 10:
+                succ_result_str = f"{'SUCCESS':>8}"
+                fail_result_str = f"{'FAIL':>8}"
+            else:
+                succ_result_str = f"{'SUCCESS':>7}"
+                fail_result_str = f"{'FAIL':>7}"
+
             if self._evaluate_response(response):
-                print(f"Level {level_id}: {TColors.OKGREEN}SUCCESS{TColors.ENDC}")
+                print(f"Level {level_id}: {TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
                 num_successes += 1
             else:
-                print(f"Level {level_id}: {TColors.FAIL}FAIL{TColors.ENDC}")
+                print(f"Level {level_id}: {TColors.FAIL}{fail_result_str}{TColors.ENDC}")
 
             log_conversation("manipulation", self.defense_func.__name__, level_id,
                              prompt, response, self._evaluate_response(response))

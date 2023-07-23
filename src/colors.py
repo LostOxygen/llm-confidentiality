@@ -21,5 +21,6 @@ ATTACK_NAMES: dict[str, str] = {
     "llm": "LLM",
     "translation": "Translation",
     "chatml_abuse": "ChatML-Abuse",
-    "masking": "Masking"
+    "masking": "Masking",
+    "typoglycemia": "Typoglycemia"
 }

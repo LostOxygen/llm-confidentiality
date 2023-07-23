@@ -15,7 +15,7 @@ from src.strategy import Strategy
 from src.attacks import (
         ATTACK_LIST, payload_splitting, obfuscation,
         indirect, manipulation, llm_attack, translation, chatml_abuse,
-        masking
+        masking, typoglycemia
     )
 from src.defenses import (
         DEFENSES_LIST, seq_enclosure, xml_tagging, heuristic_defense,
@@ -96,6 +96,7 @@ def main(attacks: List[str], defense: str, opponent_type: str,
             case "translation": attack_func = translation
             case "chatml_abuse": attack_func = chatml_abuse
             case "masking": attack_func = masking
+            case "typoglycemia": attack_func = typoglycemia
             case _:
                 print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
                 print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
@@ -114,7 +115,7 @@ def main(attacks: List[str], defense: str, opponent_type: str,
     print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
     for attack, successes in total_successes.items():
         print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
-              f"{len(SYSTEM_PROMPTS)}")
+              f"{max_level}")
 
     return 0
 

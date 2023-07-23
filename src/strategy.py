@@ -51,7 +51,8 @@ class Strategy:
             else:
                 print(f"Level {level_id}: {TColors.FAIL}{fail_result_str}{TColors.ENDC}")
 
-            log_conversation("manipulation", self.defense_func.__name__, level_id,
+            log_conversation(self.attack_func.__name__,
+                             self.defense_func.__name__, level_id,
                              prompt, response, self._evaluate_response(response))
 
         return num_successes

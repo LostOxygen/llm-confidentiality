@@ -45,7 +45,7 @@ class Strategy:
                 succ_result_str = f"{'SUCCESS':>7}"
                 fail_result_str = f"{'FAIL':>7}"
 
-            if self._evaluate_response(response):
+            if self.__evaluate_response(response):
                 print(f"Level {level_id}: {TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
                 num_successes += 1
             else:
@@ -53,12 +53,12 @@ class Strategy:
 
             log_conversation(self.attack_func.__name__,
                              self.defense_func.__name__, level_id,
-                             prompt, response, self._evaluate_response(response))
+                             prompt, response, self.__evaluate_response(response))
 
         return num_successes
 
 
-    def _evaluate_response(self, response: str) -> bool:
+    def __evaluate_response(self, response: str) -> bool:
         """
         Evaluates the response of the opponent LLM
 

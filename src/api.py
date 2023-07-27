@@ -32,8 +32,11 @@ class ChatAPI:
         if not os.path.exists(PATH):
             os.makedirs(PATH)
 
+        message += "\n"
+        message.encode("utf-8")
+
         with open(PATH+"chat_input_log.txt", "a", encoding="utf-8") as chat_file:
-            chat_file.write(message.encode("utf-8"))
+            chat_file.write(message)
 
 
     @staticmethod

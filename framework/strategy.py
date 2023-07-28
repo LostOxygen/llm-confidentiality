@@ -1,10 +1,10 @@
 """library for strategy pattern implementations"""
 from typing import Callable
 
-from src.utils import log_conversation
-from src.colors import TColors, ATTACK_NAMES
-from src.prompts import SECRET_KEY, SYSTEM_PROMPTS
-from src.api import ChatAPI
+from framework.utils import log_conversation
+from framework.colors import TColors, ATTACK_NAMES
+from framework.prompts import SECRET_KEY, SYSTEM_PROMPTS
+from framework.api import ChatAPI
 
 class Strategy:
     """Strategy pattern interface"""

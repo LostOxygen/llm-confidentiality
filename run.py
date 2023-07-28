@@ -11,18 +11,18 @@ from typing import List
 
 import openai
 
-from src.strategy import Strategy
-from src.attacks import (
+from framework.strategy import Strategy
+from framework.attacks import (
         ATTACK_LIST, payload_splitting, obfuscation,
         indirect, manipulation, llm_attack, translation, chatml_abuse,
         masking, typoglycemia
     )
-from src.defenses import (
+from framework.defenses import (
         DEFENSES_LIST, seq_enclosure, xml_tagging, heuristic_defense,
         sandwiching, llm_eval, identity_prompt
     )
-from src.prompts import SYSTEM_PROMPTS
-from src.colors import TColors
+from framework.prompts import SYSTEM_PROMPTS
+from framework.colors import TColors
 
 
 def main(attacks: List[str], defense: str, opponent_type: str,

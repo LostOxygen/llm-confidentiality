@@ -40,14 +40,18 @@ class ChatAPI:
 
 
     @staticmethod
-    def get_first_message(file_name: str = "chat_input_log.txt") -> str:
+    def get_first_message(file_name: str = "chat_input_log.txt", split_char: str = "\n") -> str:
         """returns the first (oldest) message in the input chat log and removes it from the log"""
         with open(PATH+file_name, "r", encoding="utf-8") as chat_file:
-            complete_log = chat_file.readlines()
-            first_line = complete_log.pop(0) # remove the first line from the log
+            # read the whole file and split it by the split_char
+            complete_log = chat_file.read()
+
+            # remove the first line from the log
+            first_line = complete_log[:complete_log.find(split_char)]
+            remaining_log = complete_log[complete_log.find(split_char)+2:]
 
         with open(PATH+file_name, "w", encoding="utf-8") as chat_file:
-            chat_file.write(complete_log)
+            chat_file.write(remaining_log)
 
         return first_line
 
@@ -57,5 +61,8 @@ class ChatAPI:
         """returns all messages in the input chat log and clears the log"""
         with open(PATH+file_name, "r", encoding="utf-8") as chat_file:
             complete_log = chat_file.readlines()
+
+        with open(PATH+file_name, "w", encoding="utf-8") as chat_file:
+            chat_file.write("")
 
         return complete_log

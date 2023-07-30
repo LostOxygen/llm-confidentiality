@@ -28,11 +28,11 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 | -t, --temperature | float | specifies the temperature for the LLM (default: 0.0) to control the randomness |
 
 ## Supported Large Language Models (Chat-Only)
-| Model | Paramter Specifier | Link |
+| Model | Parameter Specifier | Link |
 |-------|------|-----|
-| GPT-3.5-Turbo | gpt-3.5-turbo/gpt-3.5-turbo-0301/gpt-3.5-turbo-0613 | [Link](https://platform.openai.com/docs/models/gpt-3-5)|
-| GPT-4 | gpt-4/gpt-4-0613 | [Link](https://platform.openai.com/docs/models/gpt-4)|
-| LLaMA2 | llama2 | [Link](https://huggingface.co/meta-llama) |
+| GPT-3.5-Turbo | ```gpt-3.5-turbo``` / ```gpt-3.5-turbo-0301``` / ```gpt-3.5-turbo-0613``` | [Link](https://platform.openai.com/docs/models/gpt-3-5)|
+| GPT-4 | ```gpt-4/gpt-4-0613``` | [Link](https://platform.openai.com/docs/models/gpt-4)|
+| LLaMA2 | ```llama2``` | [Link](https://huggingface.co/meta-llama) |
 
 ## Supported Attacks and Defenses
 | Attack | Defense |

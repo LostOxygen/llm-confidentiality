@@ -1,5 +1,8 @@
 """library for LLM models, functions and helper stuff"""
+import os
+import torch
 from openai import ChatCompletion
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 class LLM():
     """abstract implementation of a genereric LLM model"""
@@ -31,6 +34,34 @@ class LLM():
                                                    messages=messages,
                                                    temperature=self.temperature)
                 response = completion.choices[0].message.content
+
+            case "llama2":
+                tokenizer = AutoTokenizer.from_pretrained(
+                                "meta-llama/Llama-2-7b-chat-hf",
+                                token=os.environ["HF_TOKEN"],
+                            )
+
+                model = AutoModelForCausalLM.from_pretrained(
+                            "meta-llama/Llama-2-7b-chat-hf",
+                            torch_dtype=torch.bfloat16,
+                            load_in_8bit=True,
+                            low_cpu_mem_usage=True,
+                            token=os.environ["HF_TOKEN"],
+                        )
+
+                formatted_messages = f"""<s>[INST] <<SYS>>
+                    {system_prompt}
+                    <</SYS>>
+                    {user_prompt}
+                    <</INST>>
+                """
+
+                inputs = tokenizer.encode(formatted_messages, return_tensors="pt")
+                outputs = model.generate(inputs, do_sample=True, temperature=self.temperature)
+                response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+            case "llama":
+                raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 

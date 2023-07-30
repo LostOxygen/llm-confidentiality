@@ -25,7 +25,7 @@ from framework.prompts import SYSTEM_PROMPTS
 from framework.colors import TColors
 
 
-def main(attacks: List[str], defense: str, opponent_type: str,
+def main(attacks: List[str], defense: str, llm_type: str,
          temperature: float, max_level: int,
          ) -> None:
     """
@@ -34,7 +34,7 @@ def main(attacks: List[str], defense: str, opponent_type: str,
     Parameters: 
         attack: List[str] - specifies a list of attacks against the LLM
         defense: str - specifies the defense type
-        opponent_type: str - specifies the opponent LLM type
+        llm_type: str - specifies the opponent LLM type
         temperature: float - specifies the opponent LLM temperature to control randomness
         max_level: int - max. system prompt level upon which to test the attacks to
 
@@ -54,7 +54,24 @@ def main(attacks: List[str], defense: str, opponent_type: str,
     except FileNotFoundError:
         print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
               f"file and put it into the root directory.{TColors.ENDC}")
-        sys.exit(1)
+        if llm_type in ["gpt-3.5-turbo" | "gpt-3.5-turbo-0301" | "gpt-4"]:
+            sys.exit(1)
+
+    # paste the key into the key.txt file and put into the root directory
+    try:
+        with open(file="hf_token.txt", mode="r", encoding="utf-8") as f:
+            key = f.read()
+            assert key != "", f"{TColors.FAIL}HF Token is empty.{TColors.ENDC}"
+
+            os.environ["HF_TOKEN"] = key
+            openai.api_key = key
+            print(f"{TColors.OKGREEN}Huggingface token loaded.{TColors.ENDC}")
+
+    except FileNotFoundError:
+        print(f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
+              f"file and put it into the root directory.{TColors.ENDC}")
+        if llm_type in ["llama", "llama2"]:
+            sys.exit(1)
 
 
     if "all" in attacks:
@@ -68,7 +85,7 @@ def main(attacks: List[str], defense: str, opponent_type: str,
     print(f"## System: {os.cpu_count()} CPU cores on {socket.gethostname()}")
     print(f"## Attack type: {attacks}")
     print(f"## Defense type: {defense}")
-    print(f"## Opponent LLM: {opponent_type}")
+    print(f"## Opponent LLM: {llm_type}")
     print(f"## Testing Level 0-{max_level}")
     print(f"## Temperature: {temperature}")
     print("#"*60+"\n")
@@ -104,7 +121,7 @@ def main(attacks: List[str], defense: str, opponent_type: str,
 
         # initialize the strategy
         strategy = Strategy(attack_func=attack_func, defense_func=defense_func,
-                            llm_type=opponent_type, temperature=temperature,
+                            llm_type=llm_type, temperature=temperature,
                             max_level=max_level)
 
         # run the attack
@@ -126,7 +143,7 @@ if __name__ == "__main__":
                         help="specifies the attack types", nargs="+")
     parser.add_argument("--defense", "-d", type=str, default="None",
                         help="specifies the defense type", choices=DEFENSES_LIST)
-    parser.add_argument("--opponent_type", "-o", type=str, default="gpt-3.5-turbo-0301",
+    parser.add_argument("--llm_type", "-llm", type=str, default="gpt-3.5-turbo-0301",
                         help="specifies the opponent LLM type")
     parser.add_argument("--temperature", "-t", type=float, default=0.0,
                         help="specifies the opponent LLM temperature")

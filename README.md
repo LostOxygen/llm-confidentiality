@@ -6,7 +6,7 @@ Before running the code, install the requirements:
 ```
 pip install -r requirements.txt
 ```
-and create a ```key.txt``` file containing your OpenAI API key in the root directory of this project.
+Create both a ```key.txt``` file containing your OpenAI API key as well as a ```hf_token.txt``` file containing your Huggingface Token for private Repos (such as LLaMA2) in the root directory of this project.
 
 ## Usage
 ```
@@ -24,9 +24,15 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 | -h, --help | | show this help message and exit |
 | -a, --attacks | List[str] | specifies the attacks which will be utilized against the LLM (default: "payload_splitting")|
 | -d, --defense | str | specifies the defense for the LLM (default: None)|
-| -o, --opponent_type | str | specifies the type of opponent (default: "gpt-3.5-turbo") |
+| -llm, --llm_type | str | specifies the type of opponent (default: "gpt-3.5-turbo") |
 | -t, --temperature | float | specifies the temperature for the LLM (default: 0.0) to control the randomness |
 
+## Supported Large Language Models (Chat-Only)
+| Model | Link |
+|-------|------|
+| GPT-3.5-Turbo | [Link](https://platform.openai.com/docs/models/gpt-3-5)|
+| GPT-4 | [Link](https://platform.openai.com/docs/models/gpt-4)|
+| LLaMA2 | [Link](https://huggingface.co/meta-llama) |
 
 ## Supported Attacks and Defenses
 | Attack | Defense |

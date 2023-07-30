@@ -10,12 +10,12 @@ Create both a ```key.txt``` file containing your OpenAI API key as well as a ```
 
 ## Usage
 ```
-python run.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFENSE] [-o | --opponent_type OPPONENT_TYPE] [-m | --max_level MAX_LEVEL] [-t | --temperature TEMPERATURE]
+python run.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFENSE] [-llm | --llm_type LLM_TYPE] [-m | --max_level MAX_LEVEL] [-t | --temperature TEMPERATURE]
 ```
 
 ## Example Usage
 ```python
-python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging" --max_level 15 --temperature 0.7
+python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging" --max_level 15 --llm_type "llama2" --temperature 0.7
 ```
 
 ## Arguments
@@ -28,11 +28,11 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 | -t, --temperature | float | specifies the temperature for the LLM (default: 0.0) to control the randomness |
 
 ## Supported Large Language Models (Chat-Only)
-| Model | Link |
-|-------|------|
-| GPT-3.5-Turbo | [Link](https://platform.openai.com/docs/models/gpt-3-5)|
-| GPT-4 | [Link](https://platform.openai.com/docs/models/gpt-4)|
-| LLaMA2 | [Link](https://huggingface.co/meta-llama) |
+| Model | Paramter Specifier | Link |
+|-------|------|-----|
+| GPT-3.5-Turbo | gpt-3.5-turbo/gpt-3.5-turbo-0301/gpt-3.5-turbo-0613 | [Link](https://platform.openai.com/docs/models/gpt-3-5)|
+| GPT-4 | gpt-4/gpt-4-0613 | [Link](https://platform.openai.com/docs/models/gpt-4)|
+| LLaMA2 | llama2 | [Link](https://huggingface.co/meta-llama) |
 
 ## Supported Attacks and Defenses
 | Attack | Defense |

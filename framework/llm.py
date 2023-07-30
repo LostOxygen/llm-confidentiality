@@ -29,7 +29,8 @@ class LLM():
         ]
 
         match self.llm_type:
-            case ("gpt-3.5-turbo" | "gpt-3.5-turbo-0301" | "gpt-4"):
+            case ("gpt-3.5-turbo" | "gpt-3.5-turbo-0301" | 
+                  "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"):
                 completion = ChatCompletion.create(model=self.llm_type,
                                                    messages=messages,
                                                    temperature=self.temperature)

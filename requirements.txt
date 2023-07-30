@@ -1,2 +1,5 @@
 langchain
 openai
+accelerate
+transformers
+huggingface-hub

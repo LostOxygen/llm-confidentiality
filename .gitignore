@@ -1,6 +1,7 @@
 # project specific ignores
 logs/
 key.txt
+hf_token.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

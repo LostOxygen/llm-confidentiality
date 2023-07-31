@@ -26,6 +26,8 @@ from framework.defenses import (
 from framework.prompts import SYSTEM_PROMPTS
 from framework.colors import TColors
 
+os.environ["TRANSFORMERS_CACHE"] = "/data/"
+
 
 def main(attacks: List[str], defense: str, llm_type: str,
          temperature: float, max_level: int,

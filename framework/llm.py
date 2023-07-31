@@ -78,10 +78,10 @@ class LLM():
                     <</INST>>
                 """
 
-                inputs = self.tokenizer.encode(formatted_messages, return_tensors="pt").to("cuda:0")
+                inputs = self.tokenizer.encode(formatted_messages, return_tensors="pt").input_ids
                 outputs = self.model.generate(inputs, do_sample=True,
                                               temperature=self.temperature,
-                                              max_length=10000)
+                                              max_length=5000)
                 response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
                 # remove the previous chat history from the response

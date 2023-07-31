@@ -30,7 +30,6 @@ class LLM():
                             load_in_8bit=True,
                             low_cpu_mem_usage=True,
                             token=os.environ["HF_TOKEN"],
-                            max_memory=f"{int(torch.cuda.mem_get_info()[0]/1024**3)-2}GB"
                         )
 
             case "llama":

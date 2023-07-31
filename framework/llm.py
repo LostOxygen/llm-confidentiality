@@ -76,6 +76,11 @@ class LLM():
                 outputs = self.model.generate(inputs, do_sample=True, temperature=self.temperature)
                 response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
+                # remove the previous chat history from the response 
+                # so only the models' actual response remains
+                response = response[response.find("/INST")+5:]
+
+
             case "llama":
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
             case _:

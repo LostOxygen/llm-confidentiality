@@ -14,6 +14,7 @@ class Strategy:
                  llm_type: str, temperature: float, max_level: int):
         self.attack_func: Callable = attack_func
         self.defense_func: Callable = defense_func
+        self.llm_type = llm_type
         self.llm: LLM = LLM(llm_type, temperature)
         self.max_level: int = max_level
         self.chat_api_add_messages: Callable = ChatAPI.add_message
@@ -53,7 +54,7 @@ class Strategy:
             else:
                 print(f"Level {level_id}: {TColors.FAIL}{fail_result_str}{TColors.ENDC}")
 
-            log_conversation(self.attack_func.__name__,
+            log_conversation(self.llm_type, self.attack_func.__name__,
                              self.defense_func.__name__, level_id,
                              mal_prompt, response, self.__evaluate_response(response))
 

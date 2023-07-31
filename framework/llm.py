@@ -55,7 +55,7 @@ class LLM():
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
             case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
-                self.temperature = max(0.0, min(self.temperature, 2.0))
+                self.temperature = max(0.1, min(self.temperature, 2.0))
 
                 model_name = "lmsys/"
                 if self.llm_type.split("-")[1] == "7b":
@@ -137,7 +137,7 @@ class LLM():
                 inputs = self.tokenizer.encode(formatted_messages, return_tensors="pt").to("cuda:0")
                 outputs = self.model.generate(inputs, do_sample=True,
                                               temperature=self.temperature,
-                                              max_length=5000)
+                                              max_length=4096)
                 response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
                 # remove the previous chat history from the response

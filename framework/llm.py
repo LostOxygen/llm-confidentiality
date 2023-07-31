@@ -78,7 +78,7 @@ class LLM():
                     <</INST>>
                 """
 
-                inputs = self.tokenizer.encode(formatted_messages, return_tensors="pt").input_ids
+                inputs = self.tokenizer.encode(formatted_messages, return_tensors="pt").to("cuda:0")
                 outputs = self.model.generate(inputs, do_sample=True,
                                               temperature=self.temperature,
                                               max_length=5000)

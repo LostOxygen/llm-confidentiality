@@ -31,12 +31,14 @@ class LLM():
         match self.llm_type:
             case ("gpt-3.5-turbo" | "gpt-3.5-turbo-0301" |
                   "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"):
+                adjusted_temp = max(0.0, min(self.temperature, 2.0))
                 completion = ChatCompletion.create(model=self.llm_type,
                                                    messages=messages,
-                                                   temperature=self.temperature)
+                                                   temperature=adjusted_temp)
                 response = completion.choices[0].message.content
 
             case "llama2":
+                adjusted_temp = max(0.1, min(self.temperature, 5.0))
                 tokenizer = AutoTokenizer.from_pretrained(
                                 "meta-llama/Llama-2-7b-chat-hf",
                                 token=os.environ["HF_TOKEN"],
@@ -58,7 +60,7 @@ class LLM():
                 """
 
                 inputs = tokenizer.encode(formatted_messages, return_tensors="pt")
-                outputs = model.generate(inputs, do_sample=True, temperature=self.temperature)
+                outputs = model.generate(inputs, do_sample=True, temperature=adjusted_temp)
                 response = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
             case "llama":

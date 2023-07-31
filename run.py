@@ -76,6 +76,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
         if llm_type in ["llama", "llama2"]:
             sys.exit(1)
 
+    # setting devies and variables correctly
     if not torch.cuda.is_available():
         device = "cpu"
     else:
@@ -155,7 +156,7 @@ if __name__ == "__main__":
                         help="specifies the defense type", choices=DEFENSES_LIST)
     parser.add_argument("--llm_type", "-llm", type=str, default="gpt-3.5-turbo-0301",
                         help="specifies the opponent LLM type")
-    parser.add_argument("--temperature", "-t", type=float, default=0.0,
+    parser.add_argument("--temperature", "-t", type=float, default=0.1,
                         help="specifies the opponent LLM temperature")
     parser.add_argument("--max_level", "-m", type=int, default=10,
                         help="specifies the max system prompt level to test against")

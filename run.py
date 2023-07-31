@@ -46,7 +46,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
     # paste the key into the key.txt file and put into the root directory
     try:
         with open(file="key.txt", mode="r", encoding="utf-8") as f:
-            key = f.read()
+            key = f.read().replace("\n", "")
             assert key != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
 
             os.environ["OPENAI_API_KEY"] = key
@@ -62,11 +62,10 @@ def main(attacks: List[str], defense: str, llm_type: str,
     # paste the key into the key.txt file and put into the root directory
     try:
         with open(file="hf_token.txt", mode="r", encoding="utf-8") as f:
-            key = f.read()
+            key = f.read().replace("\n", "")
             assert key != "", f"{TColors.FAIL}HF Token is empty.{TColors.ENDC}"
 
             os.environ["HF_TOKEN"] = key
-            openai.api_key = key
             print(f"{TColors.OKGREEN}Huggingface token loaded.")
             login(token=key, add_to_git_credential=False)
             print(f"{TColors.ENDC}")

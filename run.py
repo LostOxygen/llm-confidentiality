@@ -138,7 +138,8 @@ def main(attacks: List[str], defense: str, llm_type: str,
 
         # run the attack
         total_successes[attack] = strategy.execute()
-
+        del strategy
+        torch.cuda.empty_cache()
 
     # print the results
     print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")

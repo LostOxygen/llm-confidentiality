@@ -9,6 +9,8 @@ class LLM():
     def __init__(self, llm_type: str, temperature: float = 1.0):
         self.llm_type: str = llm_type
         self.temperature: float = temperature
+        self.model: AutoModelForCausalLM = None
+        self.tokenizer: AutoTokenizer = None
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
@@ -87,6 +89,16 @@ class LLM():
                         )
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
+
+
+    def __del__(self):
+        """Deconstructor for the LLM class"""
+        del self.llm_type
+        del self.temperature
+        if self.model is not None:
+            del self.model
+        if self.tokenizer is not None:
+            del self.tokenizer
 
 
     def predict(self, system_prompt: str, user_prompt: str) -> str:

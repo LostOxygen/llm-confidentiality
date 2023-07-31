@@ -49,10 +49,32 @@ class LLM():
                             quantization_config=config,
                             low_cpu_mem_usage=True,
                             token=os.environ["HF_TOKEN"],
-                        ).to("cuda:0")
+                        )
 
-            case "llama":
-                raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
+            case "beluga2":
+                self.temperature = max(0.01, min(self.temperature, 2.0))
+                model_name = "stabilityai/StableBeluga2"
+                # create quantization config
+                config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_use_double_quant=True,
+                    bnb_4bit_compute_dtype=torch.bfloat16
+                )
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                                model_name,
+                                token=os.environ["HF_TOKEN"],
+                            )
+
+                self.model = AutoModelForCausalLM.from_pretrained(
+                            model_name,
+                            device_map="auto",
+                            quantization_config=config,
+                            low_cpu_mem_usage=True,
+                            token=os.environ["HF_TOKEN"],
+                        )
+
 
             case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
                 self.temperature = max(0.01, min(self.temperature, 2.0))
@@ -136,19 +158,35 @@ class LLM():
                 """
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids.to(0)
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids
+                    inputs.to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
-                                                max_length=2048)
+                                                max_length=256)
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
-                response = response[0][response.find("/INST")+5:]
+                response = response[0].replace(formatted_messages, "")
 
 
-            case "llama":
-                raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
+            case "beluga2":
+                formatted_messages = f"""
+                ### System:
+                {system_prompt}
+
+                ### User:
+                {user_prompt}
+
+                ### Assistant:\n
+                """
+                with torch.no_grad():
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids
+                    inputs.to("cuda")
+                    outputs = self.model.generate(inputs, do_sample=True,
+                                                temperature=self.temperature,
+                                                max_length=256)
+                    response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
 
             case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
                 formatted_messages = f"""
@@ -158,10 +196,11 @@ class LLM():
                 """
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids.to(0)
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids
+                    inputs.to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
-                                                max_length=2048)
+                                                max_length=256)
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
 
                  # remove the previous chat history from the response

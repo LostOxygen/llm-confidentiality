@@ -144,7 +144,7 @@ class LLM():
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
-                response = response[response.find("/INST")+5:]
+                response = response[0][response.find("/INST")+5:]
 
 
             case "llama":
@@ -158,7 +158,7 @@ class LLM():
                 """
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids.to("cuda:0")
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids.to(0)
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=2048)
@@ -166,7 +166,7 @@ class LLM():
 
                  # remove the previous chat history from the response
                 # so only the models' actual response remains
-                response = response.replace(formatted_messages, "")
+                response = response[0].replace(formatted_messages, "")
 
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")

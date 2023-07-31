@@ -41,6 +41,29 @@ class LLM():
 
             case "llama":
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
+            
+            case "vicuna":
+                self.temperature = max(0.0, min(self.temperature, 2.0))
+                # create quantization config
+                config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_use_double_quant=True,
+                    bnb_4bit_compute_dtype=torch.bfloat16
+                )
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                                "lmsys/vicuna-33b-v1.3",
+                                token=os.environ["HF_TOKEN"],
+                            )
+
+                self.model = AutoModelForCausalLM.from_pretrained(
+                            "lmsys/vicuna-33b-v1.3",
+                            device_map="auto",
+                            quantization_config=config,
+                            low_cpu_mem_usage=True,
+                            token=os.environ["HF_TOKEN"],
+                        )
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
@@ -91,6 +114,20 @@ class LLM():
 
             case "llama":
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
+
+            case "vicuna":
+                formatted_messages = f"""
+                {system_prompt}
+
+                USER: {user_prompt}
+                """
+                inputs = self.tokenizer.encode(formatted_messages, return_tensors="pt").to("cuda:0")
+                outputs = self.model.generate(inputs, do_sample=True,
+                                              temperature=self.temperature,
+                                              max_length=5000)
+                response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+                response = response[response.find("ASSISTANT:")+10:]
+
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 

@@ -3,3 +3,5 @@ openai
 accelerate
 transformers
 huggingface-hub
+bitsandbytes
+scipy

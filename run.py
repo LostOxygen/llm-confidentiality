@@ -10,6 +10,8 @@ import argparse
 from typing import List
 
 import openai
+import torch
+from huggingface_hub import login
 
 from framework.strategy import Strategy
 from framework.attacks import (
@@ -65,7 +67,9 @@ def main(attacks: List[str], defense: str, llm_type: str,
 
             os.environ["HF_TOKEN"] = key
             openai.api_key = key
-            print(f"{TColors.OKGREEN}Huggingface token loaded.{TColors.ENDC}")
+            print(f"{TColors.OKGREEN}Huggingface token loaded.")
+            login(token=key, add_to_git_credential=False)
+            print(f"{TColors.ENDC}")
 
     except FileNotFoundError:
         print(f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
@@ -73,6 +77,10 @@ def main(attacks: List[str], defense: str, llm_type: str,
         if llm_type in ["llama", "llama2"]:
             sys.exit(1)
 
+    if not torch.cuda.is_available():
+        device = "cpu"
+    else:
+        device = "cuda:0"
 
     if "all" in attacks:
         attacks = ATTACK_LIST
@@ -82,7 +90,10 @@ def main(attacks: List[str], defense: str, llm_type: str,
 
     print("\n"+"#"*60)
     print("## " + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
-    print(f"## System: {os.cpu_count()} CPU cores on {socket.gethostname()}")
+    print(f"## System: {torch.get_num_threads()} CPU cores with "
+          f"{os.cpu_count()} threads and "
+          f"{torch.cuda.device_count()} GPUs on {socket.gethostname()}")
+    print(f"## Using: {device}")
     print(f"## Attack type: {attacks}")
     print(f"## Defense type: {defense}")
     print(f"## Opponent LLM: {llm_type}")

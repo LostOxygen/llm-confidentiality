@@ -2,7 +2,7 @@
 import os
 import torch
 from openai import ChatCompletion
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 
 class LLM():
     """abstract implementation of a genereric LLM model"""
@@ -18,6 +18,14 @@ class LLM():
 
             case "llama2":
                 self.temperature = max(0.1, min(self.temperature, 5.0))
+                # create quantization config
+                config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_use_double_quant=True,
+                    bnb_4bit_compute_dtype=torch.bfloat16
+                )
+
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 "meta-llama/Llama-2-7b-chat-hf",
                                 token=os.environ["HF_TOKEN"],
@@ -26,8 +34,7 @@ class LLM():
                 self.model = AutoModelForCausalLM.from_pretrained(
                             "meta-llama/Llama-2-7b-chat-hf",
                             device_map="auto",
-                            torch_dtype=torch.bfloat16,
-                            load_in_8bit=True,
+                            quantization_config=config,
                             low_cpu_mem_usage=True,
                             token=os.environ["HF_TOKEN"],
                         )

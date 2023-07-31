@@ -74,12 +74,12 @@ class LLM():
                 )
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
-                                "lmsys/vicuna-33b-v1.3",
+                                model_name,
                                 token=os.environ["HF_TOKEN"],
                             )
 
                 self.model = AutoModelForCausalLM.from_pretrained(
-                            "lmsys/vicuna-33b-v1.3",
+                            model_name,
                             device_map="auto",
                             quantization_config=config,
                             low_cpu_mem_usage=True,

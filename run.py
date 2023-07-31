@@ -17,7 +17,7 @@ from framework.strategy import Strategy
 from framework.attacks import (
         ATTACK_LIST, payload_splitting, obfuscation,
         indirect, manipulation, llm_attack, translation, chatml_abuse,
-        masking, typoglycemia
+        masking, typoglycemia, advs_suffix
     )
 from framework.defenses import (
         DEFENSES_LIST, seq_enclosure, xml_tagging, heuristic_defense,
@@ -125,6 +125,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
             case "chatml_abuse": attack_func = chatml_abuse
             case "masking": attack_func = masking
             case "typoglycemia": attack_func = typoglycemia
+            case "advs_suffix": attack_func = advs_suffix
             case _:
                 print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
                 print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")

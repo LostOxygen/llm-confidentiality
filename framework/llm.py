@@ -16,7 +16,7 @@ class LLM():
                   "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
 
-            case "llama2":
+            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b"):
                 self.temperature = max(0.1, min(self.temperature, 5.0))
                 # create quantization config
                 config = BitsAndBytesConfig(
@@ -26,13 +26,23 @@ class LLM():
                     bnb_4bit_compute_dtype=torch.bfloat16
                 )
 
+                model_name = "meta-llama/"
+                if self.llm_type.split("-")[1] == "7b":
+                    model_name += "Llama-2-7b-chat-hf"
+                elif self.llm_type.split("-")[1] == "13b":
+                    model_name += "Llama-2-13b-chat-hf"
+                elif self.llm_type.split("-")[1] == "70b":
+                    model_name += "Llama-2-70b-chat-hf"
+                else:
+                    model_name += "Llama-2-70b-chat-hf"
+
                 self.tokenizer = AutoTokenizer.from_pretrained(
-                                "meta-llama/Llama-2-70b-chat-hf",
+                                model_name,
                                 token=os.environ["HF_TOKEN"],
                             )
 
                 self.model = AutoModelForCausalLM.from_pretrained(
-                            "meta-llama/Llama-2-70b-chat-hf",
+                            model_name,
                             device_map="auto",
                             quantization_config=config,
                             low_cpu_mem_usage=True,
@@ -41,9 +51,20 @@ class LLM():
 
             case "llama":
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
-            
-            case "vicuna":
+
+            case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
+
+                model_name = "lmsys/"
+                if self.llm_type.split("-")[1] == "7b":
+                    model_name += "vicuna-7b-v1.3"
+                elif self.llm_type.split("-")[1] == "13b":
+                    model_name += "vicuna-13b-v1.3"
+                elif self.llm_type.split("-")[1] == "33b":
+                    model_name += "vicuna-33b-v1.3"
+                else:
+                    model_name += "lmsys/vicuna-33b-v1.3"
+
                 # create quantization config
                 config = BitsAndBytesConfig(
                     load_in_4bit=True,
@@ -93,7 +114,7 @@ class LLM():
                                                    temperature=self.temperature)
                 response = completion.choices[0].message.content
 
-            case "llama2":
+            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b"):
                 formatted_messages = f"""<s>[INST] <<SYS>>
                     {system_prompt}
                     <</SYS>>
@@ -115,7 +136,7 @@ class LLM():
             case "llama":
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
-            case "vicuna":
+            case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
                 formatted_messages = f"""
                 {system_prompt}
 
@@ -126,7 +147,7 @@ class LLM():
                                               temperature=self.temperature,
                                               max_length=5000)
                 response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-                response = response[response.find("ASSISTANT:")+10:]
+                response = response.replace(formatted_messages, "")
 
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")

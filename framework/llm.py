@@ -19,7 +19,7 @@ class LLM():
                 self.temperature = max(0.0, min(self.temperature, 2.0))
 
             case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b"):
-                self.temperature = max(0.1, min(self.temperature, 5.0))
+                self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
                 config = BitsAndBytesConfig(
                     load_in_4bit=True,
@@ -55,7 +55,7 @@ class LLM():
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
             case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
-                self.temperature = max(0.1, min(self.temperature, 2.0))
+                self.temperature = max(0.01, min(self.temperature, 2.0))
 
                 model_name = "lmsys/"
                 if self.llm_type.split("-")[1] == "7b":

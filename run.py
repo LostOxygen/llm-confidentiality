@@ -103,6 +103,11 @@ def main(attacks: List[str], defense: str, llm_type: str,
 
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
+    # initialize the strategy
+    strategy = Strategy(attack_func=None, defense_func=None,
+                        llm_type=llm_type, temperature=temperature,
+                        max_level=max_level)
+
     # set the defense function
     match defense:
         case "seq_enclosure": defense_func = seq_enclosure
@@ -131,15 +136,11 @@ def main(attacks: List[str], defense: str, llm_type: str,
                 print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
                 sys.exit(1)
 
-        # initialize the strategy
-        strategy = Strategy(attack_func=attack_func, defense_func=defense_func,
-                            llm_type=llm_type, temperature=temperature,
-                            max_level=max_level)
-
+        # set the attack and defense functions
+        strategy.set_attack_func(attack_func)
+        strategy.set_defense_func(defense_func)
         # run the attack
         total_successes[attack] = strategy.execute()
-        del strategy
-        torch.cuda.empty_cache()
 
     # print the results
     print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")

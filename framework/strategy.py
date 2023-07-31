@@ -61,6 +61,16 @@ class Strategy:
         return num_successes
 
 
+    def set_attack_func(self, new_attack_func: Callable) -> None:
+        """helper method to set the attack function"""
+        self.attack_func = new_attack_func
+
+
+    def set_defense_func(self, new_defense_func: Callable) -> None:
+        """helper method to set the defense function"""
+        self.defense_func = new_defense_func
+
+
     def __evaluate_response(self, response: str) -> bool:
         """
         Evaluates the response of the opponent LLM

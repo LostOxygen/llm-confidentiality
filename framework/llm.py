@@ -49,7 +49,7 @@ class LLM():
                             quantization_config=config,
                             low_cpu_mem_usage=True,
                             token=os.environ["HF_TOKEN"],
-                        )
+                        ).to("cuda:0")
 
             case "llama":
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
@@ -101,6 +101,7 @@ class LLM():
             del self.tokenizer
 
 
+    @torch.inference_mode()
     def predict(self, system_prompt: str, user_prompt: str) -> str:
         """
         predicts a response for a given prompt input
@@ -134,11 +135,12 @@ class LLM():
                     <</INST>>
                 """
 
-                inputs = self.tokenizer.encode(formatted_messages, return_tensors="pt").to("cuda:0")
-                outputs = self.model.generate(inputs, do_sample=True,
-                                              temperature=self.temperature,
-                                              max_length=4096)
-                response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+                with torch.no_grad():
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids.to(0)
+                    outputs = self.model.generate(inputs, do_sample=True,
+                                                temperature=self.temperature,
+                                                max_length=2048)
+                    response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
@@ -154,11 +156,16 @@ class LLM():
 
                 USER: {user_prompt}
                 """
-                inputs = self.tokenizer.encode(formatted_messages, return_tensors="pt").to("cuda:0")
-                outputs = self.model.generate(inputs, do_sample=True,
-                                              temperature=self.temperature,
-                                              max_length=5000)
-                response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+                with torch.no_grad():
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids.to("cuda:0")
+                    outputs = self.model.generate(inputs, do_sample=True,
+                                                temperature=self.temperature,
+                                                max_length=2048)
+                    response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+
+                 # remove the previous chat history from the response
+                # so only the models' actual response remains
                 response = response.replace(formatted_messages, "")
 
             case _:

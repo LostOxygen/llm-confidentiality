@@ -27,12 +27,12 @@ class LLM():
                 )
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
-                                "meta-llama/Llama-2-13b-chat-hf",
+                                "meta-llama/Llama-2-70b-chat-hf",
                                 token=os.environ["HF_TOKEN"],
                             )
 
                 self.model = AutoModelForCausalLM.from_pretrained(
-                            "meta-llama/Llama-2-13b-chat-hf",
+                            "meta-llama/Llama-2-70b-chat-hf",
                             device_map="auto",
                             quantization_config=config,
                             low_cpu_mem_usage=True,

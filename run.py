@@ -158,7 +158,7 @@ if __name__ == "__main__":
                         help="specifies the defense type", choices=DEFENSES_LIST)
     parser.add_argument("--llm_type", "-llm", type=str, default="gpt-3.5-turbo-0301",
                         help="specifies the opponent LLM type")
-    parser.add_argument("--temperature", "-t", type=float, default=0.1,
+    parser.add_argument("--temperature", "-t", type=float, default=0.0,
                         help="specifies the opponent LLM temperature")
     parser.add_argument("--max_level", "-m", type=int, default=10,
                         help="specifies the max system prompt level to test against")

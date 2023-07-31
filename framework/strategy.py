@@ -19,10 +19,6 @@ class Strategy:
         self.max_level: int = max_level
         self.chat_api_add_messages: Callable = ChatAPI.add_message
 
-    
-    def __del__(self):
-        del self.llm
-
 
     def execute(self) -> int:
         """Executes the strategy and returns the number of successes"""

@@ -1,5 +1,5 @@
 # Attacks and Defenses against the Confidentiality of Large Language Models
-Framework for Testing Attacks and Defenses against the Confidentiality of Large Language Models (LLMs) 
+Framework for Testing Attacks and Defenses against the Confidentiality of Large Language Models (LLMs).
 
 ## Setup
 Before running the code, install the requirements:
@@ -28,20 +28,21 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 | -t, --temperature | float | specifies the temperature for the LLM (default: 0.0) to control the randomness |
 
 ## Supported Large Language Models (Chat-Only)
-| Model | Parameter Specifier | Link |
-|-------|------|-----|
-| GPT-3.5-Turbo | ```gpt-3.5-turbo``` / ```gpt-3.5-turbo-0301``` / ```gpt-3.5-turbo-0613``` | [Link](https://platform.openai.com/docs/models/gpt-3-5)|
-| GPT-4 | ```gpt-4/gpt-4-0613``` | [Link](https://platform.openai.com/docs/models/gpt-4)|
-| LLaMA2 | ```llama2``` | [Link](https://huggingface.co/meta-llama) |
+| Model | Parameter Specifier | Link | Compute Instance |
+|-------|------|-----|-----|
+| GPT-3.5-Turbo | ```gpt-3.5-turbo``` / ```gpt-3.5-turbo-0301``` / ```gpt-3.5-turbo-0613``` | [Link](https://platform.openai.com/docs/models/gpt-3-5)| OpenAI API |
+| GPT-4 | ```gpt-4``` / ```gpt-4-0613``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
+| LLaMA2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| Vicuna | ```vicuna-7b``` / ```vicuna-13b``` / ```vicuna-33b``` | [Link](https://huggingface.co/lmsys/vicuna-33b-v1.3) | Local Inference |
 
 ## Supported Attacks and Defenses
-| Attack | Defense |
-|--------|---------|
-|payload_splitting | seq_enclosure |
-|obfuscation | xml_tagging |
-|manipulation | heuristic_defense |
-|translation | sandwiching |
-|llm | llm_eval |
-|chatml_abuse | |
-|masking| |
-|typoglycemia | |
+| Attacks | | Defenses | |
+|--------|--------|---------|---------|
+| <b>Name</b> | <b>Specifier</b> | <b>Name</b> | <b>Specifier</b> |
+|[Payload Splitting](https://learnprompting.org/docs/prompt_hacking/offensive_measures/payload_splitting) | ```payload_splitting``` | [Random Sequence Enclosure](https://learnprompting.org/docs/prompt_hacking/defensive_measures/random_sequence) | ```seq_enclosure``` |
+|[Obfuscation](https://learnprompting.org/docs/prompt_hacking/offensive_measures/obfuscation) | ```obfuscation``` |[XML Tagging](https://learnprompting.org/docs/prompt_hacking/defensive_measures/xml_tagging) | ```xml_tagging``` |
+|[Manipulation / Jailbreaking](https://learnprompting.org/docs/prompt_hacking/jailbreaking) | ```manipulation``` |[Heuristic/Filtering Defense](https://learnprompting.org/docs/prompt_hacking/defensive_measures/filtering) | ```heuristic_defense``` |
+|Translation | ```translation``` |[Sandwich Defense](https://learnprompting.org/docs/prompt_hacking/defensive_measures/sandwich_defense) | ```sandwiching``` |
+|[ChatML Abuse](https://www.robustintelligence.com/blog-posts/prompt-injection-attack-on-gpt-4) | ```chatml_abuse``` | [LLM Evaluation](https://learnprompting.org/docs/prompt_hacking/defensive_measures/llm_eval) | ```llm_eval``` |
+|[Masking](https://learnprompting.org/docs/prompt_hacking/offensive_measures/obfuscation) | ```masking``` | |
+|[Typoglycemia](https://twitter.com/lauriewired/status/1682825103594205186?s=20) | ```typoglycemia``` | |

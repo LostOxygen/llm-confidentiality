@@ -51,9 +51,9 @@ class LLM():
                             token=os.environ["HF_TOKEN"],
                         )
 
-            case "beluga2":
+            case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 self.temperature = max(0.01, min(self.temperature, 2.0))
-                model_name = "stabilityai/StableBeluga2"
+                model_name = "stabilityai/"
                 # create quantization config
                 config = BitsAndBytesConfig(
                     load_in_4bit=True,
@@ -61,6 +61,15 @@ class LLM():
                     bnb_4bit_use_double_quant=True,
                     bnb_4bit_compute_dtype=torch.bfloat16
                 )
+
+                if self.llm_type.split("-")[1] == "7b":
+                    model_name += "StableBeluga-7b"
+                elif self.llm_type.split("-")[1] == "13b":
+                    model_name += "StableBeluga-13b"
+                elif self.llm_type.split("-")[1] == "70b":
+                    model_name += "StableBeluga2"
+                else:
+                    model_name += "StableBeluga2"
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
@@ -170,7 +179,7 @@ class LLM():
                 response = response[0].replace(formatted_messages, "")
 
 
-            case "beluga2":
+            case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 formatted_messages = f"""
                 ### System:
                 {system_prompt}

@@ -162,7 +162,7 @@ class LLM():
                     inputs.to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
-                                                max_length=256)
+                                                max_length=4096)
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
 
                 # remove the previous chat history from the response
@@ -185,7 +185,7 @@ class LLM():
                     inputs.to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
-                                                max_length=256)
+                                                max_length=4096)
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
 
             case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
@@ -200,7 +200,7 @@ class LLM():
                     inputs.to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
-                                                max_length=256)
+                                                max_length=4096)
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
 
                  # remove the previous chat history from the response

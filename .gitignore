@@ -2,6 +2,7 @@
 logs/
 key.txt
 hf_token.txt
+datasets/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -5,3 +5,5 @@ transformers
 huggingface-hub
 bitsandbytes
 scipy
+sentencepiece
+protobuf

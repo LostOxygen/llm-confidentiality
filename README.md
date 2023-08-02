@@ -34,7 +34,7 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 | GPT-4 | ```gpt-4``` / ```gpt-4-0613``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
 | LLaMA2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 | Vicuna | ```vicuna-7b``` / ```vicuna-13b``` / ```vicuna-33b``` | [Link](https://huggingface.co/lmsys/vicuna-33b-v1.3) | Local Inference |
-| Stable Beluga 2 | ```beluga2```| [Link](https://huggingface.co/stabilityai/StableBeluga2) | Local Inference |
+| StableBeluga (2) | ```beluga-7b``` / ```beluga-13b``` / ```beluga2-70b```| [Link](https://huggingface.co/stabilityai/StableBeluga2) | Local Inference |
 
 ## Supported Attacks and Defenses
 | Attacks | | Defenses | |

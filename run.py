@@ -30,7 +30,7 @@ os.environ["TRANSFORMERS_CACHE"] = "/data/"
 
 
 def main(attacks: List[str], defense: str, llm_type: str,
-         temperature: float, max_level: int,
+         temperature: float, max_level: int, create_dataset: bool
          ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
@@ -41,6 +41,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
         llm_type: str - specifies the opponent LLM type
         temperature: float - specifies the opponent LLM temperature to control randomness
         max_level: int - max. system prompt level upon which to test the attacks to
+        create_dataset: bool - specifies whether to create a dataset or not
 
     Returns:
         None
@@ -95,12 +96,13 @@ def main(attacks: List[str], defense: str, llm_type: str,
     print(f"## System: {torch.get_num_threads()} CPU cores with "
           f"{os.cpu_count()} threads and "
           f"{torch.cuda.device_count()} GPUs on {socket.gethostname()}")
-    print(f"## Using: {device}")
-    print(f"## Attack type: {attacks}")
-    print(f"## Defense type: {defense}")
+    print(f"## Using Device: {device}")
+    print(f"## Attack Type: {attacks}")
+    print(f"## Defense Type: {defense}")
     print(f"## Opponent LLM: {llm_type}")
     print(f"## Testing Level 0-{max_level}")
     print(f"## Temperature: {temperature}")
+    print(f"## Creating Dataset: {create_dataset}")
     print("#"*60+"\n")
 
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
@@ -108,7 +110,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
     # initialize the strategy
     strategy = Strategy(attack_func=None, defense_func=None,
                         llm_type=llm_type, temperature=temperature,
-                        max_level=max_level)
+                        max_level=max_level, create_dataset=create_dataset)
 
     # set the defense function
     match defense:
@@ -165,6 +167,8 @@ if __name__ == "__main__":
                         help="specifies the opponent LLM temperature")
     parser.add_argument("--max_level", "-m", type=int, default=10,
                         help="specifies the max system prompt level to test against")
+    parser.add_argument("--create_dataset", "-cd", help="enables dataset creation",
+                        action="store_true", default=False)
     args = parser.parse_args()
 
     main(**vars(args))

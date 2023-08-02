@@ -1,5 +1,6 @@
 """library for LLM models, functions and helper stuff"""
 import os
+from typing import Tuple
 import torch
 from openai import ChatCompletion
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
@@ -133,7 +134,7 @@ class LLM():
 
 
     @torch.inference_mode()
-    def predict(self, system_prompt: str, user_prompt: str) -> str:
+    def predict(self, system_prompt: str, user_prompt: str) -> Tuple[str, str]:
         """
         predicts a response for a given prompt input
 
@@ -143,20 +144,27 @@ class LLM():
 
         Returns:
             response: str - the LLMs' response
+            history: str - the LLMs' history with the complete dialoge so far
         """
-
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ]
 
         match self.llm_type:
             case ("gpt-3.5-turbo" | "gpt-3.5-turbo-0301" |
                   "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"):
+                messages = [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ]
                 completion = ChatCompletion.create(model=self.llm_type,
                                                    messages=messages,
                                                    temperature=self.temperature)
                 response = completion.choices[0].message.content
+                history = f"""<|im_start|>system
+                {system_prompt}<|im_end|>
+                <|im_start|>user
+                {user_prompt}<|im_end|>
+                <|im_start|>assistant
+                {response}<|im_end|>
+                """
 
             case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b"):
                 formatted_messages = f"""<s>[INST] <<SYS>>
@@ -168,16 +176,17 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids
-                    inputs.to("cuda")
+                    inputs = inputs.to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=4096)
+                    del inputs
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
+                history = response[0]+" </s>"
                 response = response[0].replace(formatted_messages, "")
-
 
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 formatted_messages = f"""
@@ -191,11 +200,17 @@ class LLM():
                 """
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids
-                    inputs.to("cuda")
+                    inputs = inputs.to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=4096)
+                    del inputs
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+
+                # remove the previous chat history from the response
+                # so only the models' actual response remains
+                history = response[0]
+                response = response[0].replace(formatted_messages, "")
 
             case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
                 formatted_messages = f"""
@@ -206,17 +221,19 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids
-                    inputs.to("cuda")
+                    inputs = inputs.to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=4096)
+                    del inputs
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
 
-                 # remove the previous chat history from the response
+                # remove the previous chat history from the response
                 # so only the models' actual response remains
+                history = response[0]
                 response = response[0].replace(formatted_messages, "")
 
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
-        return response
+        return (response, history)

@@ -90,8 +90,6 @@ class Strategy:
         the new prompt and do not just instructions or guidlines to build one:
         """
         enhanced_system_prompt = self.llm.predict("", prompt)[0]
-        # sanitize the enhanced system prompt (aka. remove the <sytem> tag)
-        enhanced_system_prompt = enhanced_system_prompt.split("\n")[1]
 
         return enhanced_system_prompt
 

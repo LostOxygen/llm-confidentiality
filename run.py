@@ -58,7 +58,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
     except FileNotFoundError:
         print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
               f"file and put it into the root directory.{TColors.ENDC}")
-        if llm_type in ["gpt-3.5-turbo" | "gpt-3.5-turbo-0301" | "gpt-4"]:
+        if llm_type in ["gpt-3.5-turbo", "gpt-3.5-turbo-0301", "gpt-4"]:
             sys.exit(1)
 
     # paste the key into the key.txt file and put into the root directory
@@ -75,7 +75,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
     except FileNotFoundError:
         print(f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
               f"file and put it into the root directory.{TColors.ENDC}")
-        if llm_type in ["llama", "llama2"]:
+        if llm_type in ["llama2", "llama2-7b", "llama2-13b", "llama2-70b"]:
             sys.exit(1)
 
     # setting devies and variables correctly

@@ -42,6 +42,7 @@ class LLM():
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
                                 token=os.environ["HF_TOKEN"],
+                                use_fast=False
                             )
 
                 self.model = AutoModelForCausalLM.from_pretrained(
@@ -75,6 +76,7 @@ class LLM():
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
                                 token=os.environ["HF_TOKEN"],
+                                use_fast=False
                             )
 
                 self.model = AutoModelForCausalLM.from_pretrained(
@@ -110,6 +112,7 @@ class LLM():
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
                                 token=os.environ["HF_TOKEN"],
+                                use_fast=False
                             )
 
                 self.model = AutoModelForCausalLM.from_pretrained(

@@ -178,13 +178,13 @@ class LLM():
                 """
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids
-                    inputs = inputs.to("cuda")
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=4096)
                     del inputs
-                    response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+                    response = self.tokenizer.batch_decode(outputs[0].cpu(),
+                                                           skip_special_tokens=True)
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
@@ -202,13 +202,13 @@ class LLM():
                 ### Assistant:\n
                 """
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids
-                    inputs = inputs.to("cuda")
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=4096)
                     del inputs
-                    response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+                    response = self.tokenizer.batch_decode(outputs[0].cpu(),
+                                                           skip_special_tokens=True)
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
@@ -223,13 +223,13 @@ class LLM():
                 """
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").input_ids
-                    inputs = inputs.to("cuda")
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     outputs = self.model.generate(inputs, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=4096)
                     del inputs
-                    response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+                    response = self.tokenizer.batch_decode(outputs[0].cpu(),
+                                                           skip_special_tokens=True)
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains

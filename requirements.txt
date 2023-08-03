@@ -1,3 +1,5 @@
+sentencepiece
+protobuf
 langchain
 openai
 accelerate
@@ -5,5 +7,3 @@ transformers
 huggingface-hub
 bitsandbytes
 scipy
-sentencepiece
-protobuf

@@ -26,6 +26,8 @@ from framework.defenses import (
 from framework.prompts import SYSTEM_PROMPTS
 from framework.colors import TColors
 
+if not os.path.isdir("/data/"):
+    os.mkdir("/data/")
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 
 

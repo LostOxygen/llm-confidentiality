@@ -6,6 +6,7 @@ from framework.colors import TColors, ATTACK_NAMES
 from framework.prompts import SECRET_KEY, SYSTEM_PROMPTS
 from framework.api import ChatAPI
 from framework.llm import LLM
+from framework.dataset import PromptDataset
 
 class Strategy:
     """Strategy pattern interface"""
@@ -18,8 +19,9 @@ class Strategy:
         self.llm_type = llm_type
         self.llm: LLM = LLM(llm_type, temperature)
         self.max_level: int = max_level
-        self.chat_api_add_messages: Callable = ChatAPI.add_message
         self.create_dataset: bool = create_dataset
+        self.chat_api_add_messages: Callable = ChatAPI.add_message
+        self.prompt_dataset = PromptDataset()
 
 
     def execute(self) -> int:
@@ -28,8 +30,12 @@ class Strategy:
         print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
               f"{ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
 
+        # create/load the prompt dataset
+        prompt_dataset = PromptDataset()
+
         for level_id in range(0, self.max_level):
-            system_prompt = SYSTEM_PROMPTS[f"level_{level_id}"]
+            # get a random system prompt
+            system_prompt = prompt_dataset.get_random_prompt()
 
             # build the malicious prompt using the attack function
             mal_prompt = self.attack_func()
@@ -55,8 +61,9 @@ class Strategy:
                 print(f"Level {level_id}: {TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
                 num_successes += 1
                 if self.create_dataset:
+                    # enhance the system prompt and save it to the dataset
                     enh_sys_prompt = self.get_enhanced_system_prompt(history)
-                    # TODO: add the enhanced system prompt to the dataset
+                    prompt_dataset.add_prompt(enh_sys_prompt)
             else:
                 print(f"Level {level_id}: {TColors.FAIL}{fail_result_str}{TColors.ENDC}")
 

@@ -179,7 +179,7 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    outputs = self.model.generate(inputs, do_sample=True,
+                    outputs = self.model.generate(inputs.input_ids, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=2048)
                     del inputs
@@ -203,7 +203,7 @@ class LLM():
                 """
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    outputs = self.model.generate(inputs, do_sample=True,
+                    outputs = self.model.generate(inputs.input_ids, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=2048)
                     del inputs
@@ -224,7 +224,7 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    outputs = self.model.generate(inputs, do_sample=True,
+                    outputs = self.model.generate(inputs.input_ids, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=2048)
                     del inputs

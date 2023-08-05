@@ -183,7 +183,7 @@ class LLM():
                                                 temperature=self.temperature,
                                                 max_length=2048)
                     del inputs
-                    response = self.tokenizer.batch_decode(outputs[0].cpu(),
+                    response = self.tokenizer.batch_decode(outputs.cpu(),
                                                            skip_special_tokens=True)
 
                 # remove the previous chat history from the response
@@ -207,7 +207,7 @@ class LLM():
                                                 temperature=self.temperature,
                                                 max_length=2048)
                     del inputs
-                    response = self.tokenizer.batch_decode(outputs[0].cpu(),
+                    response = self.tokenizer.batch_decode(outputs.cpu(),
                                                            skip_special_tokens=True)
 
                 # remove the previous chat history from the response
@@ -228,7 +228,7 @@ class LLM():
                                                 temperature=self.temperature,
                                                 max_length=2048)
                     del inputs
-                    response = self.tokenizer.batch_decode(outputs[0].cpu(),
+                    response = self.tokenizer.batch_decode(outputs.cpu(),
                                                            skip_special_tokens=True)
 
                 # remove the previous chat history from the response

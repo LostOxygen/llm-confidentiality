@@ -181,7 +181,7 @@ class LLM():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     outputs = self.model.generate(inputs.input_ids, do_sample=True,
                                                 temperature=self.temperature,
-                                                max_length=2048)
+                                                max_length=4096)
                     del inputs
                     response = self.tokenizer.batch_decode(outputs.cpu(),
                                                            skip_special_tokens=True)
@@ -205,7 +205,7 @@ class LLM():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     outputs = self.model.generate(inputs.input_ids, do_sample=True,
                                                 temperature=self.temperature,
-                                                max_length=2048)
+                                                max_length=4096)
                     del inputs
                     response = self.tokenizer.batch_decode(outputs.cpu(),
                                                            skip_special_tokens=True)
@@ -226,7 +226,7 @@ class LLM():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     outputs = self.model.generate(inputs.input_ids, do_sample=True,
                                                 temperature=self.temperature,
-                                                max_length=2048)
+                                                max_length=4096)
                     del inputs
                     response = self.tokenizer.batch_decode(outputs.cpu(),
                                                            skip_special_tokens=True)

@@ -35,7 +35,7 @@ class Strategy:
 
         for level_id in range(0, self.max_level):
             if self.create_dataset:
-                system_prompt = SYSTEM_PROMPTS[level_id]
+                system_prompt = SYSTEM_PROMPTS[f"{level_id}"]
             else:
                 # get a random system prompt
                 system_prompt = prompt_dataset.get_random_prompt()

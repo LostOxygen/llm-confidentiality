@@ -107,6 +107,7 @@ class Strategy:
         # sanitize the prompt
         enhanced_system_prompt = enhanced_system_prompt.replace("<|im_start|>system\n", "")
         enhanced_system_prompt = enhanced_system_prompt.replace("<|startoftext|>\n", "")
+        enhanced_system_prompt = enhanced_system_prompt.replace("<|startoftext|>", "")
         enhanced_system_prompt = enhanced_system_prompt.replace("System prompts:\n", "")
         enhanced_system_prompt = enhanced_system_prompt.replace("<|im_start|>assistant\n", "")
 

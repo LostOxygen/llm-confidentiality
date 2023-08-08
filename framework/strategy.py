@@ -108,6 +108,7 @@ class Strategy:
         enhanced_system_prompt = enhanced_system_prompt.replace("<|im_start|>system\n", "")
         enhanced_system_prompt = enhanced_system_prompt.replace("<|startoftext|>\n", "")
         enhanced_system_prompt = enhanced_system_prompt.replace("System prompts:\n", "")
+        enhanced_system_prompt = enhanced_system_prompt.replace("<|im_start|>assistant\n", "")
 
         # add the key to the prompt, if not already present
         if not self.__evaluate_response(enhanced_system_prompt):

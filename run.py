@@ -94,7 +94,8 @@ def main(attacks: List[str], defense: str, llm_type: str,
         max_level = len(SYSTEM_PROMPTS)
 
     print("\n"+"#"*os.get_terminal_size().columns)
-    print("## " + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
+          str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: " \
           f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
           f"{torch.cuda.device_count()} GPUs on {socket.gethostname()}")
@@ -176,5 +177,4 @@ if __name__ == "__main__":
     parser.add_argument("--create_dataset", "-cd", help="enables dataset creation",
                         action="store_true", default=False)
     args = parser.parse_args()
-
     main(**vars(args))

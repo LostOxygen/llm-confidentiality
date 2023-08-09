@@ -23,7 +23,6 @@ from framework.defenses import (
         DEFENSES_LIST, seq_enclosure, xml_tagging, heuristic_defense,
         sandwiching, llm_eval, identity_prompt
     )
-from framework.prompts import SYSTEM_PROMPTS
 from framework.colors import TColors
 
 if not os.path.isdir("/data/"):
@@ -32,7 +31,7 @@ os.environ["TRANSFORMERS_CACHE"] = "/data/"
 
 
 def main(attacks: List[str], defense: str, llm_type: str,
-         temperature: float, max_level: int, create_dataset: bool
+         temperature: float, iterations: int, create_dataset: bool
          ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
@@ -42,7 +41,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
         defense: str - specifies the defense type
         llm_type: str - specifies the opponent LLM type
         temperature: float - specifies the opponent LLM temperature to control randomness
-        max_level: int - max. system prompt level upon which to test the attacks to
+        iterations: int - number of attack iterations to test system prompts against
         create_dataset: bool - specifies whether to create a dataset or not
 
     Returns:
@@ -90,9 +89,6 @@ def main(attacks: List[str], defense: str, llm_type: str,
     if "all" in attacks:
         attacks = ATTACK_LIST
 
-    if max_level > len(SYSTEM_PROMPTS):
-        max_level = len(SYSTEM_PROMPTS)
-
     print("\n"+"#"*os.get_terminal_size().columns)
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
           str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
@@ -106,7 +102,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Type{TColors.ENDC}: {attacks}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Defense Type{TColors.ENDC}: {defense}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Opponent LLM{TColors.ENDC}: {llm_type}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Iterations{TColors.ENDC}: {max_level}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Iterations{TColors.ENDC}: {iterations}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Creating Dataset{TColors.ENDC}: {create_dataset}")
     print("#"*os.get_terminal_size().columns+"\n")
@@ -116,7 +112,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
     # initialize the strategy
     strategy = Strategy(attack_func=None, defense_func=None,
                         llm_type=llm_type, temperature=temperature,
-                        max_level=max_level, create_dataset=create_dataset)
+                        iterations=iterations, create_dataset=create_dataset)
 
     # set the defense function
     match defense:
@@ -157,7 +153,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
     print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
     for attack, successes in total_successes.items():
         print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
-              f"{max_level}")
+              f"{iterations}")
 
     return 0
 
@@ -172,8 +168,8 @@ if __name__ == "__main__":
                         help="specifies the opponent LLM type")
     parser.add_argument("--temperature", "-t", type=float, default=0.0,
                         help="specifies the opponent LLM temperature")
-    parser.add_argument("--max_level", "-m", type=int, default=10,
-                        help="specifies the max system prompt level to test against")
+    parser.add_argument("--iterations", "-i", type=int, default=10,
+                        help="specifies the number of iterations to test systems prompts")
     parser.add_argument("--create_dataset", "-cd", help="enables dataset creation",
                         action="store_true", default=False)
     args = parser.parse_args()

@@ -12,14 +12,14 @@ class Strategy:
     """Strategy pattern interface"""
 
     def __init__(self, attack_func: Callable, defense_func: Callable,
-                 llm_type: str, temperature: float, max_level: int,
+                 llm_type: str, temperature: float, iterations: int,
                  create_dataset: bool) -> None:
         self.attack_func: Callable = attack_func
         self.defense_func: Callable = defense_func
         self.llm_type = llm_type
         self.temperature = temperature
         self.llm: LLM = LLM(llm_type, temperature)
-        self.max_level: int = max_level
+        self.iterations: int = iterations
         self.create_dataset: bool = create_dataset
         self.chat_api_add_messages: Callable = ChatAPI.add_message
         self.prompt_dataset = PromptDataset()
@@ -34,7 +34,7 @@ class Strategy:
         # create/load the prompt dataset
         prompt_dataset = PromptDataset()
 
-        for level_id in range(0, self.max_level):
+        for level_id in range(0, self.iterations):
             if self.create_dataset:
                 system_prompt = SYSTEM_PROMPTS[f"{level_id}"]
             else:

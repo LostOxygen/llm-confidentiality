@@ -27,6 +27,7 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 | -llm, --llm_type | str | specifies the type of opponent (default: "gpt-3.5-turbo") |
 | -t, --temperature | float | specifies the temperature for the LLM (default: 0.0) to control the randomness |
 | -cd, --create_dataset | bool | specifies whether a new dataset of enhanced system prompts should be created (default: False) |
+| -i, --iterations | int | specifies the number of iterations for the attack (default: 10) |
 
 ## Supported Large Language Models (Chat-Only)
 | Model | Parameter Specifier | Link | Compute Instance |

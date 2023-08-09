@@ -17,6 +17,7 @@ class Strategy:
         self.attack_func: Callable = attack_func
         self.defense_func: Callable = defense_func
         self.llm_type = llm_type
+        self.temperature = temperature
         self.llm: LLM = LLM(llm_type, temperature)
         self.max_level: int = max_level
         self.create_dataset: bool = create_dataset

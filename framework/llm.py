@@ -136,7 +136,7 @@ class LLM():
             del self.tokenizer
 
 
-    @torch.inference_mode()
+    @torch.inference_mode(mode=True)
     def predict(self, system_prompt: str, user_prompt: str) -> Tuple[str, str]:
         """
         predicts a response for a given prompt input
@@ -182,8 +182,9 @@ class LLM():
                     outputs = self.model.generate(inputs.input_ids, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=4096)
-                    del inputs
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+                    del inputs
+                    del outputs
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
@@ -205,8 +206,9 @@ class LLM():
                     outputs = self.model.generate(inputs.input_ids, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=4096)
-                    del inputs
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+                    del inputs
+                    del outputs
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
@@ -225,8 +227,9 @@ class LLM():
                     outputs = self.model.generate(inputs.input_ids, do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=4096)
-                    del inputs
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+                    del inputs
+                    del outputs
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains

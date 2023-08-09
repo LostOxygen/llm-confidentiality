@@ -93,19 +93,22 @@ def main(attacks: List[str], defense: str, llm_type: str,
     if max_level > len(SYSTEM_PROMPTS):
         max_level = len(SYSTEM_PROMPTS)
 
-    print("\n"+"#"*60)
+    print("\n"+"#"*os.get_terminal_size().columns)
     print("## " + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
-    print(f"## System: {torch.get_num_threads()} CPU cores with "
-          f"{os.cpu_count()} threads and "
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: " \
+          f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
           f"{torch.cuda.device_count()} GPUs on {socket.gethostname()}")
-    print(f"## Using Device: {device}")
-    print(f"## Attack Type: {attacks}")
-    print(f"## Defense Type: {defense}")
-    print(f"## Opponent LLM: {llm_type}")
-    print(f"## Testing Level 0-{max_level}")
-    print(f"## Temperature: {temperature}")
-    print(f"## Creating Dataset: {create_dataset}")
-    print("#"*60+"\n")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Device{TColors.ENDC}: {device}")
+    if torch.cuda.is_available():
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
+              f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Type{TColors.ENDC}: {attacks}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Defense Type{TColors.ENDC}: {defense}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Opponent LLM{TColors.ENDC}: {llm_type}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Iterations{TColors.ENDC}: {max_level}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Creating Dataset{TColors.ENDC}: {create_dataset}")
+    print("#"*os.get_terminal_size().columns+"\n")
 
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 

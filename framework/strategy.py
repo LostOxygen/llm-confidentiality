@@ -52,24 +52,41 @@ class Strategy:
             self.chat_api_add_messages("user", mal_prompt)
             self.chat_api_add_messages("assistant", response)
 
-            if level_id < 10:
-                succ_result_str = f"{'SUCCESS':>8}"
-                fail_result_str = f"{'FAIL':>8}"
-            else:
-                succ_result_str = f"{'SUCCESS':>7}"
-                fail_result_str = f"{'FAIL':>7}"
+            match level_id:
+                case _ as lid if lid in range(0, 10):
+                    succ_result_str = f"{'SUCCESS':>10}"
+                    fail_result_str = f"{'FAIL':>10}"
+                case _ as lid if lid in range(10, 100):
+                    succ_result_str = f"{'SUCCESS':>9}"
+                    fail_result_str = f"{'FAIL':>9}"
+                case _ as lid if lid in range(100, 1000):
+                    succ_result_str = f"{'SUCCESS':>8}"
+                    fail_result_str = f"{'FAIL':>8}"
+                case _ as lid if lid in range(1000, 10000):
+                    succ_result_str = f"{'SUCCESS':>7}"
+                    fail_result_str = f"{'FAIL':>7}"
+                case _:
+                    succ_result_str = f"{'SUCCESS':>10}"
+                    fail_result_str = f"{'FAIL':>10}"
 
             # check if the secret key got leaked
             if self.__evaluate_response(response):
-                print(f"Level {level_id}: {TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
+                # Success print followed by prompt enhancement
+                print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
+                      f"[{TColors.OKCYAN}{level_id}{TColors.ENDC}]: " \
+                      f"{TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
                 num_successes += 1
+
                 if self.create_dataset:
                     # enhance the system prompt and save it to the dataset
                     enh_sys_prompt = self.get_enhanced_system_prompt(history)
                     if len(enh_sys_prompt) > 40:
                         prompt_dataset.add_prompt(enh_sys_prompt)
             else:
-                print(f"Level {level_id}: {TColors.FAIL}{fail_result_str}{TColors.ENDC}")
+                # fail print
+                print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
+                      f"[{TColors.OKCYAN}{level_id}{TColors.ENDC}]: " \
+                      f"{TColors.FAIL}{fail_result_str}{TColors.ENDC}")
 
             log_conversation(self.llm_type, self.attack_func.__name__,
                              self.defense_func.__name__, level_id,

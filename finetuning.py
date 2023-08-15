@@ -22,7 +22,7 @@ from framework.dataset import PromptDataset
 from framework.prompts import SECRET_KEY
 
 DATA_PATH: Final[str] = "./datasets/system_prompts.json"
-OUTPUT_DIR: Final[str] = "/data/huggingface/finetuning/"
+OUTPUT_DIR: Final[str] = "/data/finetuning/"
 if not os.path.isdir(OUTPUT_DIR):
     os.mkdir(OUTPUT_DIR)
 

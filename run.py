@@ -47,7 +47,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
     Returns:
         None
     """
-    # paste the key into the key.txt file and put into the root directory
+    # paste the OpenAI key into the key.txt file and put into the root directory
     try:
         with open(file="key.txt", mode="r", encoding="utf-8") as f:
             key = f.read().replace("\n", "")
@@ -63,7 +63,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
         if llm_type in ["gpt-3.5-turbo", "gpt-3.5-turbo-0301", "gpt-4"]:
             sys.exit(1)
 
-    # paste the key into the key.txt file and put into the root directory
+    # paste the Huggingface token into the hf_token.txt file and put into the root directory
     try:
         with open(file="hf_token.txt", mode="r", encoding="utf-8") as f:
             key = f.read().replace("\n", "")

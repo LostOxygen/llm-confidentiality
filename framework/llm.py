@@ -51,6 +51,7 @@ class LLM():
                             quantization_config=config,
                             low_cpu_mem_usage=True,
                             token=os.environ["HF_TOKEN"],
+                            trust_remote_code=True,
                         )
 
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
@@ -85,6 +86,7 @@ class LLM():
                             quantization_config=config,
                             low_cpu_mem_usage=True,
                             token=os.environ["HF_TOKEN"],
+                            trust_remote_code=True,
                         )
 
 
@@ -121,6 +123,7 @@ class LLM():
                             quantization_config=config,
                             low_cpu_mem_usage=True,
                             token=os.environ["HF_TOKEN"],
+                            trust_remote_code=True,
                         )
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")

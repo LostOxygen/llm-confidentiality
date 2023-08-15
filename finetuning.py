@@ -145,7 +145,7 @@ def main(llm_type: str) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
-    parser.add_argument("--llm_type", "-llm", type=str, default="gpt-3.5-turbo-0301",
+    parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
                         help="specifies the opponent LLM type")
     args = parser.parse_args()
     main(**vars(args))

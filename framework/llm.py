@@ -145,6 +145,53 @@ class LLM():
             del self.tokenizer
 
 
+    @staticmethod
+    def format_prompt(system_prompt: str, user_prompt: str, llm_type: str) -> str:
+        """
+        Helper method to format the prompt correctly for the different LLMs
+        
+        Parameters:
+            system_prompt: str - the system prompt to initialize the LLM
+            user_prompt: str - the user prompt for the LLM to respond on
+            llm_type: str - the type of the LLM to format the prompt for
+
+        Returns:
+            formatted_prompt: str - the formatted prompt for the LLM
+        """
+        supported_models = ["llama2", "llama2-13b", "llama2-70b",
+                            "vicuna-7b", "vicuna-13b", "vicuna-33b",
+                            "beluga-7b", "beluga-13b", "beluga-70b"]
+        assert llm_type in supported_models, f"{llm_type} prompt formatting not supported"
+
+        match llm_type:
+            case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
+                formatted_messages = f"""
+                {system_prompt}
+
+                USER: {user_prompt}
+                """
+
+            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b"):
+                formatted_messages = f"""<s>[INST] <<SYS>>
+                    {system_prompt}
+                    <</SYS>>
+                    {user_prompt}
+                    <</INST>>
+                """
+
+            case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
+                formatted_messages = f"""
+                ### System:
+                {system_prompt}
+
+                ### User:
+                {user_prompt}
+
+                ### Assistant:\n
+                """
+
+        return formatted_messages
+
     @torch.inference_mode(mode=True)
     def predict(self, system_prompt: str, user_prompt: str) -> Tuple[str, str]:
         """
@@ -179,12 +226,7 @@ class LLM():
                 """
 
             case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b"):
-                formatted_messages = f"""<s>[INST] <<SYS>>
-                    {system_prompt}
-                    <</SYS>>
-                    {user_prompt}
-                    <</INST>>
-                """
+                formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
@@ -201,15 +243,8 @@ class LLM():
                 response = response[0].replace(formatted_messages, "")
 
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
-                formatted_messages = f"""
-                ### System:
-                {system_prompt}
+                formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
-                ### User:
-                {user_prompt}
-
-                ### Assistant:\n
-                """
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     outputs = self.model.generate(inputs.input_ids, do_sample=True,
@@ -225,11 +260,7 @@ class LLM():
                 response = response[0].replace(formatted_messages, "")
 
             case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
-                formatted_messages = f"""
-                {system_prompt}
-
-                USER: {user_prompt}
-                """
+                formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")

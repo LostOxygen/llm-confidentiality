@@ -42,7 +42,8 @@ class LLM():
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
                                 token=os.environ["HF_TOKEN"],
-                                use_fast=False
+                                use_fast=False,
+                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
 
                 self.model = AutoModelForCausalLM.from_pretrained(
@@ -52,6 +53,7 @@ class LLM():
                             low_cpu_mem_usage=True,
                             token=os.environ["HF_TOKEN"],
                             trust_remote_code=True,
+                            cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
 
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
@@ -77,7 +79,8 @@ class LLM():
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
                                 token=os.environ["HF_TOKEN"],
-                                use_fast=False
+                                use_fast=False,
+                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
 
                 self.model = AutoModelForCausalLM.from_pretrained(
@@ -87,6 +90,7 @@ class LLM():
                             low_cpu_mem_usage=True,
                             token=os.environ["HF_TOKEN"],
                             trust_remote_code=True,
+                            cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
 
 
@@ -114,7 +118,8 @@ class LLM():
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
                                 token=os.environ["HF_TOKEN"],
-                                use_fast=False
+                                use_fast=False,
+                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
 
                 self.model = AutoModelForCausalLM.from_pretrained(
@@ -124,6 +129,7 @@ class LLM():
                             low_cpu_mem_usage=True,
                             token=os.environ["HF_TOKEN"],
                             trust_remote_code=True,
+                            cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")

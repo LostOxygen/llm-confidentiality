@@ -49,3 +49,30 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 |[ChatML Abuse](https://www.robustintelligence.com/blog-posts/prompt-injection-attack-on-gpt-4) | ```chatml_abuse``` | [LLM Evaluation](https://learnprompting.org/docs/prompt_hacking/defensive_measures/llm_eval) | ```llm_eval``` |
 |[Masking](https://learnprompting.org/docs/prompt_hacking/offensive_measures/obfuscation) | ```masking``` | |
 |[Typoglycemia](https://twitter.com/lauriewired/status/1682825103594205186?s=20) | ```typoglycemia``` | |
+
+# Finetuning to create enhanced system prompts
+This section covers the possible LLaMA2 finetuning options to create enhanced system prompts.
+
+## Setup
+Additionally to the above setup run
+```bash
+accelerate config
+```
+to configure the distributed training capabilities of your system.
+
+## Usage
+```python
+python finetuning.py [-h] [-llm | --llm_type LLM_NAME]
+```
+
+## Arguments
+| Argument | Type | Description |
+|----------|------|-------------|
+| -h, --help | | show this help message and exit |
+| -llm, --llm_type | str | specifies the type of llm to finetune (default: "llama2-7b") |
+
+
+## Supported Large Language Models (base)
+| Model | Parameter Specifier | Link | Compute Instance |
+|-------|------|-----|-----|
+| LLaMA2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |

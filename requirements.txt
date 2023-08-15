@@ -3,10 +3,12 @@ protobuf
 langchain
 openai
 accelerate
-transformers
+transformers @ git+https://github.com/huggingface/transformers.git
 huggingface-hub
 bitsandbytes
+einops
+wandb
 scipy
 deepspeed
-peft
+peft @ git+https://github.com/huggingface/peft.git
 trl

@@ -34,17 +34,17 @@ class LLM():
                 # complete the model name for chat or normal models
                 model_name = "meta-llama/"
                 if self.llm_type.split("-")[1] == "7b":
-                    if self.llm_type.split("-")[2] == "base":
+                    if "base" in self.llm_type:
                         model_name += "Llama-2-7b-hf"
                     else:
                         model_name += "Llama-2-7b-chat-hf"
                 elif self.llm_type.split("-")[1] == "13b":
-                    if self.llm_type.split("-")[2] == "base":
+                    if "base" in self.llm_type:
                         model_name += "Llama-2-13b-hf"
                     else:
                         model_name += "Llama-2-13b-chat-hf"
                 elif self.llm_type.split("-")[1] == "70b":
-                    if self.llm_type.split("-")[2] == "base":
+                    if "base" in self.llm_type:
                         model_name += "Llama-2-70b-hf"
                     else:
                         model_name += "Llama-2-70b-chat-hf"

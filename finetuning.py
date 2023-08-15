@@ -54,7 +54,7 @@ def gen_data() -> Generator[str, None, None]:
         {dataset.get_random_prompt()}</s>
     """
 
-    yield prompt
+    yield {"prompt": prompt}
 
 
 def main(llm_type: str) -> None:
@@ -135,7 +135,7 @@ def main(llm_type: str) -> None:
         peft_config=peft_config,
         dataset_text_field="text",
         packing=True,
-        max_seq_length=None,
+        max_seq_length=4096,
         tokenizer=llm.tokenizer,
         args=training_args,
     )

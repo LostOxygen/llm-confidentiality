@@ -68,7 +68,7 @@ class LLM():
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
 
-            case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
+            case ("beluga2" | "beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 self.temperature = max(0.01, min(self.temperature, 2.0))
                 model_name = "stabilityai/"
                 # create quantization config
@@ -170,9 +170,9 @@ class LLM():
         Returns:
             formatted_prompt: str - the formatted prompt for the LLM
         """
-        supported_models = ["llama2", "llama2-13b", "llama2-70b",
-                            "vicuna-7b", "vicuna-13b", "vicuna-33b",
-                            "beluga-7b", "beluga-13b", "beluga-70b"]
+        supported_models = ["llama2", "llama-7b", "llama2-13b", "llama2-70b",
+                            "vicuna", "vicuna-7b", "vicuna-13b", "vicuna-33b",
+                            "beluga", "beluga-7b", "beluga-13b", "beluga-70b"]
         assert llm_type in supported_models, f"{llm_type} prompt formatting not supported"
 
         match llm_type:
@@ -191,7 +191,7 @@ class LLM():
                     <</INST>>
                 """
 
-            case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
+            case ("beluga" | "beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 formatted_messages = f"""
                 ### System:
                 {system_prompt}

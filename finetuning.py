@@ -27,7 +27,7 @@ if not os.path.isdir(OUTPUT_DIR):
     os.mkdir(OUTPUT_DIR)
 
 
-def gen_data() -> Generator[str]:
+def gen_data() -> Generator[str, None, None]:
     """
     Generator function to yield the system prompt data in a formatted way from the json file.
     """

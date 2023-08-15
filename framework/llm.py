@@ -5,6 +5,7 @@ import torch
 from openai import ChatCompletion
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 
+
 class LLM():
     """abstract implementation of a genereric LLM model"""
     def __init__(self, llm_type: str, temperature: float = 1.0):
@@ -19,7 +20,8 @@ class LLM():
                   "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
 
-            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b"):
+            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
+                  "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
                 config = BitsAndBytesConfig(
@@ -29,13 +31,23 @@ class LLM():
                     bnb_4bit_compute_dtype=torch.bfloat16
                 )
 
+                # complete the model name for chat or normal models
                 model_name = "meta-llama/"
                 if self.llm_type.split("-")[1] == "7b":
-                    model_name += "Llama-2-7b-chat-hf"
+                    if self.llm_type.split("-")[2] == "base":
+                        model_name += "Llama-2-7b-hf"
+                    else:
+                        model_name += "Llama-2-7b-chat-hf"
                 elif self.llm_type.split("-")[1] == "13b":
-                    model_name += "Llama-2-13b-chat-hf"
+                    if self.llm_type.split("-")[2] == "base":
+                        model_name += "Llama-2-13b-hf"
+                    else:
+                        model_name += "Llama-2-13b-chat-hf"
                 elif self.llm_type.split("-")[1] == "70b":
-                    model_name += "Llama-2-70b-chat-hf"
+                    if self.llm_type.split("-")[2] == "base":
+                        model_name += "Llama-2-70b-hf"
+                    else:
+                        model_name += "Llama-2-70b-chat-hf"
                 else:
                     model_name += "Llama-2-70b-chat-hf"
 
@@ -193,9 +205,9 @@ class LLM():
         return formatted_messages
 
     @torch.inference_mode(mode=True)
-    def predict(self, system_prompt: str, user_prompt: str) -> Tuple[str, str]:
+    def chat(self, system_prompt: str, user_prompt: str) -> Tuple[str, str]:
         """
-        predicts a response for a given prompt input
+        predicts a response for a given prompt input 
 
         Parameters:
             system_prompt: str - the system prompt to initialize the LLM
@@ -225,7 +237,8 @@ class LLM():
                 {response}<|im_end|>
                 """
 
-            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b"):
+            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
+                  "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base"):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():

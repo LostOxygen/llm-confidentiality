@@ -46,7 +46,7 @@ class Strategy:
             # apply the defense function to the malicious prompt
             mal_prompt = self.defense_func(mal_prompt)
             # predict the response of the opponent LLM
-            response, history = self.llm.predict(system_prompt, mal_prompt)
+            response, history = self.llm.chat(system_prompt, mal_prompt)
 
             # call the chat api to add the messages to the chat
             self.chat_api_add_messages("system", system_prompt)
@@ -121,7 +121,7 @@ class Strategy:
         the system prompt and nothing else. The system prompt has to be at least 40 characters long 
         but must not be longer than 200 characters.
         """
-        enhanced_system_prompt = self.llm.predict("", prompt)[0]
+        enhanced_system_prompt = self.llm.chat("", prompt)[0]
         # sanitize the prompt
         enhanced_system_prompt = enhanced_system_prompt.replace("<|im_start|>system\n", "")
         enhanced_system_prompt = enhanced_system_prompt.replace("<|startoftext|>\n", "")

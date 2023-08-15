@@ -21,6 +21,7 @@ from framework.colors import TColors
 from framework.dataset import PromptDataset
 from framework.prompts import SECRET_KEY
 
+os.environ["TRANSFORMERS_CACHE"] = "/data/"
 DATA_PATH: Final[str] = "./datasets/system_prompts.json"
 OUTPUT_DIR: Final[str] = "/data/finetuning/"
 if not os.path.isdir(OUTPUT_DIR):

@@ -186,6 +186,7 @@ def main(llm_type: str) -> None:
 
     trainer.train()
     trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
+    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
 
     # free up memory to merge the weights
     del llm
@@ -196,7 +197,6 @@ def main(llm_type: str) -> None:
     finetuned_llm = LLM(llm_type=llm_type+"-finetuned")
     finetuned_llm.model.merge_and_unload()
     finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
-    finetuned_llm.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
 

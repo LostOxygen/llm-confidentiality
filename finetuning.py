@@ -135,27 +135,27 @@ def main(llm_type: str) -> None:
     print(f"## {TColors.HEADER}{TColors.BOLD}Finetuning Parameters{TColors.ENDC} " + \
            "#"*int(os.get_terminal_size().columns-25))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}lora_alpha{TColors.ENDC}: " \
-          f"{CONFIG['lora']['lora_alpha']}{OUTPUT_DIR}")
+          f"{CONFIG['lora']['lora_alpha']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}lora_dropout{TColors.ENDC}: " \
-          f"{CONFIG['lora']['lora_dropout']}{OUTPUT_DIR}")
+          f"{CONFIG['lora']['lora_dropout']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}r-value{TColors.ENDC}: " \
-          f"{CONFIG['lora']['r']}{OUTPUT_DIR}")
+          f"{CONFIG['lora']['r']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}bias{TColors.ENDC}: " \
-          f"{CONFIG['lora']['bias']}{OUTPUT_DIR}")
+          f"{CONFIG['lora']['bias']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}task_type{TColors.ENDC}: " \
-          f"{CONFIG['lora']['task_type']}{OUTPUT_DIR}")
+          f"{CONFIG['lora']['task_type']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}gradient_accumulaton_steps{TColors.ENDC}: " \
-          f"{CONFIG['training']['max_steps']}{OUTPUT_DIR}")
+          f"{CONFIG['training']['max_steps']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: " \
-          f"{CONFIG['training']['learning_rate']}{OUTPUT_DIR}")
+          f"{CONFIG['training']['learning_rate']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}max_steps{TColors.ENDC}: " \
-          f"{CONFIG['training']['max_steps']}{OUTPUT_DIR}")
+          f"{CONFIG['training']['max_steps']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}max_seq_length{TColors.ENDC}: " \
-          f"{CONFIG['trainer']['max_seq_length']}{OUTPUT_DIR}")
+          f"{CONFIG['trainer']['max_seq_length']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}packing{TColors.ENDC}: " \
-          f"{CONFIG['trainer']['packing']}{OUTPUT_DIR}")
+          f"{CONFIG['trainer']['packing']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}per_device_train_batch_size{TColors.ENDC}: " \
-          f"{CONFIG['training']['per_device_train_batch_size']}{OUTPUT_DIR}")
+          f"{CONFIG['training']['per_device_train_batch_size']}")
     print("#"*os.get_terminal_size().columns+"\n")
 
     # load the LLM

@@ -44,7 +44,10 @@ class LLM():
                 self.model = AutoPeftModelForCausalLM.from_pretrained(
                     model_path,
                     device_map="auto",
-                    torch_dtype=torch.bfloat16
+                    torch_dtype=torch.bfloat16,
+                    local_files_only=True,
+                    quantization_config=config,
+                    low_cpu_mem_usage=True,
                 )
 
             case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |

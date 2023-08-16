@@ -57,6 +57,7 @@ class LLM():
                                 use_fast=False,
                                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
+                self.tokenizer.pad_token = self.tokenizer.eos_token
 
                 self.model = AutoModelForCausalLM.from_pretrained(
                             model_name,

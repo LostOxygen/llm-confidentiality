@@ -22,7 +22,7 @@ class LLM():
                   "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
 
-            case ("llama-7b-finetuned" | "llama-13b-finetuned" | "llama-70b-finetuned"):
+            case ("llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
                 config = BitsAndBytesConfig(

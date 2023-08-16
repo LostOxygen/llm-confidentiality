@@ -44,7 +44,7 @@ CONFIG: Final[dict] = {
         "gradient_accumulation_steps": 4,
         "learning_rate": 2e-4,
         "logging_steps": 10,
-        "max_steps": 500,
+        "max_steps": 1000,
         "per_device_train_batch_size": 4,
     },
     "trainer": {
@@ -132,6 +132,7 @@ def main(llm_type: str) -> None:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {llm_type}")
+
     print("#"*os.get_terminal_size().columns+"\n")
 
     # load the LLM

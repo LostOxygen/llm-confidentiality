@@ -9,6 +9,5 @@ bitsandbytes
 einops
 wandb
 scipy
-deepspeed
 peft @ git+https://github.com/huggingface/peft.git
 trl

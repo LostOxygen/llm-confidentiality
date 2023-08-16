@@ -6,7 +6,7 @@ from openai import ChatCompletion
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from peft import AutoPeftModelForCausalLM
 
-OUTPUT_DIR: Final[str] = "/data/finetuning/"
+OUTPUT_DIR: Final[str] = "data/finetuning/"
 
 class LLM():
     """abstract implementation of a genereric LLM model"""
@@ -31,6 +31,7 @@ class LLM():
                     bnb_4bit_use_double_quant=True,
                     bnb_4bit_compute_dtype=torch.bfloat16
                 )
+
                 # complete the model name for chat or normal models
                 model_path = OUTPUT_DIR + self.llm_type
 

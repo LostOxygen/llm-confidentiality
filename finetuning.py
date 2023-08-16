@@ -26,7 +26,7 @@ os.environ["WANDB_WATCH"] = "false"
 os.environ["WANDB_PROJECT"]="llm-finetuning"
 
 DATA_PATH: Final[str] = "./datasets/system_prompts.json"
-OUTPUT_DIR: Final[str] = "/data/finetuning/"
+OUTPUT_DIR: Final[str] = "data/finetuning/"
 if not os.path.isdir(OUTPUT_DIR):
     os.mkdir(OUTPUT_DIR)
 
@@ -185,7 +185,8 @@ def main(llm_type: str) -> None:
     )
 
     trainer.train()
-    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
+    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"),
+                                  safe_serialization=True)
     trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
 
     # free up memory to merge the weights

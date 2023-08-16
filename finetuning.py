@@ -132,7 +132,29 @@ def main(llm_type: str) -> None:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {llm_type}")
-
+    print("## Finetuning Parameters " + "#"*os.get_terminal_size().columns-25)
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}lora_alpha{TColors.ENDC}: " \
+          f"{CONFIG['lora']['max_steps']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}lora_dropout{TColors.ENDC}: " \
+          f"{CONFIG['lora']['max_steps']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}r-value{TColors.ENDC}: " \
+          f"{CONFIG['lora']['r']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}bias{TColors.ENDC}: " \
+          f"{CONFIG['lora']['bias']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}task_type{TColors.ENDC}: " \
+          f"{CONFIG['lora']['task_type']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}gradient_accumulaton_steps{TColors.ENDC}: " \
+          f"{CONFIG['training']['max_steps']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: " \
+          f"{CONFIG['training']['learning_rate']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}max_steps{TColors.ENDC}: " \
+          f"{CONFIG['training']['max_steps']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}max_sequence_length{TColors.ENDC}: " \
+          f"{CONFIG['trainer']['max_sequence_length']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}packing{TColors.ENDC}: " \
+          f"{CONFIG['trainer']['packing']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}per_device_train_batch_size{TColors.ENDC}: " \
+          f"{CONFIG['training']['per_device_train_batch_size']}{OUTPUT_DIR}")
     print("#"*os.get_terminal_size().columns+"\n")
 
     # load the LLM

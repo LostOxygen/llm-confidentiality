@@ -46,7 +46,7 @@ CONFIG: Final[dict] = {
     },
     "trainer": {
         "max_seq_length": 4096,
-        "dataset_text_field": "text",
+        "dataset_text_field": "prompts", # this is the training field name
         "packing": False,
     }
 }

@@ -1,10 +1,12 @@
 """library for LLM models, functions and helper stuff"""
 import os
-from typing import Tuple
+from typing import Tuple, Final
 import torch
 from openai import ChatCompletion
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from peft import AutoPeftModelForCausalLM
 
+OUTPUT_DIR: Final[str] = "/data/finetuning/"
 
 class LLM():
     """abstract implementation of a genereric LLM model"""
@@ -19,6 +21,31 @@ class LLM():
             case ("gpt-3.5-turbo" | "gpt-3.5-turbo-0301" |
                   "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
+
+            case ("llama-7b-finetuned" | "llama-13b-finetuned" | "llama-70b-finetuned"):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                # create quantization config
+                config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_use_double_quant=True,
+                    bnb_4bit_compute_dtype=torch.bfloat16
+                )
+                # complete the model name for chat or normal models
+                model_path = OUTPUT_DIR + self.llm_type
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                                model_path,
+                                token=os.environ["HF_TOKEN"],
+                                use_fast=False,
+                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                            )
+
+                self.model = AutoPeftModelForCausalLM.from_pretrained(
+                    model_path,
+                    device_map="auto",
+                    torch_dtype=torch.bfloat16
+                )
 
             case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
                   "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base"):

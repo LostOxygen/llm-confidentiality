@@ -13,7 +13,7 @@ import torch
 from huggingface_hub import login
 from datasets import Dataset
 from transformers import TrainingArguments
-from peft import LoraConfig, AutoPeftModelForCausalLM
+from peft import LoraConfig
 from trl import SFTTrainer
 
 from framework.llm import LLM
@@ -161,13 +161,20 @@ def main(llm_type: str) -> None:
     )
 
     trainer.train()
-    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"_finetuned"))
+    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
 
     # free up memory to merge the weights
     del llm
     del trainer
     del dataset
     torch.cuda.empty_cache()
+
+    finetuned_llm = LLM(llm_type=llm_type+"-finetuned")
+    finetuned_llm.model.merge_and_unload()
+    finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
+    finetuned_llm.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
+
+    print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
 
 
 if __name__ == "__main__":

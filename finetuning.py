@@ -149,8 +149,8 @@ def main(llm_type: str) -> None:
           f"{CONFIG['training']['learning_rate']}{OUTPUT_DIR}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}max_steps{TColors.ENDC}: " \
           f"{CONFIG['training']['max_steps']}{OUTPUT_DIR}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}max_sequence_length{TColors.ENDC}: " \
-          f"{CONFIG['trainer']['max_sequence_length']}{OUTPUT_DIR}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}max_seq_length{TColors.ENDC}: " \
+          f"{CONFIG['trainer']['max_seq_length']}{OUTPUT_DIR}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}packing{TColors.ENDC}: " \
           f"{CONFIG['trainer']['packing']}{OUTPUT_DIR}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}per_device_train_batch_size{TColors.ENDC}: " \

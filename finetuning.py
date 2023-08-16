@@ -22,6 +22,9 @@ from framework.dataset import PromptDataset
 from framework.prompts import SECRET_KEY
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
+os.environ["WANDB_WATCH"] = "false"
+os.environ["WANDB_PROJECT"]="llm-finetuning"
+
 DATA_PATH: Final[str] = "./datasets/system_prompts.json"
 OUTPUT_DIR: Final[str] = "/data/finetuning/"
 if not os.path.isdir(OUTPUT_DIR):
@@ -144,6 +147,7 @@ def main(llm_type: str) -> None:
     peft_config = LoraConfig(**CONFIG["lora"])
 
     training_args = TrainingArguments(**CONFIG["training"])
+    training_args.run_name = "llm-finetuning" # wandb run name
 
     trainer = SFTTrainer(
         model=llm.model,

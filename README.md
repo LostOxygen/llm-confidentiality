@@ -58,7 +58,11 @@ Additionally to the above setup run
 ```bash
 accelerate config
 ```
-to configure the distributed training capabilities of your system.
+to configure the distributed training capabilities of your system. And
+```bash
+wandb login
+```
+with your WandB API key to enable logging of the finetuning process.
 
 ## Usage
 ```python

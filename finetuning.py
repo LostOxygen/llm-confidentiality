@@ -13,7 +13,7 @@ import torch
 from huggingface_hub import login
 from datasets import Dataset
 from transformers import TrainingArguments
-from peft import LoraConfig
+from peft import LoraConfig, PeftModel
 from trl import SFTTrainer
 
 from framework.llm import LLM
@@ -28,7 +28,7 @@ os.environ["WANDB_PROJECT"]="llm-finetuning"
 DATA_PATH: Final[str] = "./datasets/system_prompts.json"
 OUTPUT_DIR: Final[str] = "data/finetuning/"
 if not os.path.isdir(OUTPUT_DIR):
-    os.mkdir(OUTPUT_DIR)
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
 CONFIG: Final[dict] = {
@@ -190,12 +190,12 @@ def main(llm_type: str) -> None:
     trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
 
     # free up memory to merge the weights
-    del llm
-    del trainer
+    # del llm
+    # del trainer
     del dataset
     torch.cuda.empty_cache()
 
-    finetuned_llm = LLM(llm_type=llm_type+"-finetuned")
+    finetuned_llm = PeftModel.from_pretrained(llm.model, trainer.model)
     finetuned_llm.model.merge_and_unload()
     finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"),
                                         safe_serialization=True)

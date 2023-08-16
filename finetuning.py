@@ -132,7 +132,7 @@ def main(llm_type: str) -> None:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {llm_type}")
-    print(f"## {TColors.HEADER}{TColors.BOLD}Finetuning Parameters{TColors.ENDC} " \
+    print(f"## {TColors.HEADER}{TColors.BOLD}Finetuning Parameters{TColors.ENDC} " + \
            "#"*int(os.get_terminal_size().columns-25))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}lora_alpha{TColors.ENDC}: " \
           f"{CONFIG['lora']['lora_alpha']}{OUTPUT_DIR}")

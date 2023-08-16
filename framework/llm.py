@@ -36,7 +36,6 @@ class LLM():
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_path,
-                                token=os.environ["HF_TOKEN"],
                                 use_fast=False,
                                 local_files_only=True,
                             )

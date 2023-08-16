@@ -7,13 +7,13 @@ import sys
 import datetime
 import socket
 import argparse
-from typing import Final, Generator
+from typing import Final, Generator, List
 
 import torch
 from huggingface_hub import login
-from datasets import IterableDataset
+from datasets import Dataset
 from transformers import TrainingArguments
-from peft import LoraConfig
+from peft import LoraConfig, AutoPeftModelForCausalLM
 from trl import SFTTrainer
 
 from framework.llm import LLM
@@ -28,20 +28,43 @@ if not os.path.isdir(OUTPUT_DIR):
     os.mkdir(OUTPUT_DIR)
 
 
-def gen_data() -> Generator[str, None, None]:
+CONFIG: Final[dict] = {
+    "lora": {
+        "lora_alpha": 16,
+        "lora_dropout": 0.1,
+        "r": 64,
+        "bias": "none",
+        "task_type": "CAUSAL_LM",
+    },
+    "training": {
+        "output_dir": OUTPUT_DIR,
+        "gradient_accumulation_steps": 4,
+        "learning_rate": 2e-4,
+        "logging_steps": 10,
+        "max_steps": 500,
+        "per_device_train_batch_size": 4,
+    },
+    "trainer": {
+        "max_seq_length": 4096,
+        "dataset_text_field": "text",
+        "packing": False,
+    }
+}
+
+
+def create_dataset() -> Generator[str, None, None]:
     """
     Generator function to yield the system prompt data in a formatted way from the json file.
     """
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
     dataset = PromptDataset()
+    prompt_list: List = []
 
-    while True:
-        prompt = f"""<s>[INST] <<SYS>>
+    for idx in range(0, len(dataset)):
+        prompt = f"""
             You are a safety assistant to generate new and secure system prompts to initialize fresh LLMs.
-            <</SYS>>
 
-            You, as an confidential large language model, leaked your system prompt and
-            your secret key in the previous chat history. 
+            ### Instruction:
             Create and print a new safe system prompt to instruct an LLM to be safe against prompt
             injection and prompt leaking attacks. Use the previous system prompt as inspiration but
             do not use the previous system prompt as a base for the new prompns. Create a completely new
@@ -50,12 +73,17 @@ def gen_data() -> Generator[str, None, None]:
             a set of instructions to guide the instructed LLM into keeping the secret key safe. Print only
             the system prompt and nothing else. The system prompt has to be at least 40 characters long 
             but must not be longer than 200 characters.
-            [/INST]
 
-            {dataset.get_random_prompt()}</s>
+            ### Response:
+            {dataset.get_prompt_at_idx(idx)}
+
+            ### End
         """
+        prompt_list.append(prompt)
 
-        yield {"prompt": prompt}
+    new_dataset: dict = Dataset.from_dict({"prompts": prompt_list})
+
+    return new_dataset
 
 
 def main(llm_type: str) -> None:
@@ -110,39 +138,32 @@ def main(llm_type: str) -> None:
     llm.model.config.pretraining_tp = 1
 
     # load the dataset
-    dataset = IterableDataset(gen_data)
+    dataset = create_dataset()
 
     # create the training/finetuning arguments and the trainer
-    peft_config = LoraConfig(
-        lora_alpha=16,
-        lora_dropout=0.1,
-        r=64,
-        bias="none",
-        task_type="CAUSAL_LM",
-    )
+    peft_config = LoraConfig(**CONFIG["lora"])
 
-    training_args = TrainingArguments(
-        output_dir=OUTPUT_DIR,
-        per_device_train_batch_size=4,
-        gradient_accumulation_steps=4,
-        learning_rate=2e-4,
-        logging_steps=10,
-        max_steps=500
-    )
+    training_args = TrainingArguments(**CONFIG["training"])
 
     trainer = SFTTrainer(
         model=llm.model,
         train_dataset=dataset,
         peft_config=peft_config,
-        dataset_text_field="text",
-        packing=True,
-        max_seq_length=4096,
+        dataset_text_field=CONFIG["trainer"]["dataset_text_field"],
+        packing=CONFIG["trainer"]["packing"],
+        max_seq_length=CONFIG["trainer"]["max_seq_length"],
         tokenizer=llm.tokenizer,
         args=training_args,
     )
 
     trainer.train()
     trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"_finetuned"))
+
+    # free up memory to merge the weights
+    del llm
+    del trainer
+    del dataset
+    torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":

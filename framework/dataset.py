@@ -4,6 +4,7 @@ import json
 import random
 
 from framework.prompts import SYSTEM_PROMPTS
+from framework.colors import TColors
 
 class PromptDataset():
     """Implementation of a dataset for system prompts"""
@@ -67,3 +68,12 @@ class PromptDataset():
     def get_prompt_at_idx(self, idx: int) -> str:
         """Returns the prompt at the given index"""
         return self.data[str(idx)]
+
+
+    @staticmethod
+    def get_whole_dataset() -> dict:
+        """Returns the whole json dataset as a dictionary, even without initializing the class"""
+        if not os.path.isfile("./datasets/system_prompts.json"):
+            raise FileNotFoundError(f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}")
+        with open("./datasets/system_prompts.json", "r", encoding="utf-8") as file:
+            return json.load(file)

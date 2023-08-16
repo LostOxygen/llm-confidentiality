@@ -196,7 +196,8 @@ def main(llm_type: str) -> None:
 
     finetuned_llm = LLM(llm_type=llm_type+"-finetuned")
     finetuned_llm.model.merge_and_unload()
-    finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
+    finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"),
+                                        safe_serialization=True)
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
 

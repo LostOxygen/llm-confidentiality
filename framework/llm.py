@@ -45,6 +45,7 @@ class LLM():
                     device_map="auto",
                     torch_dtype=torch.bfloat16,
                     local_files_only=True,
+                    return_dict=True,
                     quantization_config=config,
                     low_cpu_mem_usage=True,
                 )

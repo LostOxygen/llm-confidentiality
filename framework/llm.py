@@ -38,7 +38,7 @@ class LLM():
                                 model_path,
                                 token=os.environ["HF_TOKEN"],
                                 use_fast=False,
-                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                                local_files_only=True,
                             )
 
                 self.model = AutoPeftModelForCausalLM.from_pretrained(

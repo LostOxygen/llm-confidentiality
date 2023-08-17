@@ -34,9 +34,10 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 |-------|------|-----|-----|
 | GPT-3.5-Turbo | ```gpt-3.5-turbo``` / ```gpt-3.5-turbo-0301``` / ```gpt-3.5-turbo-0613``` | [Link](https://platform.openai.com/docs/models/gpt-3-5)| OpenAI API |
 | GPT-4 | ```gpt-4``` / ```gpt-4-0613``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
-| LLaMA2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` / ```llama2-7b-finetuned``` / ```llama2-13b-finetuned``` / ```llama2-70b-finetuned```| [Link](https://huggingface.co/meta-llama) | Local Inference |
 | Vicuna | ```vicuna-7b``` / ```vicuna-13b``` / ```vicuna-33b``` | [Link](https://huggingface.co/lmsys/vicuna-33b-v1.3) | Local Inference |
 | StableBeluga (2) | ```beluga-7b``` / ```beluga-13b``` / ```beluga2-70b```| [Link](https://huggingface.co/stabilityai/StableBeluga2) | Local Inference |
+(Finetuned LLaMA models have to be generated using the ```finetuning.py``` script, see below)
 
 ## Supported Attacks and Defenses
 | Attacks | | Defenses | |

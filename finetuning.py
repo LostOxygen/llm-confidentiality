@@ -13,7 +13,7 @@ import torch
 from huggingface_hub import login
 from datasets import Dataset
 from transformers import TrainingArguments
-from peft import LoraConfig, PeftModel, AutoPeftModelForCausalLM
+from peft import LoraConfig
 from trl import SFTTrainer
 
 from framework.llm import LLM

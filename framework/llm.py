@@ -6,7 +6,7 @@ from openai import ChatCompletion
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from peft import AutoPeftModelForCausalLM
 
-OUTPUT_DIR: Final[str] = "data/finetuning/"
+OUTPUT_DIR: Final[str] = "./finetuned_models/"
 
 class LLM():
     """abstract implementation of a genereric LLM model"""
@@ -24,14 +24,6 @@ class LLM():
 
             case ("llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
-                # create quantization config
-                config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type="nf4",
-                    bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.bfloat16
-                )
-
                 # complete the model name for chat or normal models
                 model_path = OUTPUT_DIR + self.llm_type
 
@@ -45,10 +37,11 @@ class LLM():
                     model_path,
                     device_map="auto",
                     torch_dtype=torch.bfloat16,
+                    load_in_8bit=False,
                     local_files_only=True,
                     return_dict=True,
-                    quantization_config=config,
                     low_cpu_mem_usage=True,
+                    offload_folder=os.environ["TRANSFORMERS_CACHE"],
                 )
 
             case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |

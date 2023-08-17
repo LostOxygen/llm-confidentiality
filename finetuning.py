@@ -13,7 +13,7 @@ import torch
 from huggingface_hub import login
 from datasets import Dataset
 from transformers import TrainingArguments
-from peft import LoraConfig, PeftModel
+from peft import LoraConfig, PeftModel, AutoPeftModelForCausalLM
 from trl import SFTTrainer
 
 from framework.llm import LLM
@@ -188,14 +188,13 @@ def main(llm_type: str) -> None:
     trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"),
                                   safe_serialization=True)
     trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
-    trainer.model.push_to_hub(f"{llm_type}-finetuned")
 
     # free up memory to merge the weights
     del trainer
     del dataset
     torch.cuda.empty_cache()
 
-    finetuned_llm = PeftModel.from_pretrained(llm.model, f"{llm_type}-finetuned")
+    finetuned_llm = LLM(llm_type=llm_type+"-finetuned")
     finetuned_llm.model.merge_and_unload()
     finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"),
                                         safe_serialization=True)

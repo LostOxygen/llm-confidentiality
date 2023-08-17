@@ -26,6 +26,7 @@ class LLM():
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # complete the model name for chat or normal models
                 model_path = OUTPUT_DIR + self.llm_type
+
                 # complete the model name for chat or normal models
                 model_name = "meta-llama/"
                 if self.llm_type.split("-")[1] == "7b":
@@ -51,9 +52,17 @@ class LLM():
                                 use_fast=False,
                                 local_files_only=True,
                             )
+                base_model = AutoModelForCausalLM.from_pretrained(
+                            model_name,
+                            device_map="auto",
+                            low_cpu_mem_usage=True,
+                            token=os.environ["HF_TOKEN"],
+                            trust_remote_code=True,
+                            cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                        )
 
                 self.model = PeftModel.from_pretrained(
-                    model_name, # base model
+                    base_model, # base model
                     model_path, # local peft model
                     device_map="auto",
                     torch_dtype=torch.bfloat16,

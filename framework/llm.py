@@ -4,7 +4,7 @@ from typing import Tuple, Final
 import torch
 from openai import ChatCompletion
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-from peft import AutoPeftModelForCausalLM
+from peft import PeftModel
 
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 
@@ -26,6 +26,25 @@ class LLM():
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # complete the model name for chat or normal models
                 model_path = OUTPUT_DIR + self.llm_type
+                # complete the model name for chat or normal models
+                model_name = "meta-llama/"
+                if self.llm_type.split("-")[1] == "7b":
+                    if "base" in self.llm_type:
+                        model_name += "Llama-2-7b-hf"
+                    else:
+                        model_name += "Llama-2-7b-chat-hf"
+                elif self.llm_type.split("-")[1] == "13b":
+                    if "base" in self.llm_type:
+                        model_name += "Llama-2-13b-hf"
+                    else:
+                        model_name += "Llama-2-13b-chat-hf"
+                elif self.llm_type.split("-")[1] == "70b":
+                    if "base" in self.llm_type:
+                        model_name += "Llama-2-70b-hf"
+                    else:
+                        model_name += "Llama-2-70b-chat-hf"
+                else:
+                    model_name += "Llama-2-70b-chat-hf"
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_path,
@@ -33,8 +52,9 @@ class LLM():
                                 local_files_only=True,
                             )
 
-                self.model = AutoPeftModelForCausalLM.from_pretrained(
-                    model_path,
+                self.model = PeftModel.from_pretrained(
+                    model_name, # base model
+                    model_path, # local peft model
                     device_map="auto",
                     torch_dtype=torch.bfloat16,
                     load_in_8bit=False,

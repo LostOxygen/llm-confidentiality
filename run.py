@@ -24,6 +24,8 @@ from framework.defenses import (
         sandwiching, llm_eval, identity_prompt
     )
 from framework.colors import TColors
+from framework.utils import log_results
+
 
 if not os.path.isdir("/data/"):
     os.mkdir("/data/")
@@ -149,11 +151,13 @@ def main(attacks: List[str], defense: str, llm_type: str,
         total_successes[attack] = strategy.execute()
         torch.cuda.empty_cache()
 
-    # print the results
+    # print and log the results
     print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
     for attack, successes in total_successes.items():
         print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
               f"{iterations}")
+    log_results(llm_name=llm_type, defense_name=defense,
+                success_dict=total_successes, iters=iterations)
 
     return 0
 

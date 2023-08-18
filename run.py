@@ -32,7 +32,7 @@ if not os.path.isdir("/data/"):
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 
 
-def main(attacks: List[str], defense: str, llm_type: str,
+def main(attacks: List[str], defenses: List[str], llm_type: str,
          temperature: float, iterations: int, create_dataset: bool
          ) -> None:
     """
@@ -40,7 +40,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
 
     Parameters: 
         attack: List[str] - specifies a list of attacks against the LLM
-        defense: str - specifies the defense type
+        defenses: List[str] - specifies the defense type
         llm_type: str - specifies the opponent LLM type
         temperature: float - specifies the opponent LLM temperature to control randomness
         iterations: int - number of attack iterations to test system prompts against
@@ -90,6 +90,8 @@ def main(attacks: List[str], defense: str, llm_type: str,
 
     if "all" in attacks:
         attacks = ATTACK_LIST
+    if "all" in defenses:
+        defenses = DEFENSES_LIST
 
     print("\n"+"#"*os.get_terminal_size().columns)
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
@@ -102,7 +104,7 @@ def main(attacks: List[str], defense: str, llm_type: str,
         print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Type{TColors.ENDC}: {attacks}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Defense Type{TColors.ENDC}: {defense}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Defense Type{TColors.ENDC}: {defenses}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Opponent LLM{TColors.ENDC}: {llm_type}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Iterations{TColors.ENDC}: {iterations}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
@@ -116,48 +118,49 @@ def main(attacks: List[str], defense: str, llm_type: str,
                         llm_type=llm_type, temperature=temperature,
                         iterations=iterations, create_dataset=create_dataset)
 
-    # set the defense function
-    match defense:
-        case "seq_enclosure": defense_func = seq_enclosure
-        case "xml_tagging": defense_func = xml_tagging
-        case "heuristic_defense": defense_func = heuristic_defense
-        case "sandwiching": defense_func = sandwiching
-        case "llm_eval": defense_func = llm_eval
-        case "None": defense_func = identity_prompt
-        case _: defense_func = identity_prompt
+    for defense in defenses:
+        # set the defense function
+        match defense:
+            case "seq_enclosure": defense_func = seq_enclosure
+            case "xml_tagging": defense_func = xml_tagging
+            case "heuristic_defense": defense_func = heuristic_defense
+            case "sandwiching": defense_func = sandwiching
+            case "llm_eval": defense_func = llm_eval
+            case "None": defense_func = identity_prompt
+            case _: defense_func = identity_prompt
 
-    for attack in attacks:
-        # set the attack function
-        match attack:
-            case "payload_splitting": attack_func = payload_splitting
-            case "obfuscation": attack_func = obfuscation
-            case "indirect": attack_func = indirect
-            case "manipulation": attack_func = manipulation
-            case "llm": attack_func = llm_attack
-            case "translation": attack_func = translation
-            case "chatml_abuse": attack_func = chatml_abuse
-            case "masking": attack_func = masking
-            case "typoglycemia": attack_func = typoglycemia
-            case "advs_suffix": attack_func = advs_suffix
-            case _:
-                print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
-                print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
-                sys.exit(1)
+        for attack in attacks:
+            # set the attack function
+            match attack:
+                case "payload_splitting": attack_func = payload_splitting
+                case "obfuscation": attack_func = obfuscation
+                case "indirect": attack_func = indirect
+                case "manipulation": attack_func = manipulation
+                case "llm": attack_func = llm_attack
+                case "translation": attack_func = translation
+                case "chatml_abuse": attack_func = chatml_abuse
+                case "masking": attack_func = masking
+                case "typoglycemia": attack_func = typoglycemia
+                case "advs_suffix": attack_func = advs_suffix
+                case _:
+                    print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
+                    print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
+                    sys.exit(1)
 
-        # set the attack and defense functions
-        strategy.set_attack_func(attack_func)
-        strategy.set_defense_func(defense_func)
-        # run the attack
-        total_successes[attack] = strategy.execute()
-        torch.cuda.empty_cache()
+            # set the attack and defense functions
+            strategy.set_attack_func(attack_func)
+            strategy.set_defense_func(defense_func)
+            # run the attack
+            total_successes[attack] = strategy.execute()
+            torch.cuda.empty_cache()
 
-    # print and log the results
-    print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
-    for attack, successes in total_successes.items():
-        print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
-              f"{iterations}")
-    log_results(llm_name=llm_type, defense_name=defense,
-                success_dict=total_successes, iters=iterations)
+        # print and log the results
+        print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
+        for attack, successes in total_successes.items():
+            print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
+                f"{iterations}")
+        log_results(llm_name=llm_type, defense_name=defense,
+                    success_dict=total_successes, iters=iterations)
 
     return 0
 
@@ -166,8 +169,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
     parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
                         help="specifies the attack types", nargs="+")
-    parser.add_argument("--defense", "-d", type=str, default="None",
-                        help="specifies the defense type", choices=DEFENSES_LIST)
+    parser.add_argument("--defenses", "-d", type=str, default=["None"],
+                        help="specifies the defense type", nargs="+")
     parser.add_argument("--llm_type", "-llm", type=str, default="gpt-3.5-turbo-0301",
                         help="specifies the opponent LLM type")
     parser.add_argument("--temperature", "-t", type=float, default=0.0,

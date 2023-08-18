@@ -89,12 +89,14 @@ def create_dataset() -> Generator[str, None, None]:
     return new_dataset
 
 
-def main(llm_type: str) -> None:
+def main(llm_type: str, iterations: int) -> None:
     """
     Main function to start the LLM finetuning.
-    
+
     Parameters:
         llm_type: str - specifies the LLM type to finetune
+        iterations: int - specifies the number of iterations to finetune the LLM
+
     Returns:
         None
     """
@@ -120,6 +122,9 @@ def main(llm_type: str) -> None:
         device = "cpu"
     else:
         device = "cuda:0"
+
+    # update the default config
+    CONFIG["training"]["max_steps"] = iterations
 
     print("\n"+"#"*os.get_terminal_size().columns)
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
@@ -206,5 +211,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
     parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
                         help="specifies the opponent LLM type")
+    parser.add_argument("--iterations", "-i", type=int, default=1000,
+                        help="specifies the number of iterations to finetune the LLM")
     args = parser.parse_args()
     main(**vars(args))

@@ -64,8 +64,14 @@ def log_results(llm_name: str, defense_name: str, success_dict: dict, iters: int
         f.write(f">>Defense: {defense_name}\n")
         f.write(">>Attack Results: \n\n")
 
+        total_successes: int = 0
+        total_iterations: int = 0
         for attack_name, successes in success_dict.items():
+            total_successes += successes
+            total_iterations += iters
             percentage = round(successes/iters*100, 2)
             f.write(f">>Attack: {attack_name} - Successes: {successes}/{iters} -> {percentage}\n")
 
+        total_percentage = round(total_successes/total_iterations*100, 2)
+        f.write(f">>Total Successes: {total_successes}/{total_iterations} -> {total_percentage}\n")
         f.write("\n"+"#"*100)

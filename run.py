@@ -91,7 +91,7 @@ def main(attacks: List[str], defenses: List[str], llm_type: str,
     if "all" in attacks:
         attacks = ATTACK_LIST
     if "all" in defenses:
-        defenses = DEFENSES_LIST
+        defenses = ["none"] + DEFENSES_LIST
 
     print("\n"+"#"*os.get_terminal_size().columns)
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
@@ -126,7 +126,7 @@ def main(attacks: List[str], defenses: List[str], llm_type: str,
             case "heuristic_defense": defense_func = heuristic_defense
             case "sandwiching": defense_func = sandwiching
             case "llm_eval": defense_func = llm_eval
-            case "None": defense_func = identity_prompt
+            case ("None" | "none"): defense_func = identity_prompt
             case _: defense_func = identity_prompt
 
         for attack in attacks:
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
     parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
                         help="specifies the attack types", nargs="+")
-    parser.add_argument("--defenses", "-d", type=str, default=["None"],
+    parser.add_argument("--defenses", "-d", type=str, default=["none"],
                         help="specifies the defense type", nargs="+")
     parser.add_argument("--llm_type", "-llm", type=str, default="gpt-3.5-turbo-0301",
                         help="specifies the opponent LLM type")

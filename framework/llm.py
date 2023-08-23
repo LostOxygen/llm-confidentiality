@@ -224,7 +224,7 @@ class LLM():
         Returns:
             formatted_prompt: str - the formatted prompt for the LLM
         """
-        supported_models = ["llama2", "llama-7b", "llama2-13b", "llama2-70b",
+        supported_models = ["llama2", "llama2-7b", "llama2-13b", "llama2-70b",
                             "vicuna", "vicuna-7b", "vicuna-13b", "vicuna-33b",
                             "beluga", "beluga-7b", "beluga-13b", "beluga-70b"]
         assert llm_type in supported_models, f"{llm_type} prompt formatting not supported"
@@ -255,6 +255,9 @@ class LLM():
 
                 ### Assistant:\n
                 """
+
+            case _:
+                raise NotImplementedError(f"{llm_type} has no promt formatting yet.")
 
         return formatted_messages
 

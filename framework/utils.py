@@ -26,7 +26,9 @@ def log_conversation(llm_name: str, attack_name: str, defense_name: str, level: 
     if not os.path.isdir(LOG_PATH):
         os.mkdir(LOG_PATH)
 
-    with open(file=LOG_PATH+"prompt_logs.txt", mode="a", encoding="utf-8") as f:
+    file_name = LOG_PATH + f"{llm_name}_chat_logs.txt"
+
+    with open(file=file_name, mode="a", encoding="utf-8") as f:
         f.write("\n"+"#"*100)
         f.write(f"\n>>Time: {str(datetime.datetime.now().strftime('%A, %d. %B %Y %I:%M%p'))}\n")
         f.write(f">>LLM Type: {llm_name}\n")
@@ -57,7 +59,9 @@ def log_results(llm_name: str, defense_name: str, success_dict: dict, iters: int
     if not os.path.isdir(LOG_PATH):
         os.mkdir(LOG_PATH)
 
-    with open(file=LOG_PATH+f"{llm_name}_logs.txt", mode="a", encoding="utf-8") as f:
+    file_name = LOG_PATH + f"{llm_name}_result_logs.txt"
+
+    with open(file=file_name, mode="a", encoding="utf-8") as f:
         f.write("\n"+"#"*100)
         f.write(f"\n>>Time: {str(datetime.datetime.now().strftime('%A, %d. %B %Y %I:%M%p'))}\n")
         f.write(f">>LLM Type: {llm_name}\n")

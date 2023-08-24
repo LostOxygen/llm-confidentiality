@@ -9,7 +9,7 @@ def log_conversation(llm_name: str, attack_name: str, defense_name: str, level: 
                      prompt: str, response: str, success: bool) -> None:
     """
     Logs the conversation between the user and the opponent LLM into 
-    the logs.txt file.
+    the {llm_name}_chat_logs.txt file.
 
     Parameters:
         llm_name: str - the type of the opponent LLM
@@ -43,7 +43,7 @@ def log_conversation(llm_name: str, attack_name: str, defense_name: str, level: 
 
 def log_results(llm_name: str, defense_name: str, success_dict: dict, iters: int) -> None:
     """
-    Logs the final attack/defense results into the results_{llm_name}.txt file.
+    Logs the final attack/defense results into the {llm_name}_result_logs.txt file.
 
     Parameters:
         llm_name: str - the type of the opponent LLM

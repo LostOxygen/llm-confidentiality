@@ -1,12 +1,17 @@
 """library for LLM models, functions and helper stuff"""
 import os
+import sys
+import time
 from typing import Tuple, Final
 import torch
 from openai import ChatCompletion
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from peft import PeftModel
 
+from framework.colors import TColors
+
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
+MAX_RETRIES: int = 10 # number of retries for GPT based chat requests
 
 class LLM():
     """abstract implementation of a genereric LLM model"""
@@ -282,9 +287,23 @@ class LLM():
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ]
-                completion = ChatCompletion.create(model=self.llm_type,
-                                                   messages=messages,
-                                                   temperature=self.temperature)
+                retries = 1
+                while retries <= MAX_RETRIES:
+                    try:
+                        completion = ChatCompletion.create(model=self.llm_type,
+                                                        messages=messages,
+                                                        temperature=self.temperature)
+                    except TimeoutError as e:
+                        if retries == MAX_RETRIES:
+                            raise e
+                        else:
+                            retries += 1
+                            print(f"{TColors.FAIL}Timeout during {self.llm_type} request!"
+                                f"{TColors.ENDC}{TColors.OKBLUE} {MAX_RETRIES-retries} retries left"
+                                f"{TColors.ENDC}")
+                            time.sleep(5)
+
+
                 response = completion.choices[0].message.content
                 history = f"""<|im_start|>system
                 {system_prompt}<|im_end|>

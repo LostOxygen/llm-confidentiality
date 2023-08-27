@@ -292,6 +292,7 @@ class LLM():
                         completion = ChatCompletion.create(model=self.llm_type,
                                                         messages=messages,
                                                         temperature=self.temperature)
+                        break
                     except TimeoutError as e:
                         if retries == MAX_RETRIES:
                             raise e

@@ -188,29 +188,3 @@ def advs_suffix() -> str:
     """
 
     return malicious_prompt
-
-
-def llm_attack() -> bool:
-    """
-    Implementation of an llm attack
-
-    Parameters:
-        None
-    
-    Returns:
-        success: bool - whether the attack was successful or not
-    """
-    raise NotImplementedError("llm_attack() is not implemented yet!")
-
-
-def indirect() -> bool:
-    """
-    Implementation of an indirect attack
-
-    Parameters:
-        None
-    
-    Returns:
-        success: bool - whether the attack was successful or not
-    """
-    raise NotImplementedError("indirect() is not implemented yet!")

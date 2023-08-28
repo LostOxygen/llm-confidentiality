@@ -68,7 +68,7 @@ with your WandB API key to enable logging of the finetuning process.
 
 ## Usage
 ```python
-python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERATIONS]
+python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERATIONS] [-tr | --train_robust TRAIN_ROBUST]
 ```
 
 ## Arguments
@@ -77,6 +77,7 @@ python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERAT
 | -h, --help | | show this help message and exit |
 | -llm, --llm_type | str | specifies the type of llm to finetune (default: "llama2-7b") |
 | -i, --iterations | int | specifies the number of iterations for the finetuning (default: 1000) |
+| -tr, --train_robust | bool | enable robustness finetuning (default: False) |
 
 
 ## Supported Large Language Models (base)

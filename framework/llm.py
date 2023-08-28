@@ -26,7 +26,8 @@ class LLM():
                   "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
 
-            case ("llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned"):
+            case ("llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
+                  "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # complete the model name for chat or normal models
                 model_path = OUTPUT_DIR + self.llm_type
@@ -314,7 +315,9 @@ class LLM():
                 """
 
             case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
-                  "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base"):
+                  "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
+                  "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
+                  "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():

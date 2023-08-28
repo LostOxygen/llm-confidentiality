@@ -34,11 +34,13 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 |-------|------|-----|-----|
 | GPT-3.5-Turbo | ```gpt-3.5-turbo``` / ```gpt-3.5-turbo-0301``` / ```gpt-3.5-turbo-0613``` | [Link](https://platform.openai.com/docs/models/gpt-3-5)| OpenAI API |
 | GPT-4 | ```gpt-4``` / ```gpt-4-0613``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
-| LLaMA2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` / ```llama2-7b-finetuned``` / ```llama2-13b-finetuned``` / ```llama2-70b-finetuned```| [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 Finetuned | ```llama2-7b-finetuned``` / ```llama2-13b-finetuned``` / ```llama2-70b-finetuned``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 hardened | ```llama2-7b-robust``` / ```llama2-13b-robust``` / ```llama2-70b-robust```|  [Link](https://huggingface.co/meta-llama) | Local Inference |
 | Vicuna | ```vicuna-7b``` / ```vicuna-13b``` / ```vicuna-33b``` | [Link](https://huggingface.co/lmsys/vicuna-33b-v1.3) | Local Inference |
 | StableBeluga (2) | ```beluga-7b``` / ```beluga-13b``` / ```beluga2-70b```| [Link](https://huggingface.co/stabilityai/StableBeluga2) | Local Inference |
 
-(Finetuned LLaMA models have to be generated using the ```finetuning.py``` script, see below)
+(Finetuned or robust/hardened LLaMA models have to be generated using the ```finetuning.py``` script, see below)
 
 ## Supported Attacks and Defenses
 | Attacks | | Defenses | |
@@ -53,7 +55,7 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 |[Typoglycemia](https://twitter.com/lauriewired/status/1682825103594205186?s=20) | ```typoglycemia``` | |
 
 # Finetuning to create enhanced system prompts
-This section covers the possible LLaMA2 finetuning options to create enhanced system prompts.
+This section covers the possible LLaMA2 finetuning options. The first finetuning options is on a dataset consisting of system prompts to safely instruct an LLM to keep a secret key safe. The second finetuning option (using the ```--train_robust``` option) is using system prompts and adversarial prompts to harden the model against prompt injection attacks.
 
 ## Setup
 Additionally to the above setup run

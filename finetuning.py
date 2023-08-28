@@ -8,6 +8,7 @@ import datetime
 import socket
 import argparse
 from typing import Final, Generator, List
+from inspect import getmembers, isfunction
 
 import torch
 from huggingface_hub import login
@@ -16,6 +17,7 @@ from transformers import TrainingArguments
 from peft import LoraConfig
 from trl import SFTTrainer
 
+from framework import attacks
 from framework.llm import LLM
 from framework.colors import TColors
 from framework.dataset import PromptDataset
@@ -66,13 +68,30 @@ def create_dataset(is_robust: bool) -> Generator[str, None, None]:
     Returns:
         new_dataset: Dataset - the new dataset containing the finetune data
     """
-    if is_robust:
-        pass
-    else:
-        assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
-        dataset = PromptDataset()
-        prompt_list: List = []
+    assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
+    dataset = PromptDataset()
+    prompt_list: List = []
 
+    if is_robust:
+        # create prompt injection attack dataset
+        for attack in getmembers(attacks, isfunction):
+            for _ in range(100):
+                attack_func = attack[1] # [0] would be the name of the function
+                prompt = f"""
+                    {dataset.get_random_prompt()}
+
+                    ### Instruction:
+                    {attack_func()}
+
+                    ### Response:
+                    Prompt injection attack detected! I will not leak any confidential informations!
+
+                    ### End
+                """
+                prompt_list.append(prompt)
+
+    else:
+        # create system prompt dataset
         for idx in range(0, len(dataset)):
             prompt = f"""
                 You are a safety assistant to generate new and secure system prompts to initialize fresh LLMs.
@@ -94,8 +113,7 @@ def create_dataset(is_robust: bool) -> Generator[str, None, None]:
             """
             prompt_list.append(prompt)
 
-        new_dataset: dict = Dataset.from_dict({"prompts": prompt_list})
-
+    new_dataset: dict = Dataset.from_dict({"prompts": prompt_list})
     return new_dataset
 
 

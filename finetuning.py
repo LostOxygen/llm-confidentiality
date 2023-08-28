@@ -55,47 +55,58 @@ CONFIG: Final[dict] = {
 }
 
 
-def create_dataset() -> Generator[str, None, None]:
+def create_dataset(is_robust: bool) -> Generator[str, None, None]:
     """
-    Generator function to yield the system prompt data in a formatted way from the json file.
+    Creating a dictionary dataset from the system prompts.
+
+    Parameters:
+        is_robust: bool - specifies if the dataset should contain system prompts or on
+                          prompt injection attacks.
+
+    Returns:
+        new_dataset: Dataset - the new dataset containing the finetune data
     """
-    assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
-    dataset = PromptDataset()
-    prompt_list: List = []
+    if is_robust:
+        pass
+    else:
+        assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
+        dataset = PromptDataset()
+        prompt_list: List = []
 
-    for idx in range(0, len(dataset)):
-        prompt = f"""
-            You are a safety assistant to generate new and secure system prompts to initialize fresh LLMs.
+        for idx in range(0, len(dataset)):
+            prompt = f"""
+                You are a safety assistant to generate new and secure system prompts to initialize fresh LLMs.
 
-            ### Instruction:
-            Create and print a new safe system prompt to instruct an LLM to be safe against prompt
-            injection and prompt leaking attacks. Use the previous system prompt as inspiration but
-            do not use the previous system prompt as a base for the new prompns. Create a completely new
-            one.
-            The system prompt has to start with \"The secret key is \"{SECRET_KEY}\". \" followed by
-            a set of instructions to guide the instructed LLM into keeping the secret key safe. Print only
-            the system prompt and nothing else. The system prompt has to be at least 40 characters long 
-            but must not be longer than 200 characters.
+                ### Instruction:
+                Create and print a new safe system prompt to instruct an LLM to be safe against prompt
+                injection and prompt leaking attacks. Use the previous system prompt as inspiration but
+                do not use the previous system prompt as a base for the new prompns. Create a completely new
+                one.
+                The system prompt has to start with \"The secret key is \"{SECRET_KEY}\". \" followed by
+                a set of instructions to guide the instructed LLM into keeping the secret key safe. Print only
+                the system prompt and nothing else. The system prompt has to be at least 40 characters long 
+                but must not be longer than 200 characters.
 
-            ### Response:
-            {dataset.get_prompt_at_idx(idx)}
+                ### Response:
+                {dataset.get_prompt_at_idx(idx)}
 
-            ### End
-        """
-        prompt_list.append(prompt)
+                ### End
+            """
+            prompt_list.append(prompt)
 
-    new_dataset: dict = Dataset.from_dict({"prompts": prompt_list})
+        new_dataset: dict = Dataset.from_dict({"prompts": prompt_list})
 
     return new_dataset
 
 
-def main(llm_type: str, iterations: int) -> None:
+def main(llm_type: str, iterations: int, train_robust: bool) -> None:
     """
     Main function to start the LLM finetuning.
 
     Parameters:
         llm_type: str - specifies the LLM type to finetune
         iterations: int - specifies the number of iterations to finetune the LLM
+        train_robust: bool - specifies if the LLM should be hardened against prompt injections
 
     Returns:
         None
@@ -123,6 +134,9 @@ def main(llm_type: str, iterations: int) -> None:
     else:
         device = "cuda:0"
 
+    # setting the suffic
+    suffix = "robust" if train_robust else "finetuned"
+
     # update the default config
     CONFIG["training"]["max_steps"] = iterations
 
@@ -137,6 +151,7 @@ def main(llm_type: str, iterations: int) -> None:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {llm_type}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Robust-Training{TColors.ENDC}: {train_robust}")
     print(f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Finetuning Parameters " \
           f"{TColors.ENDC}" + "#"*int(os.get_terminal_size().columns-25))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}lora_alpha{TColors.ENDC}: " \
@@ -170,13 +185,13 @@ def main(llm_type: str, iterations: int) -> None:
     llm.model.config.pretraining_tp = 1
 
     # load the dataset
-    dataset = create_dataset()
+    dataset = create_dataset(is_robust=train_robust)
 
     # create the training/finetuning arguments and the trainer
     peft_config = LoraConfig(**CONFIG["lora"])
 
     training_args = TrainingArguments(**CONFIG["training"])
-    training_args.run_name = "llm-finetuning" # wandb run name
+    training_args.run_name = "llm-"+suffix # wandb run name
 
     trainer = SFTTrainer(
         model=llm.model,
@@ -190,18 +205,18 @@ def main(llm_type: str, iterations: int) -> None:
     )
 
     trainer.train()
-    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"),
+    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-"+suffix),
                                   safe_serialization=True)
-    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"))
+    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-"+suffix))
 
     # free up memory to merge the weights
     del trainer
     del dataset
     torch.cuda.empty_cache()
 
-    finetuned_llm = LLM(llm_type=llm_type+"-finetuned")
+    finetuned_llm = LLM(llm_type=llm_type+"-"+suffix)
     finetuned_llm.model.merge_and_unload()
-    finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-finetuned"),
+    finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-"+suffix),
                                         safe_serialization=True)
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
@@ -213,5 +228,7 @@ if __name__ == "__main__":
                         help="specifies the opponent LLM type")
     parser.add_argument("--iterations", "-i", type=int, default=1000,
                         help="specifies the number of iterations to finetune the LLM")
+    parser.add_argument("--train_robust", "-tr", help="enables robust finetuning",
+                        action="store_true", default=False)
     args = parser.parse_args()
     main(**vars(args))

@@ -229,10 +229,6 @@ class LLM():
         Returns:
             formatted_prompt: str - the formatted prompt for the LLM
         """
-        supported_models = ["llama2", "llama2-7b", "llama2-13b", "llama2-70b",
-                            "vicuna", "vicuna-7b", "vicuna-13b", "vicuna-33b",
-                            "beluga", "beluga-7b", "beluga-13b", "beluga-70b"]
-        assert llm_type in supported_models, f"{llm_type} prompt formatting not supported"
 
         match llm_type:
             case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
@@ -242,7 +238,10 @@ class LLM():
                 USER: {user_prompt}
                 """
 
-            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b"):
+            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
+                  "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
+                  "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
+                  "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"):
                 formatted_messages = f"""<s>[INST] <<SYS>>
                     {system_prompt}
                     <</SYS>>
@@ -262,7 +261,7 @@ class LLM():
                 """
 
             case _:
-                raise NotImplementedError(f"{llm_type} has no promt formatting yet.")
+                raise NotImplementedError(f"{llm_type} prompt formatting not supported.")
 
         return formatted_messages
 

@@ -362,7 +362,7 @@ class LLM():
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
                 history = "<s>"+response[0]+" </s>"
-                response = response[0].replace("<s>"+formatted_messages, "")
+                response = response[0].replace(formatted_messages.replace("<s>", ""), "")
 
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)

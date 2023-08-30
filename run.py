@@ -16,7 +16,7 @@ from huggingface_hub import login
 from framework.strategy import Strategy
 from framework.attacks import (
         ATTACK_LIST, payload_splitting, obfuscation,
-        indirect, manipulation, llm_attack, translation, chatml_abuse,
+        manipulation, translation, chatml_abuse,
         masking, typoglycemia, advs_suffix
     )
 from framework.defenses import (
@@ -134,9 +134,7 @@ def main(attacks: List[str], defenses: List[str], llm_type: str,
             match attack:
                 case "payload_splitting": attack_func = payload_splitting
                 case "obfuscation": attack_func = obfuscation
-                case "indirect": attack_func = indirect
                 case "manipulation": attack_func = manipulation
-                case "llm": attack_func = llm_attack
                 case "translation": attack_func = translation
                 case "chatml_abuse": attack_func = chatml_abuse
                 case "masking": attack_func = masking

@@ -197,7 +197,7 @@ def main(llm_type: str, iterations: int, train_robust: bool) -> None:
     print("#"*os.get_terminal_size().columns+"\n")
 
     # load the LLM
-    llm = LLM(llm_type=llm_type)
+    llm = LLM(llm_type=llm_type, is_finetuning=True)
     # disable caching for finetuning
     llm.model.config.use_cache = False
     llm.model.config.pretraining_tp = 1

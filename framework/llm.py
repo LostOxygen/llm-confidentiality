@@ -14,11 +14,12 @@ MAX_RETRIES: int = 10 # number of retries for GPT based chat requests
 
 class LLM():
     """abstract implementation of a genereric LLM model"""
-    def __init__(self, llm_type: str, temperature: float = 1.0):
+    def __init__(self, llm_type: str, temperature: float = 1.0, is_finetuning: bool = False):
         self.llm_type: str = llm_type
         self.temperature: float = temperature
         self.model: AutoModelForCausalLM = None
         self.tokenizer: AutoTokenizer = None
+        self.is_finetuning: bool = is_finetuning
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
@@ -56,6 +57,17 @@ class LLM():
                 else:
                     model_name += "Llama-2-70b-chat-hf"
 
+                # if the model is not finetuned, load it in quantized mode
+                if not self.is_finetuning:
+                    config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.bfloat16
+                    )
+                else:
+                    config = None
+
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_path,
                                 use_fast=False,
@@ -65,6 +77,7 @@ class LLM():
                             model_name,
                             device_map="auto",
                             low_cpu_mem_usage=True,
+                            quantization_config=config,
                             token=os.environ["HF_TOKEN"],
                             trust_remote_code=True,
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
@@ -75,7 +88,7 @@ class LLM():
                     model_path, # local peft model
                     device_map="auto",
                     torch_dtype=torch.bfloat16,
-                    load_in_8bit=True,
+                    quantization_config=config,
                     local_files_only=True,
                     return_dict=True,
                     low_cpu_mem_usage=True,

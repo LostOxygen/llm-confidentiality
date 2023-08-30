@@ -22,12 +22,16 @@ class LLM():
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
-            case ("gpt-3.5-turbo" | "gpt-3.5-turbo-0301" |
-                  "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"):
+            case (
+                    "gpt-3.5-turbo" | "gpt-3.5-turbo-0301" |
+                    "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"
+                ):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
 
-            case ("llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
-                  "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"):
+            case (
+                    "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
+                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"
+                ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # complete the model name for chat or normal models
                 model_path = OUTPUT_DIR + self.llm_type
@@ -78,8 +82,10 @@ class LLM():
                     offload_folder=os.environ["TRANSFORMERS_CACHE"],
                 )
 
-            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
-                  "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base"):
+            case (
+                    "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
+                    "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base"
+                ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
                 config = BitsAndBytesConfig(
@@ -238,10 +244,12 @@ class LLM():
                 USER: {user_prompt}
                 """
 
-            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
-                  "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
-                  "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
-                  "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"):
+            case (
+                    "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
+                    "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
+                    "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
+                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"
+                ):
                 formatted_messages = f"""<s>[INST] <<SYS>>
                     {system_prompt}
                     <</SYS>>
@@ -278,10 +286,13 @@ class LLM():
             response: str - the LLMs' response
             history: str - the LLMs' history with the complete dialoge so far
         """
+        self.model = self.model.to("cuda")
 
         match self.llm_type:
-            case ("gpt-3.5-turbo" | "gpt-3.5-turbo-0301" |
-                  "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"):
+            case (
+                    "gpt-3.5-turbo" | "gpt-3.5-turbo-0301" |
+                    "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"
+                ):
                 messages = [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
@@ -289,9 +300,11 @@ class LLM():
                 retries = 1
                 while retries <= MAX_RETRIES:
                     try:
-                        completion = ChatCompletion.create(model=self.llm_type,
-                                                        messages=messages,
-                                                        temperature=self.temperature)
+                        completion = ChatCompletion.create(
+                                        model=self.llm_type,
+                                        messages=messages,
+                                        temperature=self.temperature
+                                    )
                         break
                     except TimeoutError as e:
                         if retries == MAX_RETRIES:
@@ -313,17 +326,22 @@ class LLM():
                 {response}<|im_end|>
                 """
 
-            case ("llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
-                  "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
-                  "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
-                  "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"):
+            case (
+                    "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
+                    "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
+                    "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
+                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"
+                ):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    outputs = self.model.generate(inputs.input_ids, do_sample=True,
-                                                temperature=self.temperature,
-                                                max_length=4096)
+                    outputs = self.model.generate(
+                                            inputs.input_ids,
+                                            do_sample=True,
+                                            temperature=self.temperature,
+                                            max_length=4096
+                                        )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs
@@ -338,9 +356,12 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    outputs = self.model.generate(inputs.input_ids, do_sample=True,
-                                                temperature=self.temperature,
-                                                max_length=4096)
+                    outputs = self.model.generate(
+                                            inputs.input_ids,
+                                            do_sample=True,
+                                            temperature=self.temperature,
+                                            max_length=4096
+                                        )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs
@@ -355,9 +376,12 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    outputs = self.model.generate(inputs.input_ids, do_sample=True,
-                                                temperature=self.temperature,
-                                                max_length=4096)
+                    outputs = self.model.generate(
+                                            inputs.input_ids,
+                                            do_sample=True,
+                                            temperature=self.temperature,
+                                            max_length=4096
+                                        )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs

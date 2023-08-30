@@ -228,14 +228,14 @@ def main(llm_type: str, iterations: int, train_robust: bool) -> None:
     trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-"+suffix))
 
     # free up memory to merge the weights
-    del trainer
-    del dataset
-    torch.cuda.empty_cache()
+    # del trainer
+    # del dataset
+    # torch.cuda.empty_cache()
 
-    finetuned_llm = LLM(llm_type=llm_type+"-"+suffix)
-    finetuned_llm.model.merge_and_unload()
-    finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-"+suffix),
-                                        safe_serialization=True)
+    # finetuned_llm = LLM(llm_type=llm_type+"-"+suffix)
+    # finetuned_llm.model.merge_and_unload()
+    # finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-"+suffix),
+    #                                     safe_serialization=True)
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
 

@@ -94,6 +94,7 @@ class LLM():
                     low_cpu_mem_usage=True,
                     offload_folder=os.environ["TRANSFORMERS_CACHE"],
                 )
+                self.model = self.model.to("cuda")
 
             case (
                     "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
@@ -299,7 +300,6 @@ class LLM():
             response: str - the LLMs' response
             history: str - the LLMs' history with the complete dialoge so far
         """
-        self.model = self.model.to("cuda")
 
         match self.llm_type:
             case (
@@ -361,8 +361,8 @@ class LLM():
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
-                history = response[0]+" </s>"
-                response = response[0].replace(formatted_messages, "")
+                history = "<s>"+response[0]+" </s>"
+                response = response[0].replace("<s>"+formatted_messages, "")
 
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)

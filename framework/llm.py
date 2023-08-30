@@ -71,7 +71,7 @@ class LLM():
                     model_path, # local peft model
                     device_map="auto",
                     torch_dtype=torch.bfloat16,
-                    load_in_8bit=False,
+                    load_in_8bit=True,
                     local_files_only=True,
                     return_dict=True,
                     low_cpu_mem_usage=True,

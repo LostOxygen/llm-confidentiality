@@ -11,9 +11,12 @@ from framework.dataset import PromptDataset
 class Strategy:
     """Strategy pattern interface"""
 
-    def __init__(self, attack_func: Callable, defense_func: Callable,
-                 llm_type: str, temperature: float, iterations: int,
-                 create_dataset: bool) -> None:
+    def __init__(
+            self, attack_func: Callable, defense_func: Callable,
+            llm_type: str, temperature: float, iterations: int,
+            create_dataset: bool
+        ) -> None:
+
         self.attack_func: Callable = attack_func
         self.defense_func: Callable = defense_func
         self.llm_type = llm_type

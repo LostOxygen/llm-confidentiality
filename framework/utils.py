@@ -5,8 +5,15 @@ import datetime
 LOG_PATH: str = "./logs/"
 
 
-def log_conversation(llm_name: str, attack_name: str, defense_name: str, level: int,
-                     prompt: str, response: str, success: bool) -> None:
+def log_conversation(
+        llm_name: str,
+        attack_name: str,
+        defense_name: str,
+        level: int,
+        prompt: str,
+        response: str,
+        success: bool
+    ) -> None:
     """
     Logs the conversation between the user and the opponent LLM into 
     the {llm_name}_chat_logs.txt file.
@@ -41,7 +48,12 @@ def log_conversation(llm_name: str, attack_name: str, defense_name: str, level: 
         f.write("\n"+"#"*100)
 
 
-def log_results(llm_name: str, defense_name: str, success_dict: dict, iters: int) -> None:
+def log_results(
+        llm_name: str,
+        defense_name: str,
+        success_dict: dict,
+        iters: int
+    ) -> None:
     """
     Logs the final attack/defense results into the {llm_name}_result_logs.txt file.
 

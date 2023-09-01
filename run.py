@@ -173,7 +173,7 @@ if __name__ == "__main__":
                         help="specifies the opponent LLM type")
     parser.add_argument("--temperature", "-t", type=float, default=0.0,
                         help="specifies the opponent LLM temperature")
-    parser.add_argument("--iterations", "-i", type=int, default=10,
+    parser.add_argument("--iterations", "-i", type=int, default=100,
                         help="specifies the number of iterations to test systems prompts")
     parser.add_argument("--create_dataset", "-cd", help="enables dataset creation",
                         action="store_true", default=False)

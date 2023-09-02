@@ -40,7 +40,7 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 | Vicuna | ```vicuna-7b``` / ```vicuna-13b``` / ```vicuna-33b``` | [Link](https://huggingface.co/lmsys/vicuna-33b-v1.3) | Local Inference |
 | StableBeluga (2) | ```beluga-7b``` / ```beluga-13b``` / ```beluga2-70b```| [Link](https://huggingface.co/stabilityai/StableBeluga2) | Local Inference |
 
-(Finetuned or robust/hardened LLaMA models have to be generated using the ```finetuning.py``` script, see below)
+(Finetuned or robust/hardened LLaMA models first have to be generated using the ```finetuning.py``` script, see below)
 
 ## Supported Attacks and Defenses
 | Attacks | | Defenses | |
@@ -54,7 +54,7 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 |[Masking](https://learnprompting.org/docs/prompt_hacking/offensive_measures/obfuscation) | ```masking``` | |
 |[Typoglycemia](https://twitter.com/lauriewired/status/1682825103594205186?s=20) | ```typoglycemia``` | |
 
-# Finetuning to create enhanced system prompts
+# Finetuning to harden LLMs against attacks or create enhanced system prompts
 This section covers the possible LLaMA2 finetuning options. The first finetuning options is on a dataset consisting of system prompts to safely instruct an LLM to keep a secret key safe. The second finetuning option (using the ```--train_robust``` option) is using system prompts and adversarial prompts to harden the model against prompt injection attacks.
 
 ## Setup

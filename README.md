@@ -1,6 +1,8 @@
 # Attacks and Defenses against the Confidentiality of Large Language Models
 Framework for Testing Attacks and Defenses against the Confidentiality of Large Language Models (LLMs).
 
+<b>!! This project will most likely only work on Linux systems with NVIDIA-GPUs and CUDA installed !!</b>
+
 ## Setup
 Before running the code, install the requirements:
 ```
@@ -19,15 +21,15 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 ```
 
 ## Arguments
-| Argument | Type | Description |
-|----------|------|-------------|
-| -h, --help | | show this help message and exit |
-| -a, --attacks | List[str] | specifies the attacks which will be utilized against the LLM (default: "payload_splitting")|
-| -d, --defense | str | specifies the defense for the LLM (default: None)|
-| -llm, --llm_type | str | specifies the type of opponent (default: "gpt-3.5-turbo") |
-| -t, --temperature | float | specifies the temperature for the LLM (default: 0.0) to control the randomness |
-| -cd, --create_dataset | bool | specifies whether a new dataset of enhanced system prompts should be created (default: False) |
-| -i, --iterations | int | specifies the number of iterations for the attack (default: 10) |
+| Argument | Type | Default Value | Description |
+|----------|------|---------------|-------------|
+| ```-h, --help``` | - | - | show this help message and exit |
+| ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | specifies the attacks which will be utilized against the LLM |
+| ```-d, --defense``` | <b>str</b> | ```None``` | specifies the defense for the LLM |
+| ```-llm, --llm_type``` | <b>str</b> | ```gpt-3.5-turbo``` | specifies the type of opponent |
+| ```-t, --temperature``` | <b>float</b> | ```0.0``` | specifies the temperature for the LLM to control the randomness |
+| ```-cd, --create_dataset``` | <b>bool</b> | ```False``` | specifies whether a new dataset of enhanced system prompts should be created |
+| ```-i, --iterations``` | <b>int</b> | ```10``` | specifies the number of iterations for the attack |
 
 ## Supported Large Language Models (Chat-Only)
 | Model | Parameter Specifier | Link | Compute Instance |
@@ -53,6 +55,7 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 |[ChatML Abuse](https://www.robustintelligence.com/blog-posts/prompt-injection-attack-on-gpt-4) | ```chatml_abuse``` | [LLM Evaluation](https://learnprompting.org/docs/prompt_hacking/defensive_measures/llm_eval) | ```llm_eval``` |
 |[Masking](https://learnprompting.org/docs/prompt_hacking/offensive_measures/obfuscation) | ```masking``` | |
 |[Typoglycemia](https://twitter.com/lauriewired/status/1682825103594205186?s=20) | ```typoglycemia``` | |
+|[Adversarial Suffix](https://llm-attacks.org/) | ```advs_suffix``` | |
 
 # Finetuning to harden LLMs against attacks or create enhanced system prompts
 This section covers the possible LLaMA2 finetuning options. The first finetuning options is on a dataset consisting of system prompts to safely instruct an LLM to keep a secret key safe. The second finetuning option (using the ```--train_robust``` option) is using system prompts and adversarial prompts to harden the model against prompt injection attacks.
@@ -73,16 +76,18 @@ with your WandB API key to enable logging of the finetuning process.
 python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERATIONS] [-tr | --train_robust TRAIN_ROBUST]
 ```
 
-## Arguments
-| Argument | Type | Description |
-|----------|------|-------------|
-| -h, --help | | show this help message and exit |
-| -llm, --llm_type | str | specifies the type of llm to finetune (default: "llama2-7b") |
-| -i, --iterations | int | specifies the number of iterations for the finetuning (default: 1000) |
-| -tr, --train_robust | bool | enable robustness finetuning (default: False) |
+# Arguments
+| Argument | Type | Default Value | Description |
+|----------|------|---------------|-------------|
+| ```-h, --help``` | - | - | Show this help message and exit |
+| ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to finetune |
+| ```-i, --iterations``` | <b>int</b> | ```1000``` | Specifies the number of iterations for the finetuning |
+| ```-tr, --train_robust``` | <b>bool</b> | ```False``` | Enable robustness finetuning |
+| ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | Specifies the attacks which will be used to harden the llm during finetuning. Only has an effect if ```--train_robust``` is set to True. For supported attacks see the previous section |
 
 
 ## Supported Large Language Models (base)
 | Model | Parameter Specifier | Link | Compute Instance |
 |-------|------|-----|-----|
 | LLaMA2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+

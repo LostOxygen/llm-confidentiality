@@ -7,7 +7,7 @@ import sys
 import datetime
 import socket
 import argparse
-from typing import Final, Generator, List
+from typing import Final, List, Callable
 from inspect import getmembers, isfunction
 
 import torch
@@ -17,7 +17,11 @@ from transformers import TrainingArguments
 from peft import LoraConfig
 from trl import SFTTrainer
 
-from framework import attacks
+from framework.attacks import (
+        ATTACK_LIST, payload_splitting, obfuscation,
+        manipulation, translation, chatml_abuse,
+        masking, typoglycemia, advs_suffix
+    )
 from framework.llm import LLM
 from framework.colors import TColors
 from framework.dataset import PromptDataset
@@ -57,13 +61,48 @@ CONFIG: Final[dict] = {
 }
 
 
-def create_dataset(is_robust: bool) -> Generator[str, None, None]:
+def get_attack_list(attacks: List[str]) -> List[Callable]:
+    """
+    Creates a list of callable attack functions out of the list of attack names.
+
+    Parameters:
+        attacks: List[str] - the list of attack names
+
+    Returns:
+        attack_funcs: List[Callable] - the list of callable attack functions
+    """
+    attack_funcs: List[Callable] = []
+
+    if "all" in attacks:
+        attacks = ATTACK_LIST
+
+    for attack in attacks:
+        # set the attack function
+        match attack:
+            case "payload_splitting": attack_funcs.append(payload_splitting)
+            case "obfuscation": attack_funcs.append(obfuscation)
+            case "manipulation": attack_funcs.append(manipulation)
+            case "translation": attack_funcs.append(translation)
+            case "chatml_abuse": attack_funcs.append(chatml_abuse)
+            case "masking": attack_funcs.append(masking)
+            case "typoglycemia": attack_funcs.append(typoglycemia)
+            case "advs_suffix": attack_funcs.append(advs_suffix)
+            case _:
+                print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
+                print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
+                sys.exit(1)
+
+    return attack_funcs
+
+
+def create_dataset(is_robust: bool, attacks: List[Callable] = None) -> Dataset:
     """
     Creating a dictionary dataset from the system prompts.
 
     Parameters:
         is_robust: bool - specifies if the dataset should contain system prompts or on
                           prompt injection attacks.
+        attacks: List[Callable] - the list of attacks to harden the LLM against
 
     Returns:
         new_dataset: Dataset - the new dataset containing the finetune data
@@ -76,12 +115,11 @@ def create_dataset(is_robust: bool) -> Generator[str, None, None]:
         # create prompt injection attack dataset
         for attack in getmembers(attacks, isfunction):
             for _ in range(100):
-                attack_func = attack[1] # [0] would be the name of the function
                 prompt = f"""
                     {dataset.get_random_prompt()}
 
                     ### Instruction:
-                    {attack_func()}
+                    {attack()}
 
                     ### Response:
                     Prompt injection attack detected! I will not leak any confidential informations!
@@ -113,11 +151,11 @@ def create_dataset(is_robust: bool) -> Generator[str, None, None]:
             """
             prompt_list.append(prompt)
 
-    new_dataset: dict = Dataset.from_dict({"prompts": prompt_list})
+    new_dataset = Dataset.from_dict({"prompts": prompt_list})
     return new_dataset
 
 
-def main(llm_type: str, iterations: int, train_robust: bool) -> None:
+def main(llm_type: str, iterations: int, train_robust: bool, attacks: List[str]) -> None:
     """
     Main function to start the LLM finetuning.
 
@@ -125,6 +163,7 @@ def main(llm_type: str, iterations: int, train_robust: bool) -> None:
         llm_type: str - specifies the LLM type to finetune
         iterations: int - specifies the number of iterations to finetune the LLM
         train_robust: bool - specifies if the LLM should be hardened against prompt injections
+        attacks: List[str] - specifies the attack types to harden the LLM against
 
     Returns:
         None
@@ -158,6 +197,7 @@ def main(llm_type: str, iterations: int, train_robust: bool) -> None:
     # update the default config
     CONFIG["training"]["max_steps"] = iterations
 
+    # print system information
     print("\n"+"#"*os.get_terminal_size().columns)
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
           str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
@@ -170,6 +210,10 @@ def main(llm_type: str, iterations: int, train_robust: bool) -> None:
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {llm_type}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Robust-Training{TColors.ENDC}: {train_robust}")
+    if train_robust:
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}Attacks: {TColors.ENDC}: {attacks}")
+
+    # print the finetuning parameters
     print(f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Finetuning Parameters " \
           f"{TColors.ENDC}" + "#"*int(os.get_terminal_size().columns-25))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}lora_alpha{TColors.ENDC}: " \
@@ -202,8 +246,13 @@ def main(llm_type: str, iterations: int, train_robust: bool) -> None:
     llm.model.config.use_cache = False
     llm.model.config.pretraining_tp = 1
 
+    # create list of attacks to harden against if robust finetuning is enabled
+    attack_funcs = None
+    if train_robust:
+        attack_funcs = get_attack_list(attacks)
+
     # load the dataset
-    dataset = create_dataset(is_robust=train_robust)
+    dataset = create_dataset(is_robust=train_robust, attacks=attack_funcs)
 
     # create the training/finetuning arguments and the trainer
     peft_config = LoraConfig(**CONFIG["lora"])
@@ -227,16 +276,6 @@ def main(llm_type: str, iterations: int, train_robust: bool) -> None:
                                   safe_serialization=True)
     trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-"+suffix))
 
-    # free up memory to merge the weights
-    # del trainer
-    # del dataset
-    # torch.cuda.empty_cache()
-
-    # finetuned_llm = LLM(llm_type=llm_type+"-"+suffix)
-    # finetuned_llm.model.merge_and_unload()
-    # finetuned_llm.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-"+suffix),
-    #                                     safe_serialization=True)
-
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
 
 
@@ -248,5 +287,7 @@ if __name__ == "__main__":
                         help="specifies the number of iterations to finetune the LLM")
     parser.add_argument("--train_robust", "-tr", help="enables robust finetuning",
                         action="store_true", default=False)
+    parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
+                        help="specifies the attack types", nargs="+")
     args = parser.parse_args()
     main(**vars(args))

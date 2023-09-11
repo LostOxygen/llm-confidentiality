@@ -198,8 +198,12 @@ def main(
     else:
         device = "cuda:0"
 
-    # setting the suffic
-    suffix = "robust" if train_robust else "finetuned"
+    # setting the suffixes
+    suffix: str = "robust" if train_robust else "finetuned"
+    name_suffix: str = "-"+name_suffix if name_suffix != "" else ""
+    attack_suffix: str = "-"+"".join(attacks) if train_robust else ""
+    # combine the finale output save name
+    save_name: str = llm_type + "-" + suffix + attack_suffix + name_suffix
 
     # update the default config
     CONFIG["training"]["max_steps"] = iterations
@@ -219,6 +223,7 @@ def main(
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Robust-Training{TColors.ENDC}: {train_robust}")
     if train_robust:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Attacks: {TColors.ENDC}: {attacks}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Output Name{TColors.ENDC}: {save_name}")
 
     # print the finetuning parameters
     print(f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Finetuning Parameters " \
@@ -265,7 +270,7 @@ def main(
     peft_config = LoraConfig(**CONFIG["lora"])
 
     training_args = TrainingArguments(**CONFIG["training"])
-    training_args.run_name = "llm-"+suffix+name_suffix # wandb run name
+    training_args.run_name = "llm-"+suffix+attack_suffix+name_suffix # wandb run name
 
     trainer = SFTTrainer(
         model=llm.model,
@@ -279,7 +284,6 @@ def main(
     )
 
     trainer.train()
-    save_name: str = llm_type + "-" + suffix + "-" + name_suffix
     trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
     trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
 

@@ -14,7 +14,14 @@ MAX_RETRIES: int = 10 # number of retries for GPT based chat requests
 
 class LLM():
     """abstract implementation of a genereric LLM model"""
-    def __init__(self, llm_type: str, temperature: float = 1.0, is_finetuning: bool = False):
+    def __init__(
+            self,
+            llm_type: str,
+            temperature: float = 1.0,
+            is_finetuning: bool = False,
+            llm_suffix: str = ""
+        ) -> None:
+        self.llm_suffix: str = llm_suffix
         self.llm_type: str = llm_type
         self.temperature: float = temperature
         self.model: AutoModelForCausalLM = None
@@ -35,7 +42,7 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # complete the model name for chat or normal models
-                model_path = OUTPUT_DIR + self.llm_type
+                model_path = OUTPUT_DIR + self.llm_type + self.llm_suffix
 
                 # complete the model name for chat or normal models
                 model_name = "meta-llama/"

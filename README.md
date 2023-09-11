@@ -30,6 +30,17 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 | ```-t, --temperature``` | <b>float</b> | ```0.0``` | specifies the temperature for the LLM to control the randomness |
 | ```-cd, --create_dataset``` | <b>bool</b> | ```False``` | specifies whether a new dataset of enhanced system prompts should be created |
 | ```-i, --iterations``` | <b>int</b> | ```10``` | specifies the number of iterations for the attack |
+| ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a name suffix to load custom models  |
+
+The naming conventions for the models are as follows:
+```python
+<model_name>-<param_count>-<robustness>-<attack_suffix>-<custom_suffix>
+```
+e.g.:
+```python
+LLaMA2-7b-robust-prompt_injection-0613
+```
+
 
 ## Supported Large Language Models (Chat-Only)
 | Model | Parameter Specifier | Link | Compute Instance |
@@ -84,7 +95,7 @@ python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERAT
 | ```-i, --iterations``` | <b>int</b> | ```1000``` | Specifies the number of iterations for the finetuning |
 | ```-tr, --train_robust``` | <b>bool</b> | ```False``` | Enable robustness finetuning |
 | ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | Specifies the attacks which will be used to harden the llm during finetuning. Only has an effect if ```--train_robust``` is set to True. For supported attacks see the previous section |
-| ```-n, --name_suffix``` | <b>str</b> | ```None``` | Specifies a suffix for the finetuned model name |
+| ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
 
 
 ## Supported Large Language Models (base)

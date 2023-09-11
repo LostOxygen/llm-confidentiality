@@ -32,9 +32,15 @@ if not os.path.isdir("/data/"):
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 
 
-def main(attacks: List[str], defenses: List[str], llm_type: str,
-         temperature: float, iterations: int, create_dataset: bool
-         ) -> None:
+def main(
+        attacks: List[str],
+        defenses: List[str],
+        llm_type: str,
+        temperature: float,
+        iterations: int,
+        create_dataset: bool,
+        name_suffix: str
+    ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
 
@@ -45,6 +51,7 @@ def main(attacks: List[str], defenses: List[str], llm_type: str,
         temperature: float - specifies the opponent LLM temperature to control randomness
         iterations: int - number of attack iterations to test system prompts against
         create_dataset: bool - specifies whether to create a dataset or not
+        name_suffix: str - adds a name suffix for loading custom models
 
     Returns:
         None
@@ -114,9 +121,15 @@ def main(attacks: List[str], defenses: List[str], llm_type: str,
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
     # initialize the strategy
-    strategy = Strategy(attack_func=None, defense_func=None,
-                        llm_type=llm_type, temperature=temperature,
-                        iterations=iterations, create_dataset=create_dataset)
+    strategy = Strategy(
+                attack_func=None,
+                defense_func=None,
+                llm_type=llm_type,
+                llm_suffix=name_suffix,
+                temperature=temperature,
+                iterations=iterations,
+                create_dataset=create_dataset
+            )
 
     for defense in defenses:
         # set the defense function
@@ -177,5 +190,7 @@ if __name__ == "__main__":
                         help="specifies the number of iterations to test systems prompts")
     parser.add_argument("--create_dataset", "-cd", help="enables dataset creation",
                         action="store_true", default=False)
+    parser.add_argument("--name_suffix", "-n", help="adds a name suffix for loading custom models",
+                        default="", type=str)
     args = parser.parse_args()
     main(**vars(args))

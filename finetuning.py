@@ -155,7 +155,13 @@ def create_dataset(is_robust: bool, attacks: List[Callable] = None) -> Dataset:
     return new_dataset
 
 
-def main(llm_type: str, iterations: int, train_robust: bool, attacks: List[str]) -> None:
+def main(
+        llm_type: str,
+        iterations: int,
+        train_robust: bool,
+        attacks: List[str],
+        name_suffix: str
+    ) -> None:
     """
     Main function to start the LLM finetuning.
 
@@ -164,6 +170,7 @@ def main(llm_type: str, iterations: int, train_robust: bool, attacks: List[str])
         iterations: int - specifies the number of iterations to finetune the LLM
         train_robust: bool - specifies if the LLM should be hardened against prompt injections
         attacks: List[str] - specifies the attack types to harden the LLM against
+        name_suffix: str - specifies a name suffix for the finetuned model
 
     Returns:
         None
@@ -258,7 +265,7 @@ def main(llm_type: str, iterations: int, train_robust: bool, attacks: List[str])
     peft_config = LoraConfig(**CONFIG["lora"])
 
     training_args = TrainingArguments(**CONFIG["training"])
-    training_args.run_name = "llm-"+suffix # wandb run name
+    training_args.run_name = "llm-"+suffix+name_suffix # wandb run name
 
     trainer = SFTTrainer(
         model=llm.model,
@@ -272,9 +279,9 @@ def main(llm_type: str, iterations: int, train_robust: bool, attacks: List[str])
     )
 
     trainer.train()
-    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-"+suffix),
-                                  safe_serialization=True)
-    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, llm_type+"-"+suffix))
+    save_name: str = llm_type + "-" + suffix + "-" + name_suffix
+    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
+    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
 
@@ -289,5 +296,7 @@ if __name__ == "__main__":
                         action="store_true", default=False)
     parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
                         help="specifies the attack types", nargs="+")
+    parser.add_argument("--name_suffix", "-n", help="adds a name suffix for the finetuned model",
+                        default="", type=str)
     args = parser.parse_args()
     main(**vars(args))

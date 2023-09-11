@@ -31,6 +31,8 @@ os.environ["TRANSFORMERS_CACHE"] = "/data/"
 os.environ["WANDB_WATCH"] = "false"
 os.environ["WANDB_PROJECT"]="llm-finetuning"
 
+# number of attack samples per attack type and main iteration
+NUM_ATTACK_SAMPLES: Final[int] = 100 
 DATA_PATH: Final[str] = "./datasets/system_prompts.json"
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 if not os.path.isdir(OUTPUT_DIR):
@@ -113,8 +115,8 @@ def create_dataset(is_robust: bool, attacks: List[Callable] = None) -> Dataset:
 
     if is_robust:
         # create prompt injection attack dataset
-        for attack in getmembers(attacks, isfunction):
-            for _ in range(100):
+        for attack in attacks:
+            for _ in range(NUM_ATTACK_SAMPLES):
                 prompt = f"""
                     {dataset.get_random_prompt()}
 

@@ -8,7 +8,6 @@ import datetime
 import socket
 import argparse
 from typing import Final, List, Callable
-from inspect import getmembers, isfunction
 
 import torch
 from huggingface_hub import login
@@ -32,7 +31,7 @@ os.environ["WANDB_WATCH"] = "false"
 os.environ["WANDB_PROJECT"]="llm-finetuning"
 
 # number of attack samples per attack type and main iteration
-NUM_ATTACK_SAMPLES: Final[int] = 100 
+NUM_ATTACK_SAMPLES: Final[int] = 100
 DATA_PATH: Final[str] = "./datasets/system_prompts.json"
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 if not os.path.isdir(OUTPUT_DIR):

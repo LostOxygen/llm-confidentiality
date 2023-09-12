@@ -30,7 +30,7 @@ python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging"
 | ```-t, --temperature``` | <b>float</b> | ```0.0``` | specifies the temperature for the LLM to control the randomness |
 | ```-cd, --create_dataset``` | <b>bool</b> | ```False``` | specifies whether a new dataset of enhanced system prompts should be created |
 | ```-i, --iterations``` | <b>int</b> | ```10``` | specifies the number of iterations for the attack |
-| ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a name suffix to load custom models  |
+| ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a name suffix to load custom models. Since argument parameter strings aren't allowed to start with '-' symbols, the first '-' will be added by the parser automatically |
 
 The naming conventions for the models are as follows:
 ```python

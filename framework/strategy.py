@@ -26,7 +26,11 @@ class Strategy:
         self.defense_func: Callable = defense_func
         self.llm_type = llm_type
         self.temperature = temperature
-        self.llm: LLM = LLM(llm_type, temperature, llm_suffix)
+        self.llm: LLM = LLM(
+                llm_type=llm_type,
+                temperature=temperature,
+                llm_suffix=llm_suffix
+            )
         self.iterations: int = iterations
         self.create_dataset: bool = create_dataset
         self.chat_api_add_messages: Callable = ChatAPI.add_message

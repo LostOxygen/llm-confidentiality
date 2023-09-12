@@ -111,6 +111,10 @@ def main(
     if "all" in defenses:
         defenses = ["none"] + DEFENSES_LIST
 
+    # add '-' in front of the name suffix
+    if name_suffix != "" and not name_suffix.startswith("-"):
+        name_suffix = "-" + name_suffix
+
     print("\n"+"#"*os.get_terminal_size().columns)
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
           str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))

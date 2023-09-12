@@ -17,9 +17,15 @@ from peft import LoraConfig
 from trl import SFTTrainer
 
 from framework.attacks import (
-        ATTACK_LIST, payload_splitting, obfuscation,
-        manipulation, translation, chatml_abuse,
-        masking, typoglycemia, advs_suffix
+        ATTACK_LIST,
+        payload_splitting,
+        obfuscation,
+        manipulation,
+        translation,
+        chatml_abuse,
+        masking,
+        typoglycemia,
+        advs_suffix
     )
 from framework.llm import LLM
 from framework.colors import TColors

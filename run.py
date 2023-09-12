@@ -15,13 +15,24 @@ from huggingface_hub import login
 
 from framework.strategy import Strategy
 from framework.attacks import (
-        ATTACK_LIST, payload_splitting, obfuscation,
-        manipulation, translation, chatml_abuse,
-        masking, typoglycemia, advs_suffix
+        ATTACK_LIST,
+        payload_splitting,
+        obfuscation,
+        manipulation,
+        translation,
+        chatml_abuse,
+        masking,
+        typoglycemia,
+        advs_suffix
     )
 from framework.defenses import (
-        DEFENSES_LIST, seq_enclosure, xml_tagging, heuristic_defense,
-        sandwiching, llm_eval, identity_prompt
+        DEFENSES_LIST,
+        seq_enclosure,
+        xml_tagging,
+        heuristic_defense,
+        sandwiching,
+        llm_eval,
+        identity_prompt
     )
 from framework.colors import TColors
 from framework.utils import log_results

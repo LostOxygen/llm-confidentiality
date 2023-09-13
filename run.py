@@ -4,6 +4,7 @@
 
 import os
 import sys
+import time
 import datetime
 import socket
 import argparse
@@ -67,6 +68,8 @@ def main(
     Returns:
         None
     """
+    start = time.perf_counter()  # start timer
+
     # paste the OpenAI key into the key.txt file and put into the root directory
     try:
         with open(file="key.txt", mode="r", encoding="utf-8") as f:
@@ -187,6 +190,10 @@ def main(
                 f"{iterations}")
         log_results(llm_name=llm_type, defense_name=defense,
                     success_dict=total_successes, iters=iterations)
+
+    end = time.perf_counter()
+    duration = (round(end - start) / 60.) / 60.
+    print(f"{TColors.HEADER}Computation Time: {duration}{TColors.ENDC}")
 
     return 0
 

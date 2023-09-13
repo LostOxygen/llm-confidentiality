@@ -4,6 +4,7 @@
 
 import os
 import sys
+import time
 import datetime
 import socket
 import argparse
@@ -182,6 +183,7 @@ def main(
     Returns:
         None
     """
+    start = time.perf_counter()  # start timer
     # paste the Huggingface token into the hf_token.txt file and put into the root directory
     try:
         with open(file="hf_token.txt", mode="r", encoding="utf-8") as f:
@@ -295,6 +297,9 @@ def main(
     trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
+    end = time.perf_counter()
+    duration = (round(end - start) / 60.) / 60.
+    print(f"{TColors.HEADER}Computation Time: {duration}{TColors.ENDC}")
 
 
 if __name__ == "__main__":

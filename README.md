@@ -47,9 +47,10 @@ LLaMA2-7b-robust-prompt_injection-0613
 |-------|------|-----|-----|
 | GPT-3.5-Turbo | ```gpt-3.5-turbo``` / ```gpt-3.5-turbo-0301``` / ```gpt-3.5-turbo-0613``` | [Link](https://platform.openai.com/docs/models/gpt-3-5)| OpenAI API |
 | GPT-4 | ```gpt-4``` / ```gpt-4-0613``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
-| LLaMA2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
-| LLaMA2 Finetuned | ```llama2-7b-finetuned``` / ```llama2-13b-finetuned``` / ```llama2-70b-finetuned``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
-| LLaMA2 hardened | ```llama2-7b-robust``` / ```llama2-13b-robust``` / ```llama2-70b-robust```|  [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 (base) | ```llama2-7b-base``` / ```llama2-13b-base``` / ```llama2-70b-base``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 (chat) Finetuned | ```llama2-7b-finetuned``` / ```llama2-13b-finetuned``` / ```llama2-70b-finetuned``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 (chat) hardened | ```llama2-7b-robust``` / ```llama2-13b-robust``` / ```llama2-70b-robust```|  [Link](https://huggingface.co/meta-llama) | Local Inference |
 | Vicuna | ```vicuna-7b``` / ```vicuna-13b``` / ```vicuna-33b``` | [Link](https://huggingface.co/lmsys/vicuna-33b-v1.3) | Local Inference |
 | StableBeluga (2) | ```beluga-7b``` / ```beluga-13b``` / ```beluga2-70b```| [Link](https://huggingface.co/stabilityai/StableBeluga2) | Local Inference |
 
@@ -101,5 +102,5 @@ python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERAT
 ## Supported Large Language Models (base)
 | Model | Parameter Specifier | Link | Compute Instance |
 |-------|------|-----|-----|
-| LLaMA2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 (base) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 

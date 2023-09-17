@@ -11,3 +11,4 @@ wandb
 scipy
 peft @ git+https://github.com/huggingface/peft.git
 trl
+nltk

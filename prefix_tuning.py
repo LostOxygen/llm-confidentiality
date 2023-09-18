@@ -165,7 +165,7 @@ def main(
         attacks: List[str],
         name_suffix: str,
         max_length: int = 4096,
-        lr: float = 1e-2,
+        lr: float = 1e-4,
         batch_size: int = 8,
     ) -> None:
     """Main function to start the LLM prefix tuning"""

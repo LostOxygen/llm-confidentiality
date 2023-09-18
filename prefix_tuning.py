@@ -164,7 +164,7 @@ def main(
         epochs: int,
         attacks: List[str],
         name_suffix: str,
-        max_length: int,
+        max_length: int = 4096,
         lr: float = 1e-2,
         batch_size: int = 8,
     ) -> None:

@@ -312,8 +312,8 @@ if __name__ == "__main__":
     parser.add_argument("--name_suffix", "-n", help="adds a name suffix for the finetuned model",
                         default="", type=str)
     parser.add_argument("--batch_size", "-bs", help="specifies the training batch size",
-                        default="", type=int, default=2)
+                        default=2, type=int)
     parser.add_argument("--learning_rate", "-lr", help="specifies the training learning rate",
-                        default="", type=float, default=1e-4)
+                        default=1e-4, type=float)
     args = parser.parse_args()
     main(**vars(args))

@@ -14,6 +14,8 @@ import argparse
 from typing import Final, List, Callable
 
 from huggingface_hub import login
+from trl import SFTTrainer
+from transformers import TrainingArguments
 from transformers import (
     AutoTokenizer,
     default_data_collator,
@@ -57,6 +59,15 @@ os.environ["TRANSFORMERS_CACHE"] = "/data/"
 glob_tokenizer: AutoTokenizer = None
 glob_max_length: int = 4096
 
+# Trainer Config
+CONFIG: Final[dict] = {
+    "training": {
+        "output_dir": OUTPUT_DIR,
+        "gradient_accumulation_steps": 4,
+        "logging_steps": 10
+    }
+}
+
 
 def get_attack_list(attacks: List[str]) -> List[Callable]:
     """
@@ -97,9 +108,8 @@ def preprocess_function(data) -> dict:
     Helper function to preprocess the data for the LLM by mapping
     the prompts to their encodings (Tokens).
     """
-    inputs = data["prompts"]
     glob_tokenizer.pad_token = glob_tokenizer.eos_token
-    model_inputs = glob_tokenizer(inputs,
+    model_inputs = glob_tokenizer(data,
                                   max_length=glob_max_length,
                                   padding="max_length",
                                   truncation=True,
@@ -108,7 +118,7 @@ def preprocess_function(data) -> dict:
     return model_inputs
 
 
-def create_dataloader(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
+def get_data(attacks: List[Callable] = None) -> Dataset:
     """
     Creating a dictionary dataset from the system prompts.
 
@@ -117,7 +127,7 @@ def create_dataloader(attacks: List[Callable] = None, batch_size: int = 8) -> Da
         batch_size: int - the batch size for the dataloader
 
     Returns:
-        train_dataloader: DataLoader - the Dataloader containing the tokenized prompt dataset
+        train_data: Dataset - the Dataset containing the tokenized prompt dataset
     """
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
     dataset = PromptDataset()
@@ -137,29 +147,30 @@ def create_dataloader(attacks: List[Callable] = None, batch_size: int = 8) -> Da
 
                 ### End
             """
-            prompt_list.append(prompt)
+            prompt_list.append(preprocess_function(prompt))
 
-    new_dataset = Dataset.from_dict({"prompts": prompt_list})
+    train_data = Dataset.from_dict({"prompts": prompt_list})
 
-    # convert the prompts into tokens
-    processed_dataset = new_dataset.map(
-        preprocess_function,
-        batched=True,
-        num_proc=1,
-        load_from_cache_file=False,
-        desc="Running tokenizer on the prompts",
-    )
+    # # convert the prompts into tokens
+    # processed_dataset = new_dataset.map(
+    #     preprocess_function,
+    #     batched=True,
+    #     num_proc=1,
+    #     load_from_cache_file=False,
+    #     desc="Running tokenizer on the prompts",
+    # )
+
 
     # create the dataloader
-    train_dataloader = DataLoader(
-        processed_dataset,
-        batch_size=batch_size,
-        collate_fn=default_data_collator,
-        shuffle=True,
-        pin_memory=True
-    )
+    # train_dataloader = DataLoader(
+    #     processed_dataset,
+    #     batch_size=batch_size,
+    #     collate_fn=default_data_collator,
+    #     shuffle=True,
+    #     pin_memory=True
+    # )
 
-    return train_dataloader
+    return train_data
 
 
 def main(
@@ -248,8 +259,8 @@ def main(
 
     llm = LLM(llm_type=llm_type)
 
-    model = get_peft_model(llm.model, peft_config)
-    model.print_trainable_parameters()
+    # model = get_peft_model(llm.model, peft_config)
+    # model.print_trainable_parameters()
 
     # set some global variables for the dataset mappings
     global glob_tokenizer
@@ -261,37 +272,62 @@ def main(
     attack_funcs = get_attack_list(attacks)
 
     # create the dataloaders
-    train_dataloader = create_dataloader(attacks=attack_funcs, batch_size=batch_size)
+    train_data = get_data(attacks=attack_funcs)
 
-    # setting up the optimizer and learning rate scheduler
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    lr_scheduler = get_linear_schedule_with_warmup(
-        optimizer=optimizer,
-        num_warmup_steps=0,
-        num_training_steps=(len(train_dataloader) * epochs),
+    training_args = TrainingArguments(**CONFIG["training"])
+    training_args.max_steps = epochs
+    training_args.learning_rate = learning_rate
+    training_args.per_device_train_batch_size = batch_size
+    training_args.run_name = "llm-"+suffix+attack_suffix+name_suffix # wandb run name
+
+    trainer = SFTTrainer(
+        model=llm.model,
+        train_dataset=train_data,
+        peft_config=peft_config,
+        dataset_text_field="prompts",
+        packing=False,
+        max_seq_length=max_length,
+        tokenizer=llm.tokenizer,
+        args=training_args,
     )
 
-    # create the training loop
-    for epoch in range(epochs):
-        model.train()
-        total_loss = 0
-        for _, batch in enumerate(tqdm(train_dataloader)):
-            batch = {k: v.to(device) for k, v in batch.items()}
-            outputs = model(**batch)
-            loss = outputs.loss
-            total_loss += loss.detach().float()
-            loss.backward()
-            optimizer.step()
-            lr_scheduler.step()
-            optimizer.zero_grad()
+    trainer.train()
+    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
+    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
 
-        train_epoch_loss = total_loss / len(train_dataloader)
-        train_ppl = torch.exp(train_epoch_loss)
-        print(f"Epoch: [{TColors.OKBLUE}{epoch}{TColors.ENDC}]: {train_ppl=} {train_epoch_loss=}")
 
-    # save the model
-    model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
-    llm.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
+
+
+
+    # # setting up the optimizer and learning rate scheduler
+    # optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+    # lr_scheduler = get_linear_schedule_with_warmup(
+    #     optimizer=optimizer,
+    #     num_warmup_steps=0,
+    #     num_training_steps=(len(train_dataloader) * epochs),
+    # )
+
+    # # create the training loop
+    # for epoch in range(epochs):
+    #     model.train()
+    #     total_loss = 0
+    #     for _, batch in enumerate(tqdm(train_dataloader)):
+    #         batch = {k: v.to(device) for k, v in batch.items()}
+    #         outputs = model(**batch)
+    #         loss = outputs.loss
+    #         total_loss += loss.detach().float()
+    #         loss.backward()
+    #         optimizer.step()
+    #         lr_scheduler.step()
+    #         optimizer.zero_grad()
+
+    #     train_epoch_loss = total_loss / len(train_dataloader)
+    #     train_ppl = torch.exp(train_epoch_loss)
+    #     print(f"Epoch: [{TColors.OKBLUE}{epoch}{TColors.ENDC}]: {train_ppl=} {train_epoch_loss=}")
+
+    # # save the model
+    # model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
+    # llm.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
 
     print(f"{TColors.OKGREEN}Prefix-Tuning finished.{TColors.ENDC}")
     end = time.perf_counter()

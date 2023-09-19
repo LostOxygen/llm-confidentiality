@@ -42,6 +42,7 @@ from framework.attacks import (
         advs_suffix
     )
 from framework.dataset import PromptDataset
+from framework.llm import LLM
 
 # number of attack samples per attack type and main iteration
 NUM_ATTACK_SAMPLES: Final[int] = 100
@@ -235,30 +236,31 @@ def main(
         num_virtual_tokens=20
     )
 
-    parameter_count = llm_type.split("llama")[-1]
-    base_name = llm_type.split(parameter_count)[0] # remove the parameter count
-    base_name = base_name[0].upper() + base_name[1:] # capitalize the first letter
-    hf_model_identifier = "meta-llama/" + base_name + "-" + parameter_count + "-chat-hf"
-    model = AutoModelForCausalLM.from_pretrained(
-        hf_model_identifier,
-        device_map="auto",
-        token=os.environ["HF_TOKEN"],
-        cache_dir=os.environ["TRANSFORMERS_CACHE"],
-        low_cpu_mem_usage=True,
-        trust_remote_code=True
-        )
+    llm = LLM(llm_type=llm_type, is_finetuning=True)
+    # parameter_count = llm_type.split("llama")[-1]
+    # base_name = llm_type.split(parameter_count)[0] # remove the parameter count
+    # base_name = base_name[0].upper() + base_name[1:] # capitalize the first letter
+    # hf_model_identifier = "meta-llama/" + base_name + "-" + parameter_count + "-chat-hf"
+    # model = AutoModelForCausalLM.from_pretrained(
+    #     hf_model_identifier,
+    #     device_map="auto",
+    #     token=os.environ["HF_TOKEN"],
+    #     cache_dir=os.environ["TRANSFORMERS_CACHE"],
+    #     low_cpu_mem_usage=True,
+    #     trust_remote_code=True
+    #     )
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        hf_model_identifier,
-        token=os.environ["HF_TOKEN"]
-        )
+    # tokenizer = AutoTokenizer.from_pretrained(
+    #     hf_model_identifier,
+    #     token=os.environ["HF_TOKEN"]
+    #     )
 
-    model = get_peft_model(model, peft_config)
+    model = get_peft_model(llm.model, peft_config)
     model.print_trainable_parameters()
 
     # set some global variables for the dataset mappings
     global glob_tokenizer
-    glob_tokenizer = tokenizer
+    glob_tokenizer = llm.tokenizer
     global glob_max_length
     glob_max_length = max_length
 
@@ -277,8 +279,6 @@ def main(
     )
 
     # create the training loop
-    model = model.to(device)
-
     for epoch in range(epochs):
         model.train()
         total_loss = 0

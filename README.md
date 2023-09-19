@@ -136,7 +136,7 @@ python prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epochs EPOCHS]
 | ```-e, --epochs``` | <b>int</b> | ```10``` | Specifies the number of epochs for the prefix tuning |
 | ```-bs, --batch_size``` | <b>int</b> | ```2``` | Specifies the batch size for the prefix tuning |
 | ```-lr, --learning_rate``` | <b>float</b> | ```0.0001``` | Specifies the learning rate for the prefix tuning |
-| ```-ml, --max_seq_length``` | <b>int</b> | ```1024``` | Specifies the max. sequence length in tokens |
+| ```-ml, --max_length``` | <b>int</b> | ```1024``` | Specifies the max. sequence length in tokens |
 | ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | Specifies the attacks which will be used to harden the llm during finetuning. Only has an effect if ```--train_robust``` is set to True. For supported attacks see the previous section |
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
 

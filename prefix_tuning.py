@@ -314,7 +314,7 @@ if __name__ == "__main__":
                         default=2, type=int)
     parser.add_argument("--learning_rate", "-lr", help="specifies the training learning rate",
                         default=1e-4, type=float)
-    parser.add_argument("--max_seq_length", "-ml", help="specifies the max. sequence length",
+    parser.add_argument("--max_length", "-ml", help="specifies the max. sequence length",
                         default=1024, type=int)
     args = parser.parse_args()
     main(**vars(args))

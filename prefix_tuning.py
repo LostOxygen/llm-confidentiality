@@ -235,7 +235,7 @@ def main(
         num_virtual_tokens=20
     )
 
-    hf_model_identifier = "meta-llama/" + llm_type + "-chat"
+    hf_model_identifier = "meta-llama/" + llm_type + "-chat-hf"
     model = AutoModelForCausalLM.from_pretrained(
         hf_model_identifier,
         device_map="auto",

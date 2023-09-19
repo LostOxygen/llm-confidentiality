@@ -125,15 +125,17 @@ This is a new and more efficient approach to finetune LLMs.
 
 ### Usage
 ```python
-python prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epochs EPOCHS] [-a | --attacks ATTACKS_LIST] [-n | --name_suffix NAME_SUFFIX]
+python prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epochs EPOCHS] [-bs | --batch_size BATCH_SIZE] [-lr | --learning_rate LEARNING_RATE] [-a | --attacks ATTACKS_LIST] [-n | --name_suffix NAME_SUFFIX]
 ```
 
 ### Arguments
 | Argument | Type | Default Value | Description |
 |----------|------|---------------|-------------|
 | ```-h, --help``` | - | - | Show this help message and exit |
-| ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to finetune |
-| ```-e, --epochs``` | <b>int</b> | ```10``` | Specifies the number of epochs for the finetuning |
+| ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to prefix tune |
+| ```-e, --epochs``` | <b>int</b> | ```10``` | Specifies the number of epochs for the prefix tuning |
+| ```-bs, --batch_size``` | <b>int</b> | ```2``` | Specifies the batch size for the prefix tuning |
+| ```-lr, --learning_rate``` | <b>float</b> | ```0.0001``` | Specifies the learning rate for the prefix tuning |
 | ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | Specifies the attacks which will be used to harden the llm during finetuning. Only has an effect if ```--train_robust``` is set to True. For supported attacks see the previous section |
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
 

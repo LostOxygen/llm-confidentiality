@@ -167,11 +167,22 @@ def main(
         epochs: int,
         attacks: List[str],
         name_suffix: str,
+        learning_rate: float,
+        batch_size: int,
         max_length: int = 4096,
-        lr: float = 1e-4,
-        batch_size: int = 4,
     ) -> None:
-    """Main function to start the LLM prefix tuning"""
+    """
+    Main function to start the LLM prefix tuning
+    
+    Parameters:
+        llm_type: str - specifies the opponent LLM type
+        epochs: int - specifies the number of iterations to finetune the LLM
+        attacks: List[str] - specifies the attack functions to harden the LLM against
+        name_suffix: str - adds a name suffix for the final model
+        max_length: int - specifies the maximum length of the input sequence
+        learning_rate: float - specifies the learning rate for the optimizer
+        batch_size: int - specifies the batch size for the dataloader
+    """
 
     start = time.perf_counter()  # start timer
     # paste the Huggingface token into the hf_token.txt file and put into the root directory
@@ -225,7 +236,7 @@ def main(
     print(f"## {TColors.OKBLUE}{TColors.BOLD}epochs{TColors.ENDC}: {epochs}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}max_length{TColors.ENDC}: {max_length}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}batch_size{TColors.ENDC}: {batch_size}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: {lr}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: {learning_rate}")
     print("#"*os.get_terminal_size().columns+"\n")
 
     # load the llm and config and stuff
@@ -254,7 +265,7 @@ def main(
     train_dataloader = create_dataloader(attacks=attack_funcs, batch_size=batch_size)
 
     # setting up the optimizer and learning rate scheduler
-    optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
     lr_scheduler = get_linear_schedule_with_warmup(
         optimizer=optimizer,
         num_warmup_steps=0,
@@ -300,5 +311,9 @@ if __name__ == "__main__":
                         help="specifies the attack types", nargs="+")
     parser.add_argument("--name_suffix", "-n", help="adds a name suffix for the finetuned model",
                         default="", type=str)
+    parser.add_argument("--batch_size", "-bs", help="specifies the training batch size",
+                        default="", type=int, default=2)
+    parser.add_argument("--learning_rate", "-lr", help="specifies the training learning rate",
+                        default="", type=float, default=1e-4)
     args = parser.parse_args()
     main(**vars(args))

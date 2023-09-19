@@ -94,7 +94,7 @@ def main(
 
             os.environ["HF_TOKEN"] = key
             print(f"{TColors.OKGREEN}Huggingface token loaded.")
-            login(token=key, add_to_git_credential=False)
+            login(token=key, add_to_git_credential=True)
             print(f"{TColors.ENDC}")
 
     except FileNotFoundError:

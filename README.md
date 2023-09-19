@@ -10,6 +10,12 @@ python -m pip install -U -r requirements.txt
 ```
 Create both a ```key.txt``` file containing your OpenAI API key as well as a ```hf_token.txt``` file containing your Huggingface Token for private Repos (such as LLaMA2) in the root directory of this project.
 
+Sometimes it can be necessary to login to your Huggingface account via the CLI:
+```
+git config --global credential.helper store
+huggingface-cli login
+```
+
 ## Usage
 ```
 python run.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFENSE] [-llm | --llm_type LLM_TYPE] [-m | --max_level MAX_LEVEL] [-t | --temperature TEMPERATURE]

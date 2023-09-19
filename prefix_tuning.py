@@ -235,8 +235,9 @@ def main(
         num_virtual_tokens=20
     )
 
+    hf_model_identifier = "meta-llama/" + llm_type + "-chat"
     model = AutoModelForCausalLM.from_pretrained(
-        "meta-llama/"+llm_type,
+        hf_model_identifier,
         device_map="auto",
         token=os.environ["HF_TOKEN"],
         cache_dir=os.environ["TRANSFORMERS_CACHE"],
@@ -245,7 +246,7 @@ def main(
         )
 
     tokenizer = AutoTokenizer.from_pretrained(
-        "meta-llama/"+llm_type,
+        hf_model_identifier,
         token=os.environ["HF_TOKEN"]
         )
 

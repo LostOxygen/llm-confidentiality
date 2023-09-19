@@ -4,7 +4,7 @@ langchain
 openai
 accelerate
 tokenizers==0.13.3
-transformers @ git+https://github.com/huggingface/transformers.git
+transformers
 huggingface-hub
 bitsandbytes
 einops

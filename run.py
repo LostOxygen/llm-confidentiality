@@ -188,8 +188,12 @@ def main(
         for attack, successes in total_successes.items():
             print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
                 f"{iterations}")
-        log_results(llm_name=llm_type, defense_name=defense,
-                    success_dict=total_successes, iters=iterations)
+        log_results(
+                llm_name=llm_type+name_suffix,
+                defense_name=defense,
+                success_dict=total_successes,
+                iters=iterations
+            )
 
     end = time.perf_counter()
     duration = (round(end - start) / 60.) / 60.

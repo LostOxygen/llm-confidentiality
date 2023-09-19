@@ -25,6 +25,7 @@ class Strategy:
         self.attack_func: Callable = attack_func
         self.defense_func: Callable = defense_func
         self.llm_type = llm_type
+        self.llm_suffix = llm_suffix
         self.temperature = temperature
         self.llm: LLM = LLM(
                 llm_type=llm_type,
@@ -101,9 +102,15 @@ class Strategy:
                       f"[{TColors.OKCYAN}{level_id}{TColors.ENDC}]: " \
                       f"{TColors.FAIL}{fail_result_str}{TColors.ENDC}")
 
-            log_conversation(self.llm_type, self.attack_func.__name__,
-                             self.defense_func.__name__, level_id,
-                             mal_prompt, response, self.__evaluate_response(response))
+            log_conversation(
+                    llm_name=self.llm_type+self.llm_suffix,
+                    attack_name=self.attack_func.__name__,
+                    defense_name=self.defense_func.__name__,
+                    level=level_id,
+                    prompt=mal_prompt,
+                    response=response,
+                    success=self.__evaluate_response(response)
+                )
 
         return num_successes
 

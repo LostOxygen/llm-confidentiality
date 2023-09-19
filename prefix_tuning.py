@@ -298,7 +298,7 @@ def main(
 
     # save the model
     model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
-    tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
+    llm.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
 
     print(f"{TColors.OKGREEN}Prefix-Tuning finished.{TColors.ENDC}")
     end = time.perf_counter()

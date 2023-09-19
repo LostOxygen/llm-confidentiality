@@ -44,7 +44,7 @@ from framework.dataset import PromptDataset
 from framework.llm import LLM
 
 # number of attack samples per attack type and main iteration
-NUM_ATTACK_SAMPLES: Final[int] = 100
+NUM_ATTACK_SAMPLES: Final[int] = 10
 DATA_PATH: Final[str] = "./datasets/system_prompts.json"
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 if not os.path.isdir(OUTPUT_DIR):
@@ -232,7 +232,7 @@ def main(
 
     # print the prefix tuning parameters
     print(f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Prefix-Tuning Parameters " \
-          f"{TColors.ENDC}" + "#"*int(os.get_terminal_size().columns-25))
+          f"{TColors.ENDC}" + "#"*int(os.get_terminal_size().columns-26))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}epochs{TColors.ENDC}: {epochs}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}max_length{TColors.ENDC}: {max_length}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}batch_size{TColors.ENDC}: {batch_size}")

@@ -169,7 +169,7 @@ def main(
         name_suffix: str,
         learning_rate: float,
         batch_size: int,
-        max_length: int = 4096,
+        max_length: int,
     ) -> None:
     """
     Main function to start the LLM prefix tuning
@@ -243,7 +243,6 @@ def main(
     peft_config = PrefixTuningConfig(
         task_type=TaskType.CAUSAL_LM,
         inference_mode=False,
-
         num_virtual_tokens=20
     )
 
@@ -315,5 +314,7 @@ if __name__ == "__main__":
                         default=2, type=int)
     parser.add_argument("--learning_rate", "-lr", help="specifies the training learning rate",
                         default=1e-4, type=float)
+    parser.add_argument("--max_seq_length", "-ml", help="specifies the max. sequence length",
+                        default=1024, type=int)
     args = parser.parse_args()
     main(**vars(args))

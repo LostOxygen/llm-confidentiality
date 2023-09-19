@@ -16,7 +16,6 @@ from typing import Final, List, Callable
 from huggingface_hub import login
 from transformers import (
     AutoTokenizer,
-    AutoModelForCausalLM,
     default_data_collator,
     get_linear_schedule_with_warmup
 )
@@ -170,7 +169,7 @@ def main(
         name_suffix: str,
         max_length: int = 4096,
         lr: float = 1e-4,
-        batch_size: int = 8,
+        batch_size: int = 4,
     ) -> None:
     """Main function to start the LLM prefix tuning"""
 
@@ -233,27 +232,11 @@ def main(
     peft_config = PrefixTuningConfig(
         task_type=TaskType.CAUSAL_LM,
         inference_mode=False,
+
         num_virtual_tokens=20
     )
 
-    llm = LLM(llm_type=llm_type, is_finetuning=True)
-    # parameter_count = llm_type.split("llama")[-1]
-    # base_name = llm_type.split(parameter_count)[0] # remove the parameter count
-    # base_name = base_name[0].upper() + base_name[1:] # capitalize the first letter
-    # hf_model_identifier = "meta-llama/" + base_name + "-" + parameter_count + "-chat-hf"
-    # model = AutoModelForCausalLM.from_pretrained(
-    #     hf_model_identifier,
-    #     device_map="auto",
-    #     token=os.environ["HF_TOKEN"],
-    #     cache_dir=os.environ["TRANSFORMERS_CACHE"],
-    #     low_cpu_mem_usage=True,
-    #     trust_remote_code=True
-    #     )
-
-    # tokenizer = AutoTokenizer.from_pretrained(
-    #     hf_model_identifier,
-    #     token=os.environ["HF_TOKEN"]
-    #     )
+    llm = LLM(llm_type=llm_type)
 
     model = get_peft_model(llm.model, peft_config)
     model.print_trainable_parameters()

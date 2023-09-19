@@ -232,8 +232,8 @@ def main(
         num_virtual_tokens=20
     )
 
-    model = AutoModelForCausalLM.from_pretrained(llm_type)
-    tokenizer = AutoTokenizer.from_pretrained(llm_type)
+    model = AutoModelForCausalLM.from_pretrained("meta-llama/"+llm_type)
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/"+llm_type)
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
 

@@ -49,6 +49,9 @@ DATA_PATH: Final[str] = "./datasets/system_prompts.json"
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 if not os.path.isdir(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
+if not os.path.isdir("/data/"):
+    os.mkdir("/data/")
+os.environ["TRANSFORMERS_CACHE"] = "/data/"
 
 # hacky global variables for the tokenizer
 glob_tokenizer: AutoTokenizer = None
@@ -232,8 +235,21 @@ def main(
         num_virtual_tokens=20
     )
 
-    model = AutoModelForCausalLM.from_pretrained("meta-llama/"+llm_type)
-    tokenizer = AutoTokenizer.from_pretrained("meta-llama/"+llm_type)
+    model = AutoModelForCausalLM.from_pretrained(
+        "meta-llama/"+llm_type,
+        device_map="auto",
+        token=os.environ["HF_TOKEN"],
+        use_auth_token=True,
+        cache_dir=os.environ["TRANSFORMERS_CACHE"],
+        low_cpu_mem_usage=True,
+        trust_remote_code=True
+        )
+
+    tokenizer = AutoTokenizer.from_pretrained(
+        "meta-llama/"+llm_type,
+        token=os.environ["HF_TOKEN"]
+        )
+
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
 

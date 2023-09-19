@@ -101,6 +101,7 @@ def preprocess_function(data) -> dict:
     model_inputs = glob_tokenizer(inputs,
                                   max_length=glob_max_length,
                                   padding="max_length",
+                                  pad_token=glob_tokenizer.eos_token,
                                   truncation=True,
                                   return_tensors="pt"
                                 )
@@ -145,7 +146,6 @@ def create_dataloader(attacks: List[Callable] = None, batch_size: int = 8) -> Da
         preprocess_function,
         batched=True,
         num_proc=1,
-        remove_columns=new_dataset["prompts"].column_names,
         load_from_cache_file=False,
         desc="Running tokenizer on the prompts",
     )
@@ -226,7 +226,7 @@ def main(
     print(f"## {TColors.OKBLUE}{TColors.BOLD}max_length{TColors.ENDC}: {max_length}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}batch_size{TColors.ENDC}: {batch_size}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: {lr}")
-
+    print("#"*os.get_terminal_size().columns+"\n")
 
     # load the llm and config and stuff
     peft_config = PrefixTuningConfig(

@@ -3,6 +3,7 @@ protobuf
 langchain
 openai
 accelerate
+tokenizers==0.13.3
 transformers @ git+https://github.com/huggingface/transformers.git
 huggingface-hub
 bitsandbytes

@@ -98,6 +98,7 @@ def preprocess_function(data) -> dict:
     the prompts to their encodings (Tokens).
     """
     inputs = data["prompts"]
+    glob_tokenizer.pad_token = glob_tokenizer.eos_token
     model_inputs = glob_tokenizer(inputs,
                                   max_length=glob_max_length,
                                   padding="max_length",

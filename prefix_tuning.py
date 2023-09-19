@@ -102,7 +102,6 @@ def preprocess_function(data) -> dict:
     model_inputs = glob_tokenizer(inputs,
                                   max_length=glob_max_length,
                                   padding="max_length",
-                                  pad_token=glob_tokenizer.eos_token,
                                   truncation=True,
                                   return_tensors="pt"
                                 )

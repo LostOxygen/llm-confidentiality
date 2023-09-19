@@ -236,7 +236,8 @@ def main(
     )
 
     parameter_count = llm_type.split("llama")[-1]
-    base_name = llm_type.split(parameter_count)[0]
+    base_name = llm_type.split(parameter_count)[0] # remove the parameter count
+    base_name = base_name[0].upper() + base_name[1:] # capitalize the first letter
     hf_model_identifier = "meta-llama/" + base_name + "-" + parameter_count + "-chat-hf"
     model = AutoModelForCausalLM.from_pretrained(
         hf_model_identifier,

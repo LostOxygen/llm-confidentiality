@@ -239,7 +239,6 @@ def main(
         "meta-llama/"+llm_type,
         device_map="auto",
         token=os.environ["HF_TOKEN"],
-        use_auth_token=True,
         cache_dir=os.environ["TRANSFORMERS_CACHE"],
         low_cpu_mem_usage=True,
         trust_remote_code=True

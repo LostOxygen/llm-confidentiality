@@ -1,5 +1,7 @@
 # project specific ignores
 logs/
+finetuned_models/
+wandb/
 key.txt
 hf_token.txt
 wandb_key.txt

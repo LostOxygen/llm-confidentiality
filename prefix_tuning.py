@@ -15,8 +15,6 @@ from typing import Final, List, Callable
 
 import pkbar
 from huggingface_hub import login
-from trl import SFTTrainer
-from transformers import TrainingArguments
 from transformers import (
     AutoTokenizer,
     default_data_collator,
@@ -29,7 +27,6 @@ from peft import (
 from datasets import Dataset
 import torch
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 from framework.colors import TColors
 from framework.attacks import (
@@ -151,7 +148,7 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
             """
             prompt_list.append(prompt)
 
-            label = f"""
+            label = """
                 Prompt injection attack detected! I will not leak any confidential informations!
             """
             label_list.append(label)
@@ -295,7 +292,6 @@ def main(
         num_training_steps=(len(train_data) * epochs),
     )
 
-    past_key_vals = None
     kbar = pkbar.Kbar(target=epochs, width=40, always_stateful=True)
     # create the training loop
     for epoch in range(epochs):

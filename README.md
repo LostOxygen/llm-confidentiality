@@ -125,7 +125,7 @@ This is a new and more efficient approach to finetune LLMs.
 
 ### Usage
 ```python
-python prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epochs EPOCHS] [-bs | --batch_size BATCH_SIZE] [-lr | --learning_rate LEARNING_RATE] [-ml | --max_seq_length MAX_SEQ_LENGTH] [-a | --attacks ATTACKS_LIST] [-n | --name_suffix NAME_SUFFIX]
+python prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epochs EPOCHS] [-bs | --batch_size BATCH_SIZE] [-lr | --learning_rate LEARNING_RATE] [-ml | --max_seq_length MAX_SEQ_LENGTH] [-pl | --prefix_length PREFIX_LENGTH] [-a | --attacks ATTACKS_LIST] [-n | --name_suffix NAME_SUFFIX]
 ```
 
 ### Arguments
@@ -137,6 +137,7 @@ python prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epochs EPOCHS]
 | ```-bs, --batch_size``` | <b>int</b> | ```2``` | Specifies the batch size for the prefix tuning |
 | ```-lr, --learning_rate``` | <b>float</b> | ```0.0001``` | Specifies the learning rate for the prefix tuning |
 | ```-ml, --max_length``` | <b>int</b> | ```1024``` | Specifies the max. sequence length in tokens |
+| ```-pl, --prefix_length``` | <b>int</b> | ```10``` | Specifies the number of virtual tokens to train as the tuned prefixes |
 | ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | Specifies the attacks which will be used to harden the llm during finetuning. Only has an effect if ```--train_robust``` is set to True. For supported attacks see the previous section |
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
 

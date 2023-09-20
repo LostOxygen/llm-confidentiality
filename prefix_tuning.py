@@ -13,6 +13,7 @@ import socket
 import argparse
 from typing import Final, List, Callable
 
+import pkbar
 from huggingface_hub import login
 from trl import SFTTrainer
 from transformers import TrainingArguments
@@ -46,7 +47,7 @@ from framework.dataset import PromptDataset
 from framework.llm import LLM
 
 # number of attack samples per attack type and main iteration
-NUM_ATTACK_SAMPLES: Final[int] = 10
+NUM_ATTACK_SAMPLES: Final[int] = 1
 DATA_PATH: Final[str] = "./datasets/system_prompts.json"
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 if not os.path.isdir(OUTPUT_DIR):
@@ -58,15 +59,6 @@ os.environ["TRANSFORMERS_CACHE"] = "/data/"
 # hacky global variables for the tokenizer
 glob_tokenizer: AutoTokenizer = None
 glob_max_length: int = 4096
-
-# Trainer Config
-CONFIG: Final[dict] = {
-    "training": {
-        "output_dir": OUTPUT_DIR,
-        "gradient_accumulation_steps": 4,
-        "logging_steps": 10
-    }
-}
 
 
 def get_attack_list(attacks: List[str]) -> List[Callable]:
@@ -108,17 +100,29 @@ def preprocess_function(data) -> dict:
     Helper function to preprocess the data for the LLM by mapping
     the prompts to their encodings (Tokens).
     """
+    inputs = data["prompts"]
+    labels = data["labels"]
     glob_tokenizer.pad_token = glob_tokenizer.eos_token
-    model_inputs = glob_tokenizer(data,
-                                  max_length=glob_max_length,
-                                  padding="max_length",
-                                  truncation=True,
-                                  return_tensors="pt"
-                                )
+    model_inputs = glob_tokenizer(
+            inputs,
+            max_length=glob_max_length,
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt"
+        )
+    label_inputs = glob_tokenizer(
+            labels,
+            max_length=glob_max_length,
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt"
+        )
+    
+    model_inputs["labels"] = label_inputs["input_ids"]
     return model_inputs
 
 
-def get_data(attacks: List[Callable] = None) -> Dataset:
+def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
     """
     Creating a dictionary dataset from the system prompts.
 
@@ -127,11 +131,12 @@ def get_data(attacks: List[Callable] = None) -> Dataset:
         batch_size: int - the batch size for the dataloader
 
     Returns:
-        train_data: Dataset - the Dataset containing the tokenized prompt dataset
+        train_data: DataLoader - the DataLoader containing the tokenized prompt dataset
     """
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
     dataset = PromptDataset()
-    prompt_list: List = []
+    prompt_list: List[str] = []
+    label_list: List[str] = []
 
     # create prompt injection attack dataset
     for attack in attacks:
@@ -143,34 +148,36 @@ def get_data(attacks: List[Callable] = None) -> Dataset:
                 {attack()}
 
                 ### Response:
-                Prompt injection attack detected! I will not leak any confidential informations!
-
-                ### End
             """
-            prompt_list.append(preprocess_function(prompt))
+            prompt_list.append(prompt)
 
-    train_data = Dataset.from_dict({"prompts": prompt_list})
+            label = f"""
+                Prompt injection attack detected! I will not leak any confidential informations!
+            """
+            label_list.append(label)
 
-    # # convert the prompts into tokens
-    # processed_dataset = new_dataset.map(
-    #     preprocess_function,
-    #     batched=True,
-    #     num_proc=1,
-    #     load_from_cache_file=False,
-    #     desc="Running tokenizer on the prompts",
-    # )
+    new_dataset = Dataset.from_dict({"prompts": prompt_list, "labels": label_list})
 
+    # convert the prompts into tokens
+    processed_dataset = new_dataset.map(
+        preprocess_function,
+        batched=True,
+        num_proc=1,
+        remove_columns=new_dataset.column_names,
+        load_from_cache_file=False,
+        desc="Running tokenizer on the prompts",
+    )
 
     # create the dataloader
-    # train_dataloader = DataLoader(
-    #     processed_dataset,
-    #     batch_size=batch_size,
-    #     collate_fn=default_data_collator,
-    #     shuffle=True,
-    #     pin_memory=True
-    # )
+    train_dataloader = DataLoader(
+        processed_dataset,
+        batch_size=batch_size,
+        collate_fn=default_data_collator,
+        shuffle=True,
+        pin_memory=True
+    )
 
-    return train_data
+    return train_dataloader
 
 
 def main(
@@ -181,6 +188,7 @@ def main(
         learning_rate: float,
         batch_size: int,
         max_length: int,
+        prefix_length: int
     ) -> None:
     """
     Main function to start the LLM prefix tuning
@@ -193,6 +201,10 @@ def main(
         max_length: int - specifies the maximum length of the input sequence
         learning_rate: float - specifies the learning rate for the optimizer
         batch_size: int - specifies the batch size for the dataloader
+        prefix_length: int - specifies the number of virtual tokens to train as a prefix
+
+    Returns:
+        None
     """
 
     start = time.perf_counter()  # start timer
@@ -243,24 +255,25 @@ def main(
 
     # print the prefix tuning parameters
     print(f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Prefix-Tuning Parameters " \
-          f"{TColors.ENDC}" + "#"*int(os.get_terminal_size().columns-26))
+          f"{TColors.ENDC}" + "#"*int(os.get_terminal_size().columns-28))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}epochs{TColors.ENDC}: {epochs}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}max_length{TColors.ENDC}: {max_length}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}batch_size{TColors.ENDC}: {batch_size}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: {learning_rate}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}prefix_length{TColors.ENDC}: {prefix_length}")
     print("#"*os.get_terminal_size().columns+"\n")
 
     # load the llm and config and stuff
     peft_config = PrefixTuningConfig(
         task_type=TaskType.CAUSAL_LM,
         inference_mode=False,
-        num_virtual_tokens=20
+        num_virtual_tokens=prefix_length
     )
 
     llm = LLM(llm_type=llm_type)
 
-    # model = get_peft_model(llm.model, peft_config)
-    # model.print_trainable_parameters()
+    model = get_peft_model(llm.model, peft_config)
+    model.print_trainable_parameters()
 
     # set some global variables for the dataset mappings
     global glob_tokenizer
@@ -272,64 +285,46 @@ def main(
     attack_funcs = get_attack_list(attacks)
 
     # create the dataloaders
-    train_data = get_data(attacks=attack_funcs)
+    train_data = get_data(attacks=attack_funcs, batch_size=batch_size)
 
-    training_args = TrainingArguments(**CONFIG["training"])
-    training_args.max_steps = epochs
-    training_args.learning_rate = learning_rate
-    training_args.per_device_train_batch_size = batch_size
-    training_args.run_name = "llm-"+suffix+attack_suffix+name_suffix # wandb run name
-
-    trainer = SFTTrainer(
-        model=llm.model,
-        train_dataset=train_data,
-        peft_config=peft_config,
-        dataset_text_field="prompts",
-        packing=False,
-        max_seq_length=max_length,
-        tokenizer=llm.tokenizer,
-        args=training_args,
+    # setting up the optimizer and learning rate scheduler
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
+    lr_scheduler = get_linear_schedule_with_warmup(
+        optimizer=optimizer,
+        num_warmup_steps=10,
+        num_training_steps=(len(train_data) * epochs),
     )
 
-    trainer.train()
-    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
-    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
+    past_key_vals = None
+    kbar = pkbar.Kbar(target=epochs, width=40, always_stateful=True)
+    # create the training loop
+    for epoch in range(epochs):
+        model.train()
+        total_loss = 0
 
+        for _, batch in enumerate(train_data):
+            batch = {k: v.to(device) for k, v in batch.items()}
+            outputs = model(**batch)
+            # We don't use .loss here since the model may return tuples instead of ModelOutput.
+            loss = outputs["loss"] if isinstance(outputs, dict) else outputs[0]
+            total_loss += loss.detach().float()
+            loss.backward()
+            optimizer.step()
+            lr_scheduler.step()
+            optimizer.zero_grad()
 
+        train_epoch_loss = total_loss / len(train_data)
+        train_ppl = torch.exp(train_epoch_loss)
+        train_epoch_loss = train_epoch_loss.item()
+        train_ppl = train_ppl.item()
+        kbar.update(epoch+1, values=[("train_epoch_loss", train_epoch_loss),
+                                   ("train_ppl", train_ppl)])
 
+    # save the model
+    model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
+    llm.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
 
-
-    # # setting up the optimizer and learning rate scheduler
-    # optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
-    # lr_scheduler = get_linear_schedule_with_warmup(
-    #     optimizer=optimizer,
-    #     num_warmup_steps=0,
-    #     num_training_steps=(len(train_dataloader) * epochs),
-    # )
-
-    # # create the training loop
-    # for epoch in range(epochs):
-    #     model.train()
-    #     total_loss = 0
-    #     for _, batch in enumerate(tqdm(train_dataloader)):
-    #         batch = {k: v.to(device) for k, v in batch.items()}
-    #         outputs = model(**batch)
-    #         loss = outputs.loss
-    #         total_loss += loss.detach().float()
-    #         loss.backward()
-    #         optimizer.step()
-    #         lr_scheduler.step()
-    #         optimizer.zero_grad()
-
-    #     train_epoch_loss = total_loss / len(train_dataloader)
-    #     train_ppl = torch.exp(train_epoch_loss)
-    #     print(f"Epoch: [{TColors.OKBLUE}{epoch}{TColors.ENDC}]: {train_ppl=} {train_epoch_loss=}")
-
-    # # save the model
-    # model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
-    # llm.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
-
-    print(f"{TColors.OKGREEN}Prefix-Tuning finished.{TColors.ENDC}")
+    print(f"\n{TColors.OKGREEN}Prefix-Tuning finished.{TColors.ENDC}")
     end = time.perf_counter()
     duration = (round(end - start) / 60.) / 60.
     print(f"{TColors.HEADER}Computation Time: {duration}{TColors.ENDC}")
@@ -340,17 +335,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prefix Tuning")
     parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
                         help="specifies the opponent LLM type")
-    parser.add_argument("--epochs", "-e", type=int, default=10,
+    parser.add_argument("--epochs", "-e", type=int, default=100,
                         help="specifies the number of iterations to finetune the LLM")
     parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
                         help="specifies the attack types", nargs="+")
     parser.add_argument("--name_suffix", "-n", help="adds a name suffix for the finetuned model",
                         default="", type=str)
     parser.add_argument("--batch_size", "-bs", help="specifies the training batch size",
-                        default=2, type=int)
+                        default=5, type=int)
     parser.add_argument("--learning_rate", "-lr", help="specifies the training learning rate",
-                        default=1e-4, type=float)
+                        default=5e-5, type=float)
     parser.add_argument("--max_length", "-ml", help="specifies the max. sequence length",
                         default=1024, type=int)
+    parser.add_argument("--prefix_length", "-pl", help="specifies the prefix length (virtual tokens)",
+                        default=10, type=int)
     args = parser.parse_args()
     main(**vars(args))

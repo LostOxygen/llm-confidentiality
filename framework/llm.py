@@ -85,7 +85,6 @@ class LLM():
                             device_map="auto",
                             low_cpu_mem_usage=True,
                             quantization_config=config,
-                            token=os.environ["HF_TOKEN"],
                             trust_remote_code=True,
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
@@ -138,7 +137,6 @@ class LLM():
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
-                                token=os.environ["HF_TOKEN"],
                                 use_fast=False,
                                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
@@ -149,7 +147,6 @@ class LLM():
                             device_map="auto",
                             quantization_config=config,
                             low_cpu_mem_usage=True,
-                            token=os.environ["HF_TOKEN"],
                             trust_remote_code=True,
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
@@ -176,7 +173,6 @@ class LLM():
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
-                                token=os.environ["HF_TOKEN"],
                                 use_fast=False,
                                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
@@ -186,7 +182,6 @@ class LLM():
                             device_map="auto",
                             quantization_config=config,
                             low_cpu_mem_usage=True,
-                            token=os.environ["HF_TOKEN"],
                             trust_remote_code=True,
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
@@ -215,7 +210,6 @@ class LLM():
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
-                                token=os.environ["HF_TOKEN"],
                                 use_fast=False,
                                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
@@ -225,7 +219,6 @@ class LLM():
                             device_map="auto",
                             quantization_config=config,
                             low_cpu_mem_usage=True,
-                            token=os.environ["HF_TOKEN"],
                             trust_remote_code=True,
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )

@@ -9,11 +9,7 @@ from transformers import (
     AutoModelForCausalLM,
     BitsAndBytesConfig
 )
-from peft import (
-    PeftModel,
-    PrefixTuningConfig,
-    TaskType
-)
+from peft import PeftModel
 
 from framework.colors import TColors
 

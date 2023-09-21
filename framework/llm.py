@@ -263,7 +263,8 @@ class LLM():
                     "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
                     "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
                     "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
-                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"
+                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust" |
+                    "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix"
                 ):
                 formatted_messages = f"""<s>[INST] <<SYS>>
                     {system_prompt}

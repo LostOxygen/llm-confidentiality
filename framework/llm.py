@@ -38,7 +38,8 @@ class LLM():
 
             case (
                     "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
-                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"
+                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust" |
+                    "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # complete the model name for chat or normal models

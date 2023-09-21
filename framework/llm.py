@@ -4,8 +4,16 @@ import time
 from typing import Tuple, Final
 import torch
 from openai import ChatCompletion
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-from peft import PeftModel
+from transformers import (
+    AutoTokenizer,
+    AutoModelForCausalLM,
+    BitsAndBytesConfig
+)
+from peft import (
+    PeftModel,
+    PrefixTuningConfig,
+    TaskType
+)
 
 from framework.colors import TColors
 
@@ -38,12 +46,11 @@ class LLM():
 
             case (
                     "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
-                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust" |
-                    "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 
+                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # complete the model name for chat or normal models
-                model_path = OUTPUT_DIR + self.llm_type + self.llm_suffix
+                finetuned_model = OUTPUT_DIR + self.llm_type + self.llm_suffix
 
                 # complete the model name for chat or normal models
                 model_name = "meta-llama/"
@@ -77,7 +84,7 @@ class LLM():
                     config = None
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
-                                model_path,
+                                finetuned_model,
                                 use_fast=False,
                                 local_files_only=True,
                             )
@@ -92,7 +99,7 @@ class LLM():
 
                 self.model = PeftModel.from_pretrained(
                     base_model, # base model
-                    model_path, # local peft model
+                    finetuned_model, # local peft model
                     device_map="auto",
                     torch_dtype=torch.bfloat16,
                     quantization_config=config,
@@ -102,6 +109,68 @@ class LLM():
                     offload_folder=os.environ["TRANSFORMERS_CACHE"],
                 )
                 self.model = self.model.to("cuda")
+
+            case (
+                "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 
+                ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                # complete the model name for chat or normal models
+                finetuned_model = OUTPUT_DIR + self.llm_type + self.llm_suffix
+
+                # complete the model name for chat or normal models
+                model_name = "meta-llama/"
+                if self.llm_type.split("-")[1] == "7b":
+                    if "base" in self.llm_type:
+                        model_name += "Llama-2-7b-hf"
+                    else:
+                        model_name += "Llama-2-7b-chat-hf"
+                elif self.llm_type.split("-")[1] == "13b":
+                    if "base" in self.llm_type:
+                        model_name += "Llama-2-13b-hf"
+                    else:
+                        model_name += "Llama-2-13b-chat-hf"
+                elif self.llm_type.split("-")[1] == "70b":
+                    if "base" in self.llm_type:
+                        model_name += "Llama-2-70b-hf"
+                    else:
+                        model_name += "Llama-2-70b-chat-hf"
+                else:
+                    model_name += "Llama-2-70b-chat-hf"
+
+                # if the model is not finetuned, load it in quantized mode
+                if not self.is_finetuning:
+                    config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.bfloat16
+                    )
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                                finetuned_model,
+                                use_fast=False,
+                                local_files_only=True,
+                            )
+                base_model = AutoModelForCausalLM.from_pretrained(
+                            model_name,
+                            device_map="auto",
+                            low_cpu_mem_usage=True,
+                            quantization_config=config,
+                            trust_remote_code=True,
+                            cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                        )
+
+                self.model = PeftModel.from_pretrained(
+                    base_model, # base model
+                    finetuned_model, # local peft model
+                    device_map="auto",
+                    low_cpu_mem_usage=True,
+                    torch_dtype=torch.bfloat16,
+                    quantization_config=config,
+                    local_files_only=True,
+                    #return_dict=True,
+                    offload_folder=os.environ["TRANSFORMERS_CACHE"],
+                )
 
             case (
                     "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
@@ -345,8 +414,7 @@ class LLM():
                     "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
                     "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
                     "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
-                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust" |
-                    "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 
+                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"
                 ):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
@@ -358,6 +426,7 @@ class LLM():
                                             temperature=self.temperature,
                                             max_length=4096
                                         )
+                    print("outputs: ", outputs.cpu())
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs
@@ -366,6 +435,41 @@ class LLM():
                 # so only the models' actual response remains
                 history = "<s>"+response[0]+" </s>"
                 response = response[0].replace(formatted_messages.replace("<s>", ""), "")
+            
+            case (
+                    "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 
+                ):
+                formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
+
+                with torch.no_grad():
+                    inputs = self.tokenizer(
+                            formatted_messages,
+                            max_length=1024,
+                            truncation=True,
+                            padding="max_length",
+                            return_tensors="pt"
+                        ).to("cuda")
+
+                    model_inputs = {key: val.to("cuda") for key, val in inputs.items()}
+                    print("inputs: ", model_inputs["input_ids"])
+                    print("token_length: ", len(model_inputs["input_ids"][0]))
+                    outputs = self.model.generate(
+                                            input_ids=model_inputs["input_ids"],
+                                            do_sample=True,
+                                            temperature=self.temperature,
+                                            max_length=4096
+                                        )
+                    print("outputs: ", outputs.cpu())
+                    response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+                    del inputs
+                    del model_inputs
+                    del outputs
+
+                # remove the previous chat history from the response
+                # so only the models' actual response remains
+                history = "<s>"+response[0]+" </s>"
+                response = response[0].replace(formatted_messages.replace("<s>", ""), "")
+                print("response:", response)
 
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)

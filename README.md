@@ -44,7 +44,7 @@ The naming conventions for the models are as follows:
 ```
 e.g.:
 ```python
-LLaMA2-7b-robust-prompt_injection-0613
+llama2-7b-robust-prompt_injection-0613
 ```
 
 

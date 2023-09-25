@@ -30,6 +30,7 @@ import torch
 from torch.utils.data import DataLoader
 from accelerate import Accelerator
 
+from framework.prompts import SECRET_KEY
 from framework.colors import TColors
 from framework.attacks import (
         ATTACK_LIST,
@@ -42,7 +43,7 @@ from framework.attacks import (
         typoglycemia,
         advs_suffix
     )
-from framework.dataset import PromptDataset
+from framework.dataset import PromptDataset, ResponseDataset
 from framework.llm import LLM
 
 # number of attack samples per attack type and main iteration
@@ -133,7 +134,8 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
         train_data: DataLoader - the DataLoader containing the tokenized prompt dataset
     """
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
-    dataset = PromptDataset()
+    prompt_dataset = PromptDataset()
+    response_dataset = ResponseDataset()
     prompt_list: List[str] = []
     label_list: List[str] = []
 
@@ -141,17 +143,24 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
     for attack in attacks:
         for _ in range(NUM_ATTACK_SAMPLES):
             prompt = f"""
-                {dataset.get_random_prompt()}
+                {prompt_dataset.get_random_prompt()}
 
                 ### Instruction:
                 {attack()}
 
                 ### Response:
+                {response_dataset.get_random_response()}
             """
             prompt_list.append(prompt)
 
-            label = """
-                Prompt injection attack detected! I will not leak any confidential informations!
+            label = f"""
+                {prompt_dataset.get_random_prompt()}
+
+                ### Instruction:
+                {attack()}
+
+                ### Response:
+                {response_dataset.get_random_response().replace(SECRET_KEY, "####")}
             """
             label_list.append(label)
 

@@ -1,6 +1,5 @@
 """library for strategy pattern implementations"""
 from typing import Callable
-import time
 
 from framework.utils import log_conversation
 from framework.colors import TColors, ATTACK_NAMES

@@ -3,10 +3,10 @@ from typing import Callable
 
 from framework.utils import log_conversation
 from framework.colors import TColors, ATTACK_NAMES
-from framework.prompts import SECRET_KEY, SYSTEM_PROMPTS
+from framework.prompts import SECRET_KEY
 from framework.api import ChatAPI
 from framework.llm import LLM
-from framework.dataset import PromptDataset
+from framework.dataset import PromptDataset, ResponseDataset
 
 class Strategy:
     """Strategy pattern interface"""
@@ -19,7 +19,8 @@ class Strategy:
             llm_suffix: str,
             temperature: float,
             iterations: int,
-            create_dataset: bool
+            create_prompt_dataset: bool,
+            create_response_dataset: bool
         ) -> None:
 
         self.attack_func: Callable = attack_func
@@ -33,9 +34,13 @@ class Strategy:
                 llm_suffix=llm_suffix
             )
         self.iterations: int = iterations
-        self.create_dataset: bool = create_dataset
+        self.create_prompt_dataset: bool = create_prompt_dataset
+        self.create_response_dataset: bool = create_response_dataset
+        # add the message to the potential chat api
         self.chat_api_add_messages: Callable = ChatAPI.add_message
+        # create/load the prompt dataset
         self.prompt_dataset = PromptDataset()
+        self.response_datast = ResponseDataset()
 
 
     def execute(self) -> int:
@@ -44,15 +49,8 @@ class Strategy:
         print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
               f"{ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
 
-        # create/load the prompt dataset
-        prompt_dataset = PromptDataset()
-
         for iteration in range(0, self.iterations):
-            if self.create_dataset:
-                system_prompt = SYSTEM_PROMPTS[f"{iteration}"]
-            else:
-                # get a random system prompt
-                system_prompt = prompt_dataset.get_random_prompt()
+            system_prompt = self.prompt_dataset.get_random_prompt()
 
             # build the malicious prompt using the attack function
             mal_prompt = self.attack_func()
@@ -91,11 +89,16 @@ class Strategy:
                       f"{TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
                 num_successes += 1
 
-                if self.create_dataset:
+                if self.create_response_dataset:
+                    # save the response to the responses dataset
+                    if response != "":
+                        self.response_dataset.add_response(response)
+
+                if self.create_prompt_dataset:
                     # enhance the system prompt and save it to the dataset
                     enh_sys_prompt = self.get_enhanced_system_prompt(history)
                     if len(enh_sys_prompt) > 40:
-                        prompt_dataset.add_prompt(enh_sys_prompt)
+                        self.prompt_dataset.add_prompt(enh_sys_prompt)
             else:
                 # fail print
                 print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \

@@ -25,9 +25,11 @@ class PromptDataset():
 
 
     def __initialize_dataset(self) -> None:
-        """Initializes the dataset
+        """
+        Initializes the dataset
         This method is meant to be called only once when the dataset is created to
-        push the existing SYSTEM_PROMPTS to the dataset"""
+        push the existing SYSTEM_PROMPTS to the dataset
+        """
         with open(self.data_path, "a", encoding="utf-8") as file:
             json.dump(SYSTEM_PROMPTS, file, ensure_ascii=False, indent=4)
 
@@ -76,4 +78,78 @@ class PromptDataset():
         if not os.path.isfile("./datasets/system_prompts.json"):
             raise FileNotFoundError(f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}")
         with open("./datasets/system_prompts.json", "r", encoding="utf-8") as file:
+            return json.load(file)
+
+
+class ResponseDataset():
+    """Implementation of a dataset for secret leaking responses"""
+
+    def __init__(self) -> None:
+        self.data_path: str = "./datasets/leaking_responses.json"
+        if not os.path.exists("./datasets"):
+            os.mkdir("./datasets")
+        if not os.path.isfile(self.data_path):
+            with open(self.data_path, "w", encoding="utf-8"):
+                pass
+            self.__initialize_dataset()
+        # the actual dataset hold in memory
+        self.data = self.__load_dataset()
+
+    def __len__(self) -> int:
+        return len(self.data)
+
+
+    def __initialize_dataset(self) -> None:
+        """
+        Initializes the dataset
+        This method is meant to be called only once when the dataset is created to
+        initialize the dataset
+        """
+        pass
+
+
+    def __load_dataset(self) -> dict:
+        """Loads the dataset from the file system"""
+        with open(self.data_path, "r", encoding="utf-8") as file:
+            return json.load(file)
+
+
+    def __save_dataset(self) -> None:
+        """Saves the dataset to the file system"""
+        with open(self.data_path, "w", encoding="utf-8") as file:
+            json.dump(self.data, file, ensure_ascii=False, indent=4)
+
+
+    def add_response(self, response: str) -> None:
+        """Adds a response to the dataset"""
+        self.data.update({str(len(self.data)): str(response)})
+        self.__save_dataset()
+
+
+    def get_first_response(self) -> str:
+        """Returns the first response in the dataset"""
+        return self.data["0"]
+
+
+    def get_last_response(self) -> str:
+        """Returns the last response in the dataset"""
+        return self.data[str(len(self.data) - 1)]
+
+
+    def get_random_response(self) -> str:
+        """Returns a random response from the dataset"""
+        return self.data[str(random.randint(0, len(self.data) - 1))]
+
+
+    def get_response_at_idx(self, idx: int) -> str:
+        """Returns the response at the given index"""
+        return self.data[str(idx)]
+
+
+    @staticmethod
+    def get_whole_dataset() -> dict:
+        """Returns the whole json dataset as a dictionary, even without initializing the class"""
+        if not os.path.isfile("./datasets/leaking_responses.json"):
+            raise FileNotFoundError(f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}")
+        with open("./datasets/leaking_responses.json", "r", encoding="utf-8") as file:
             return json.load(file)

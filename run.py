@@ -50,7 +50,8 @@ def main(
         llm_type: str,
         temperature: float,
         iterations: int,
-        create_dataset: bool,
+        create_prompt_dataset: bool,
+        create_response_dataset: bool,
         name_suffix: str
     ) -> None:
     """
@@ -62,7 +63,8 @@ def main(
         llm_type: str - specifies the opponent LLM type
         temperature: float - specifies the opponent LLM temperature to control randomness
         iterations: int - number of attack iterations to test system prompts against
-        create_dataset: bool - specifies whether to create a dataset or not
+        create_prompt_dataset: bool - specifies whether to create a system prompt dataset or not
+        create_response_dataset: bool - specifies whether to create a responses dataset or not
         name_suffix: str - adds a name suffix for loading custom models
 
     Returns:
@@ -133,7 +135,10 @@ def main(
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Opponent LLM{TColors.ENDC}: {llm_type+name_suffix}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Iterations{TColors.ENDC}: {iterations}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Creating Dataset{TColors.ENDC}: {create_dataset}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Creating System Prompt Dataset{TColors.ENDC}: " \
+          f"{create_prompt_dataset}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Creating Responses Dataset{TColors.ENDC}: " \
+          f"{create_response_dataset}")
     print("#"*os.get_terminal_size().columns+"\n")
 
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
@@ -146,7 +151,8 @@ def main(
                 llm_suffix=name_suffix,
                 temperature=temperature,
                 iterations=iterations,
-                create_dataset=create_dataset
+                create_prompt_dataset=create_prompt_dataset,
+                create_response_dataset=create_response_dataset
             )
 
     for defense in defenses:
@@ -214,7 +220,9 @@ if __name__ == "__main__":
                         help="specifies the opponent LLM temperature")
     parser.add_argument("--iterations", "-i", type=int, default=100,
                         help="specifies the number of iterations to test systems prompts")
-    parser.add_argument("--create_dataset", "-cd", help="enables dataset creation",
+    parser.add_argument("--create_prompt_dataset", "-cp", help="enabl. sys prompt dataset creation",
+                        action="store_true", default=False)
+    parser.add_argument("--create_response_dataset", "-cr", help="enabl. response dataset creation",
                         action="store_true", default=False)
     parser.add_argument("--name_suffix", "-n", help="adds a name suffix for loading custom models",
                         default="", type=str)

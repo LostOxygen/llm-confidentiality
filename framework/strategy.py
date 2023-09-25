@@ -1,5 +1,6 @@
 """library for strategy pattern implementations"""
 from typing import Callable
+import time
 
 from framework.utils import log_conversation
 from framework.colors import TColors, ATTACK_NAMES
@@ -47,9 +48,9 @@ class Strategy:
         # create/load the prompt dataset
         prompt_dataset = PromptDataset()
 
-        for level_id in range(0, self.iterations):
+        for iteration in range(0, self.iterations):
             if self.create_dataset:
-                system_prompt = SYSTEM_PROMPTS[f"{level_id}"]
+                system_prompt = SYSTEM_PROMPTS[f"{iteration}"]
             else:
                 # get a random system prompt
                 system_prompt = prompt_dataset.get_random_prompt()
@@ -66,7 +67,7 @@ class Strategy:
             self.chat_api_add_messages("user", mal_prompt)
             self.chat_api_add_messages("assistant", response)
 
-            match level_id:
+            match iteration:
                 case _ as lid if lid in range(0, 10):
                     succ_result_str = f"{'SUCCESS':>10}"
                     fail_result_str = f"{'FAIL':>10}"
@@ -87,7 +88,7 @@ class Strategy:
             if self.__evaluate_response(response):
                 # Success print followed by prompt enhancement
                 print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
-                      f"[{TColors.OKCYAN}{level_id}{TColors.ENDC}]: " \
+                      f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
                       f"{TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
                 num_successes += 1
 
@@ -99,14 +100,15 @@ class Strategy:
             else:
                 # fail print
                 print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
-                      f"[{TColors.OKCYAN}{level_id}{TColors.ENDC}]: " \
+                      f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
                       f"{TColors.FAIL}{fail_result_str}{TColors.ENDC}")
 
+            # logging stuff
             log_conversation(
                     llm_name=self.llm_type+self.llm_suffix,
                     attack_name=self.attack_func.__name__,
                     defense_name=self.defense_func.__name__,
-                    level=level_id,
+                    iteration=iteration,
                     prompt=mal_prompt,
                     response=response,
                     success=self.__evaluate_response(response)

@@ -9,7 +9,7 @@ def log_conversation(
         llm_name: str,
         attack_name: str,
         defense_name: str,
-        level: int,
+        iteration: int,
         prompt: str,
         response: str,
         success: bool
@@ -22,7 +22,7 @@ def log_conversation(
         llm_name: str - the type of the opponent LLM
         attack_name: str - the name of the attack
         defense_name: str - the name of the defense
-        level: int - the level of the attack
+        iteration: int - the iteration of the attack
         prompt: str - the prompt sent to the opponent LLM
         response: str - the response of the opponent LLM
         success: bool - whether the response contains the secret key or not
@@ -41,7 +41,7 @@ def log_conversation(
         f.write(f">>LLM Type: {llm_name}\n")
         f.write(f">>Attack: {attack_name}\n")
         f.write(f">>Defense: {defense_name}\n")
-        f.write(f">>Level: {level}\n")
+        f.write(f">>iteration: {iteration}\n")
         f.write(f">>Success: {success}\n")
         f.write(f">>Prompt: \n{prompt}\n")
         f.write(f">>Response: \n{response}\n")

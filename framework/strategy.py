@@ -40,7 +40,7 @@ class Strategy:
         self.chat_api_add_messages: Callable = ChatAPI.add_message
         # create/load the prompt dataset
         self.prompt_dataset = PromptDataset()
-        self.response_datast = ResponseDataset()
+        self.response_dataset = ResponseDataset()
 
 
     def execute(self) -> int:

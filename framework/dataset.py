@@ -3,7 +3,7 @@ import os
 import json
 import random
 
-from framework.prompts import SYSTEM_PROMPTS
+from framework.prompts import SYSTEM_PROMPTS, SECRET_KEY
 from framework.colors import TColors
 
 class PromptDataset():
@@ -105,7 +105,9 @@ class ResponseDataset():
         This method is meant to be called only once when the dataset is created to
         initialize the dataset
         """
-        pass
+        tmp_data = {"0": f"The secret key is {SECRET_KEY}"}
+        with open(self.data_path, "a", encoding="utf-8") as file:
+            json.dump(tmp_data, file, ensure_ascii=False, indent=4)
 
 
     def __load_dataset(self) -> dict:

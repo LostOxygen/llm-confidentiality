@@ -115,7 +115,7 @@ def preprocess_function(data) -> dict:
             truncation=True,
             return_tensors="pt"
         )
-    
+
     model_inputs["labels"] = label_inputs["input_ids"]
     return model_inputs
 
@@ -344,7 +344,7 @@ if __name__ == "__main__":
                         default=5e-5, type=float)
     parser.add_argument("--max_length", "-ml", help="specifies the max. sequence length",
                         default=1024, type=int)
-    parser.add_argument("--prefix_length", "-pl", help="specifies the prefix length (virtual tokens)",
-                        default=10, type=int)
+    parser.add_argument("--prefix_length", "-pl", default=10, type=int,
+                        help="specifies the prefix length (virtual tokens)")
     args = parser.parse_args()
     main(**vars(args))

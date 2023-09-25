@@ -431,7 +431,7 @@ class LLM():
                 # so only the models' actual response remains
                 history = "<s>"+response[0]+" </s>"
                 response = response[0].replace(formatted_messages.replace("<s>", ""), "")
-            
+
             case (
                     "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 
                 ):

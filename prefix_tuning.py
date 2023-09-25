@@ -28,6 +28,7 @@ from peft import (
 from datasets import Dataset
 import torch
 from torch.utils.data import DataLoader
+from accelerate import Accelerator
 
 from framework.colors import TColors
 from framework.attacks import (
@@ -228,11 +229,13 @@ def main(
         device = "cpu"
     else:
         device = "cuda:0"
+    accelerator = Accelerator()
 
     # setting the suffixes
     suffix: str = "prefix"
     name_suffix: str = "-" + name_suffix if name_suffix != "" else ""
     attack_suffix: str = "-" + "".join(attacks)
+
     # combine the finale output save name
     save_name: str = llm_type + "-" + suffix + attack_suffix + name_suffix
 
@@ -293,6 +296,11 @@ def main(
         num_training_steps=(len(train_data) * epochs),
     )
 
+    # prepare to accelerate
+    model, optimizer, train_data = accelerator.prepare(
+        model, optimizer, train_data
+    )
+
     kbar = pkbar.Kbar(target=epochs, width=40, always_stateful=True)
     # create the training loop
     for epoch in range(epochs):
@@ -300,12 +308,12 @@ def main(
         total_loss = 0
 
         for _, batch in enumerate(train_data):
-            batch = {k: v.to(device) for k, v in batch.items()}
+            # batch = {k: v.to(device) for k, v in batch.items()}
             outputs = model(**batch)
             # We don't use .loss here since the model may return tuples instead of ModelOutput.
             loss = outputs["loss"] if isinstance(outputs, dict) else outputs[0]
             total_loss += loss.detach().float()
-            loss.backward()
+            accelerator.backward(loss)
             optimizer.step()
             lr_scheduler.step()
             optimizer.zero_grad()

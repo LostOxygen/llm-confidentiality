@@ -121,11 +121,11 @@ python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERAT
 
 ---
 ## Prefix-Tuning to harden LLMs against attacks
-This is a new and more efficient approach to finetune LLMs.
+This is a new and more efficient approach to finetune LLMs. The prefix-tuning script uses huggingfaces accelerator for distributed training, so make sure to run ```accelerate config``` before running the script.
 
 ### Usage
 ```python
-python prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epochs EPOCHS] [-bs | --batch_size BATCH_SIZE] [-lr | --learning_rate LEARNING_RATE] [-ml | --max_seq_length MAX_SEQ_LENGTH] [-pl | --prefix_length PREFIX_LENGTH] [-a | --attacks ATTACKS_LIST] [-n | --name_suffix NAME_SUFFIX]
+accelerate launch prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epochs EPOCHS] [-bs | --batch_size BATCH_SIZE] [-lr | --learning_rate LEARNING_RATE] [-ml | --max_seq_length MAX_SEQ_LENGTH] [-pl | --prefix_length PREFIX_LENGTH] [-a | --attacks ATTACKS_LIST] [-n | --name_suffix NAME_SUFFIX]
 ```
 
 ### Arguments

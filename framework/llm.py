@@ -422,7 +422,6 @@ class LLM():
                                             temperature=self.temperature,
                                             max_length=4096
                                         )
-                    print("outputs: ", outputs.cpu())
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs
@@ -455,7 +454,6 @@ class LLM():
                                             temperature=self.temperature,
                                             max_length=4096
                                         )
-                    print("outputs: ", outputs.cpu())
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del model_inputs

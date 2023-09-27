@@ -47,6 +47,10 @@ e.g.:
 ```python
 llama2-7b-robust-prompt_injection-0613
 ```
+If you want to run the attacks against a prefix-tuned model with a custom suffix (e.g., ```1000epochs```), you would have to specify the arguments a follows:
+```python
+... --model_name llama2-7b-prefix --name_suffix 1000epochs ...
+```
 
 
 ## Supported Large Language Models (Chat-Only)

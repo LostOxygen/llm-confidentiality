@@ -446,8 +446,6 @@ class LLM():
                         ).to("cuda")
 
                     model_inputs = {key: val.to("cuda") for key, val in inputs.items()}
-                    print("inputs: ", model_inputs["input_ids"])
-                    print("token_length: ", len(model_inputs["input_ids"][0]))
                     outputs = self.model.generate(
                                             input_ids=model_inputs["input_ids"],
                                             do_sample=True,

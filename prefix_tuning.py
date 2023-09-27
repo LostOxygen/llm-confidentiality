@@ -106,14 +106,14 @@ def preprocess_function(data) -> dict:
     model_inputs = glob_tokenizer(
             inputs,
             max_length=glob_max_length,
-            padding="max_length",
+            padding="do_not_pad",
             truncation=True,
             return_tensors="pt"
         )
     label_inputs = glob_tokenizer(
             labels,
             max_length=glob_max_length,
-            padding="max_length",
+            padding="do_not_pad",
             truncation=True,
             return_tensors="pt"
         )

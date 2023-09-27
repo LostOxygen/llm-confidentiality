@@ -439,9 +439,9 @@ class LLM():
                 with torch.no_grad():
                     inputs = self.tokenizer(
                             formatted_messages,
-                            max_length=1024,
+                            max_length=4096,
                             truncation=True,
-                            padding="max_length",
+                            padding="do_not_pad",
                             return_tensors="pt"
                         ).to("cuda")
 
@@ -463,7 +463,6 @@ class LLM():
                 # so only the models' actual response remains
                 history = "<s>"+response[0]+" </s>"
                 response = response[0].replace(formatted_messages.replace("<s>", ""), "")
-                print("response:", response)
 
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)

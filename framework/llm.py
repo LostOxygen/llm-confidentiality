@@ -437,23 +437,18 @@ class LLM():
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(
-                            formatted_messages,
-                            max_length=4096,
-                            truncation=True,
-                            padding="do_not_pad",
-                            return_tensors="pt"
-                        ).to("cuda")
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
 
                     model_inputs = {key: val.to("cuda") for key, val in inputs.items()}
+                    del inputs
+            
                     outputs = self.model.generate(
-                                            input_ids=model_inputs["input_ids"],
+                                            inputs=model_inputs["input_ids"],
                                             do_sample=True,
                                             temperature=self.temperature,
                                             max_length=4096
                                         )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
-                    del inputs
                     del model_inputs
                     del outputs
 

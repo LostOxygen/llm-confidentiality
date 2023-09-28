@@ -47,7 +47,7 @@ from framework.dataset import PromptDataset, ResponseDataset
 from framework.llm import LLM
 
 # number of attack samples per attack type and main iteration
-NUM_ATTACK_SAMPLES: Final[int] = 1
+NUM_ATTACK_SAMPLES: Final[int] = 1000
 DATA_PATH: Final[str] = "./datasets/system_prompts.json"
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 if not os.path.isdir(OUTPUT_DIR):
@@ -106,14 +106,14 @@ def preprocess_function(data) -> dict:
     model_inputs = glob_tokenizer(
             inputs,
             max_length=glob_max_length,
-            padding="do_not_pad",
+            padding="max_length",
             truncation=True,
             return_tensors="pt"
         )
     label_inputs = glob_tokenizer(
             labels,
             max_length=glob_max_length,
-            padding="do_not_pad",
+            padding="max_length",
             truncation=True,
             return_tensors="pt"
         )
@@ -339,7 +339,7 @@ def main(
         train_epoch_loss = train_epoch_loss.item()
         train_ppl = train_ppl.item()
         kbar.update(epoch+1, values=[("train_epoch_loss", train_epoch_loss),
-                                   ("train_ppl", train_ppl)])
+                                     ("train_ppl", train_ppl)])
 
     # save the model
     model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
@@ -356,14 +356,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prefix Tuning")
     parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
                         help="specifies the opponent LLM type")
-    parser.add_argument("--epochs", "-e", type=int, default=100,
+    parser.add_argument("--epochs", "-e", type=int, default=10,
                         help="specifies the number of iterations to finetune the LLM")
     parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
                         help="specifies the attack types", nargs="+")
     parser.add_argument("--name_suffix", "-n", help="adds a name suffix for the finetuned model",
                         default="", type=str)
     parser.add_argument("--batch_size", "-bs", help="specifies the training batch size",
-                        default=5, type=int)
+                        default=1, type=int)
     parser.add_argument("--learning_rate", "-lr", help="specifies the training learning rate",
                         default=5e-5, type=float)
     parser.add_argument("--max_length", "-ml", help="specifies the max. sequence length",

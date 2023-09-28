@@ -144,20 +144,31 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
         for _ in range(NUM_ATTACK_SAMPLES):
             random_prompt = prompt_dataset.get_random_prompt()
             random_response = response_dataset.get_random_response()
+            sanitized_response = random_response.replace(SECRET_KEY, "#"*len(SECRET_KEY))
             attack_str = attack()
 
-            prompt = f"""
+            prompt = f"""<s>[INST] <<SYS>>
                 {random_prompt}
 
-                ### Instruction:
+                <</SYS>>
                 {attack_str}
 
-                ### Response:
+                [/INSTR]
                 {random_response}
+                </s>
             """
             prompt_list.append(prompt)
 
-            label = prompt.replace(SECRET_KEY, "#"*len(SECRET_KEY))
+            label = f"""<s>[INST] <<SYS>>
+                {random_prompt}
+
+                <</SYS>>
+                {attack_str}
+
+                [/INSTR]
+                {sanitized_response}
+                </s>
+            """
             label_list.append(label)
 
     new_dataset = Dataset.from_dict({"prompts": prompt_list, "labels": label_list})

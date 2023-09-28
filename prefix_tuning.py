@@ -142,25 +142,29 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
     # create prompt injection attack dataset
     for attack in attacks:
         for _ in range(NUM_ATTACK_SAMPLES):
+            random_prompt = prompt_dataset.get_random_prompt()
+            random_response = response_dataset.get_random_response()
+            attack_str = attack()
+
             prompt = f"""
-                {prompt_dataset.get_random_prompt()}
+                {random_prompt}
 
                 ### Instruction:
-                {attack()}
+                {attack_str}
 
                 ### Response:
-                {response_dataset.get_random_response()}
+                {random_response}
             """
             prompt_list.append(prompt)
 
             label = f"""
-                {prompt_dataset.get_random_prompt()}
+                {random_prompt}
 
                 ### Instruction:
-                {attack()}
+                {attack_str}
 
                 ### Response:
-                {response_dataset.get_random_response().replace(SECRET_KEY, "####")}
+                {random_response.replace(SECRET_KEY, "####")}
             """
             label_list.append(label)
 

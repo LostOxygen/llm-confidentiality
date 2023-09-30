@@ -53,7 +53,7 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 ```
 
 
-## Supported Large Language Models (Chat-Only)
+## Supported Large Language Models
 | Model | Parameter Specifier | Link | Compute Instance |
 |-------|------|-----|-----|
 | GPT-3.5-Turbo | ```gpt-3.5-turbo``` / ```gpt-3.5-turbo-0301``` / ```gpt-3.5-turbo-0613``` | [Link](https://platform.openai.com/docs/models/gpt-3-5)| OpenAI API |
@@ -118,10 +118,10 @@ python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERAT
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
 
 
-### Supported Large Language Models (base)
+### Supported Large Language Models
 | Model | Parameter Specifier | Link | Compute Instance |
 |-------|------|-----|-----|
-| LLaMA2 (base) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 
 
 ---
@@ -147,7 +147,7 @@ accelerate launch prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epo
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
 
 
-### Supported Large Language Models (base)
+### Supported Large Language Models
 | Model | Parameter Specifier | Link | Compute Instance |
 |-------|------|-----|-----|
-| LLaMA2 (base) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |

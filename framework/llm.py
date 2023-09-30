@@ -441,7 +441,7 @@ class LLM():
 
                     model_inputs = {key: val.to("cuda") for key, val in inputs.items()}
                     del inputs
-            
+
                     outputs = self.model.generate(
                                             inputs=model_inputs["input_ids"],
                                             do_sample=True,

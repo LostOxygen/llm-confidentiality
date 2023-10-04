@@ -72,12 +72,11 @@ class PromptDataset():
         return self.data[str(idx)]
 
 
-    @staticmethod
-    def get_whole_dataset() -> dict:
+    def get_whole_dataset(self) -> dict:
         """Returns the whole json dataset as a dictionary, even without initializing the class"""
-        if not os.path.isfile("./datasets/system_prompts.json"):
+        if not os.path.isfile(self.data_path):
             raise FileNotFoundError(f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}")
-        with open("./datasets/system_prompts.json", "r", encoding="utf-8") as file:
+        with open(self.data_path, "r", encoding="utf-8") as file:
             return json.load(file)
 
 
@@ -148,10 +147,9 @@ class ResponseDataset():
         return self.data[str(idx)]
 
 
-    @staticmethod
-    def get_whole_dataset() -> dict:
+    def get_whole_dataset(self) -> dict:
         """Returns the whole json dataset as a dictionary, even without initializing the class"""
-        if not os.path.isfile("./datasets/leaking_responses.json"):
+        if not os.path.isfile(self.data_path):
             raise FileNotFoundError(f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}")
-        with open("./datasets/leaking_responses.json", "r", encoding="utf-8") as file:
+        with open(self.data_path, "r", encoding="utf-8") as file:
             return json.load(file)

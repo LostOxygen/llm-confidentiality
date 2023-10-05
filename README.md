@@ -1,11 +1,11 @@
 # Attacks and Defenses against the Confidentiality of Large Language Models
 This kinda framework was developed to study the confidentiality of Large Language Models (LLMs). The framework contains several features:
-- A set of attacks against LLMs, where the LLM is not allowed to leak a secret key
-- A set of defenses against the aforementioned attacks
-- Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe
+- A set of attacks against LLMs, where the LLM is not allowed to leak a secret key -> [jump](#attacks-and-defenses)
+- A set of defenses against the aforementioned attacks -> [jump](#attacks-and-defenses)
+- Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe 
 - Creating datasets of responses which leak the secret key as well as these more safe system promts
-- Finetuning and Prefix-Tuning LLMs to harden them against these attacks using the datasets
-- Evaluate the usefulness of LLMs using different metrics and benchmarks 
+- Finetuning and Prefix-Tuning LLMs to harden them against these attacks using the datasets -> [jump](#finetuning-peft-and-prefix-tuning)
+- Evaluate the usefulness of LLMs using different metrics and benchmarks -> [jump](#evaluation-using-various-llm-benchmarks)
 
 <b>!! This project will most likely only work on Linux systems with NVIDIA-GPUs and CUDA installed !!</b>
 
@@ -22,6 +22,7 @@ git config --global credential.helper store
 huggingface-cli login
 ```
 
+# Attacks and Defenses
 ## Usage
 ```
 python attack.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFENSE] [-llm | --llm_type LLM_TYPE] [-m | --max_level MAX_LEVEL] [-t | --temperature TEMPERATURE]
@@ -157,3 +158,33 @@ accelerate launch prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epo
 | Model | Parameter Specifier | Link | Compute Instance |
 |-------|------|-----|-----|
 | LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+
+
+# Evaluation using various LLM Benchmarks
+This section covers the evaluation of LLMs using various benchmarks [see here](https://www.whytryai.com/p/llm-benchmarks). The LLMs are tested on different question or completion tasks.
+
+### Usage
+```python
+python evaluate.py [-h] [-b | --benchmarks BENCHMARKS_LIST] [-llm | --llm_type LLM_TYPE] [-t | --temperature TEMPERATURE] [-n | --name_suffix NAME_SUFFIX] [-i | --iterations ITERATIONS]
+```
+
+### Arguments
+| Argument | Type | Default Value | Description |
+|----------|------|---------------|-------------|
+| ```-h, --help``` | - | - | Show this help message and exit |
+| ```-b, --benchmarks``` | <b>List[str]</b> | ```hellaswag``` |Specifies the type of llm to prefix tune |
+| ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to prefix tune |
+| ```-t, --temperature``` | <b>float</b> | ```0.0``` | specifies the temperature for the LLM to control the randomness |
+| ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
+| ```-i, --iterations``` | <b>int</b> | ```100``` | Specifies the number of iterations for evaluation per benchmark |
+
+
+### Supported Large Language Models
+| Model | Parameter Specifier | Link | Compute Instance |
+|-------|------|-----|-----|
+| LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+
+### Supported Benchmarks
+| Benchmark | Parameter Specifier | Link | Estimated Size |
+|-------|------|-----|-----|
+| HellaSwag | ```hellaswag```| [Link](https://huggingface.co/datasets/Rowan/hellaswag) | ```136.81 MB``` |

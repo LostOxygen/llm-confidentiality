@@ -1,18 +1,18 @@
 """library for strategy pattern implementations"""
-from typing import Callable
+from typing import Callable, Type
 
-from framework.utils import log_conversation
-from framework.colors import TColors, ATTACK_NAMES
+from framework.utils import log_conversation, log_benchmark_conversation
+from framework.colors import TColors, ATTACK_NAMES, BENCHMARK_NAMES
 from framework.prompts import SECRET_KEY
 from framework.api import ChatAPI
 from framework.llm import LLM
 from framework.dataset import PromptDataset, ResponseDataset
+from framework.benchmarks import get_benchmark_data, format_benchmark_data
 
 class AttackStrategy:
     """Strategy pattern interface for attacking and defending LLMs"""
 
-    def __init__(
-            self,
+    def __init__(self,
             attack_func: Callable,
             defense_func: Callable,
             llm_type: str,
@@ -28,7 +28,7 @@ class AttackStrategy:
         self.llm_type = llm_type
         self.llm_suffix = llm_suffix
         self.temperature = temperature
-        self.llm: LLM = LLM(
+        self.llm: Type[LLM] = LLM(
                 llm_type=llm_type,
                 temperature=temperature,
                 llm_suffix=llm_suffix
@@ -181,3 +181,106 @@ class AttackStrategy:
             success: bool - whether the response contains the secret key or not
         """
         return SECRET_KEY in response
+
+
+class BenchmarkStrategy:
+    """Strategy pattern interface for benchmarking usefulness of LLMs"""
+
+    def __init__(self,
+            benchmark_name: str,
+            llm_type: str,
+            llm_suffix: str,
+            temperature: float,
+            test_iterations: int = 100,
+        ) -> None:
+
+        self.benchmark_name: str = benchmark_name
+        self.llm_type = llm_type
+        self.llm_suffix = llm_suffix
+        self.temperature = temperature
+        self.test_iterations: int = test_iterations
+        self.llm: Type[LLM] = LLM(
+                llm_type=llm_type,
+                temperature=temperature,
+                llm_suffix=llm_suffix
+            )
+
+        # get the benchmark dataloader
+        self.benchmark_dataloader = get_benchmark_data(benchmark_name)
+
+
+    def execute(self) -> int:
+        """Executes the strategy and returns the number of successes"""
+        num_successes: int = 0
+        print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
+              f"{BENCHMARK_NAMES[self.benchmark_name]} Benchmark{TColors.ENDC}")
+
+        for iteration, data in enumerate(self.benchmark_dataloader):
+            # create the input prompt with questions and the instructing sys prompt
+            prompt, system_prompt = format_benchmark_data(self.benchmark_name, data)
+            # generate the answer from the LLM
+            response, _ = self.llm.chat(system_prompt, prompt)
+
+            match iteration:
+                case _ as lid if lid in range(0, 10):
+                    succ_result_str = f"{'SUCCESS':>10}"
+                    fail_result_str = f"{'FAIL':>10}"
+                case _ as lid if lid in range(10, 100):
+                    succ_result_str = f"{'SUCCESS':>9}"
+                    fail_result_str = f"{'FAIL':>9}"
+                case _ as lid if lid in range(100, 1000):
+                    succ_result_str = f"{'SUCCESS':>8}"
+                    fail_result_str = f"{'FAIL':>8}"
+                case _ as lid if lid in range(1000, 10000):
+                    succ_result_str = f"{'SUCCESS':>7}"
+                    fail_result_str = f"{'FAIL':>7}"
+                case _:
+                    succ_result_str = f"{'SUCCESS':>10}"
+                    fail_result_str = f"{'FAIL':>10}"
+
+            # check if the secret key got leaked
+            if self.__evaluate_response(response, data):
+                # Success print followed by prompt enhancement
+                print(f"{TColors.BOLD}Test {TColors.ENDC}" \
+                      f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
+                      f"{TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
+                num_successes += 1
+
+            else:
+                # fail print
+                print(f"{TColors.BOLD}Test {TColors.ENDC}" \
+                      f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
+                      f"{TColors.FAIL}{fail_result_str}{TColors.ENDC}")
+
+            # logging stuff
+            log_benchmark_conversation(
+                    llm_name=self.llm_type+self.llm_suffix,
+                    attack_name=self.attack_func.__name__,
+                    defense_name=self.defense_func.__name__,
+                    iteration=iteration,
+                    prompt=prompt,
+                    response=response,
+                    success=self.__evaluate_response(response, data)
+                )
+
+        return num_successes
+
+
+    def update_benchmark(self, benchmark_name: str) -> None:
+        """helper method to update the benchmark"""
+        self.benchmark_name = benchmark_name
+        self.benchmark_dataloader = get_benchmark_data(benchmark_name)
+
+
+    def __evaluate_response(self, response: str, data: dict) -> bool:
+        """
+        Evaluates the response of the tested LLM
+
+        Parameters:
+            response: str - the response of the LLM
+            data: dict - the data from the benchmark dataset
+
+        Returns:
+            success: bool - whether the response contains the secret key or not
+        """
+        return data["label"] in response

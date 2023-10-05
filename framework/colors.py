@@ -1,4 +1,5 @@
 """helper library for printing colored text"""
+from typing import Final
 
 class TColors():
     """Color class with ANSI escape codes for colored text"""
@@ -13,7 +14,7 @@ class TColors():
     UNDERLINE = "\033[4m"
 
 
-ATTACK_NAMES: dict[str, str] = {
+ATTACK_NAMES: Final[dict[str, str]] = {
     "payload_splitting": "Payload Splitting",
     "obfuscation": "Base64 Obfuscation",
     "indirect": "Indirect",
@@ -24,4 +25,8 @@ ATTACK_NAMES: dict[str, str] = {
     "masking": "Masking",
     "typoglycemia": "Typoglycemia",
     "advs_suffix": "Adversarial Suffix"
+}
+
+BENCHMARK_NAMES: Final[dict[str, str]] = {
+    "hellaswag": "HellaSwag"
 }

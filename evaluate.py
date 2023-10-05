@@ -151,7 +151,7 @@ def main(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
-    parser.add_argument("--benchmarks", "-b", type=str, default=["payload_splitting"],
+    parser.add_argument("--benchmarks", "-b", type=str, default=["hellaswag"],
                         help="specifies the benchmark types", nargs="+")
     parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
                         help="specifies the LLM type which gets tested")

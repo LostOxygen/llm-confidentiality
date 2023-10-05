@@ -1,5 +1,11 @@
 # Attacks and Defenses against the Confidentiality of Large Language Models
-Framework for Testing Attacks and Defenses against the Confidentiality of Large Language Models (LLMs).
+This kinda framework was developed to study the confidentiality of Large Language Models (LLMs). The framework contains several features:
+- A set of attacks against LLMs, where the LLM is not allowed to leak a secret key
+- A set of defenses against the aforementioned attacks
+- Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe
+- Creating datasets of responses which leak the secret key as well as these more safe system promts
+- Finetuning and Prefix-Tuning LLMs to harden them against these attacks using the datasets
+- Evaluate the usefulness of LLMs using different metrics and benchmarks 
 
 <b>!! This project will most likely only work on Linux systems with NVIDIA-GPUs and CUDA installed !!</b>
 
@@ -18,12 +24,12 @@ huggingface-cli login
 
 ## Usage
 ```
-python run.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFENSE] [-llm | --llm_type LLM_TYPE] [-m | --max_level MAX_LEVEL] [-t | --temperature TEMPERATURE]
+python attack.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFENSE] [-llm | --llm_type LLM_TYPE] [-m | --max_level MAX_LEVEL] [-t | --temperature TEMPERATURE]
 ```
 
 ## Example Usage
 ```python
-python run.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging" --max_level 15 --llm_type "llama2" --temperature 0.7
+python attack.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging" --max_level 15 --llm_type "llama2" --temperature 0.7
 ```
 
 ## Arguments

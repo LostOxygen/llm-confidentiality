@@ -1,7 +1,7 @@
 """library for LLM models, functions and helper stuff"""
 import os
 import time
-from typing import Tuple, Final
+from typing import Tuple, Final, Type
 import torch
 from openai import ChatCompletion
 from transformers import (
@@ -31,8 +31,8 @@ class LLM():
             from peft import PeftModel
 
         self.temperature: float = temperature
-        self.model: AutoModelForCausalLM = None
-        self.tokenizer: AutoTokenizer = None
+        self.model: Type[AutoModelForCausalLM] = None
+        self.tokenizer: Type[AutoTokenizer] = None
         self.is_finetuning: bool = is_finetuning
 
         # pre load the models and tokenizer and adjust the temperature

@@ -14,7 +14,7 @@ import openai
 import torch
 from huggingface_hub import login
 
-from framework.strategy import Strategy
+from framework.strategy import AttackStrategy
 from framework.attacks import (
         ATTACK_LIST,
         payload_splitting,
@@ -145,7 +145,7 @@ def main(
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
     # initialize the strategy
-    strategy = Strategy(
+    strategy = AttackStrategy(
                 attack_func=None,
                 defense_func=None,
                 llm_type=llm_type,

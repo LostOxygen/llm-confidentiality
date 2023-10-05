@@ -134,7 +134,7 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
         train_data: DataLoader - the DataLoader containing the tokenized prompt dataset
     """
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
-    prompt_dataset = PromptDataset()
+    prompt_dataset = PromptDataset(is_train=True)
     response_dataset = ResponseDataset()
     prompt_list: List[str] = []
     label_list: List[str] = []

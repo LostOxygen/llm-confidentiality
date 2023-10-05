@@ -7,10 +7,22 @@ from framework.prompts import SYSTEM_PROMPTS, SECRET_KEY
 from framework.colors import TColors
 
 class PromptDataset():
-    """Implementation of a dataset for system prompts"""
+    """
+    Implementation of a dataset for system prompts
 
-    def __init__(self) -> None:
-        self.data_path: str = "./datasets/system_prompts.json"
+    The default setting is to use the system prompts dataset for training
+    but is_train = false can be passed to the constructor to use the dataset
+    with testing data.
+    """
+
+    def __init__(self, is_train: bool = True) -> None:
+        self.is_train = is_train
+
+        if self.is_train:
+            self.data_path: str = "./datasets/system_prompts_train.json"
+        else:
+            self.data_path: str = "./datasets/system_prompts_test.json"
+
         if not os.path.exists("./datasets"):
             os.mkdir("./datasets")
         if not os.path.isfile(self.data_path):

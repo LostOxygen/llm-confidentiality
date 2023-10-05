@@ -116,7 +116,7 @@ def create_dataset(is_robust: bool, attacks: List[Callable] = None) -> Dataset:
         new_dataset: Dataset - the new dataset containing the finetune data
     """
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
-    dataset = PromptDataset()
+    dataset = PromptDataset(is_train=True)
     prompt_list: List = []
 
     if is_robust:

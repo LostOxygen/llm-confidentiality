@@ -9,8 +9,6 @@ from transformers import (
     AutoModelForCausalLM,
     BitsAndBytesConfig
 )
-from peft import PeftModel
-
 from framework.colors import TColors
 
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
@@ -27,6 +25,11 @@ class LLM():
         ) -> None:
         self.llm_suffix: str = llm_suffix
         self.llm_type: str = llm_type
+
+        if self.llm_type not in ("gpt-3.5-turbo", "gpt-4"):
+            # yes i know this is really dirty, but it does it's job
+            from peft import PeftModel
+
         self.temperature: float = temperature
         self.model: AutoModelForCausalLM = None
         self.tokenizer: AutoTokenizer = None
@@ -294,8 +297,6 @@ class LLM():
 
     def __del__(self):
         """Deconstructor for the LLM class"""
-        del self.llm_type
-        del self.temperature
         if self.model is not None:
             del self.model
         if self.tokenizer is not None:

@@ -126,9 +126,9 @@ def main(
         if strategy.benchmark_name != benchmark:
             strategy.update_benchmark(benchmark)
 
-            # run the benchmark
-            total_successrates[benchmark] = strategy.execute()
-            torch.cuda.empty_cache()
+        # run the benchmark
+        total_successrates[benchmark] = strategy.execute()
+        torch.cuda.empty_cache()
 
         # print and log the results
         print(f"{TColors.OKBLUE}{TColors.BOLD}>> Benchmark Results:{TColors.ENDC}")

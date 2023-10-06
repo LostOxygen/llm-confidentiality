@@ -238,8 +238,9 @@ class BenchmarkStrategy:
                     succ_result_str = f"{'SUCCESS':>10}"
                     fail_result_str = f"{'FAIL':>10}"
 
-            # check if the secret key got leaked
-            if self.__evaluate_response(response, data):
+            # check if the benchmark was successful
+            success = self.__evaluate_response(response, data)
+            if success:
                 # Success print followed by prompt enhancement
                 print(f"{TColors.BOLD}Test {TColors.ENDC}" \
                       f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
@@ -255,12 +256,11 @@ class BenchmarkStrategy:
             # logging stuff
             log_benchmark_conversation(
                     llm_name=self.llm_type+self.llm_suffix,
-                    attack_name=self.attack_func.__name__,
-                    defense_name=self.defense_func.__name__,
+                    benchmark_name=self.benchmark_name,
                     iteration=iteration,
                     prompt=prompt,
                     response=response,
-                    success=self.__evaluate_response(response, data)
+                    success=success
                 )
 
         return num_successes

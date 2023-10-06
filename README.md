@@ -160,7 +160,8 @@ accelerate launch prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epo
 | LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 
 
-# Evaluation using various LLM Benchmarks
+# Evaluation using various LLM Benchmarks (WIP and not functional yet!!!)
+## See (this)[https://github.com/EleutherAI/lm-evaluation-harness] for a working evaluation harness
 This section covers the evaluation of LLMs using various benchmarks [see here](https://www.whytryai.com/p/llm-benchmarks). The LLMs are tested on different question or completion tasks.
 
 ### Usage

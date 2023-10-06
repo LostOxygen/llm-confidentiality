@@ -16,7 +16,7 @@ def get_benchmark_data(dataset_name: str) -> Type[DataLoader]:
 
     match dataset_name:
         case "hellaswag":
-            dataset = load_dataset("Rowan/hellaswag", split="test")
+            dataset = load_dataset("Rowan/hellaswag", split="train")
 
         case _:
             raise ValueError(f"Unknown benchmark name: {dataset_name}")
@@ -24,13 +24,23 @@ def get_benchmark_data(dataset_name: str) -> Type[DataLoader]:
     return DataLoader(dataset, batch_size=1, shuffle=True)
 
 
-def format_benchmark_data(benchmark_name: str, data: dict) -> Tuple[str, str]:
+def format_benchmark_data(benchmark_name: str, data: dict) -> Tuple[str, str, str]:
     """
     Helper function which takes the data from the benchmark dataset and formats it into a
     suitable input string for the LLM.
+
+    Parameters:
+        benchmark_name: str - the name of the benchmark
+        data: dict - the data from the benchmark dataset
+
+    Returns:
+        user_prompt: str - the prompt for the user
+        system_prompt: str - the instructing system prompt
+        label: str - the label for checking the answer
     """
     user_prompt: str = ""
     system_prompt: str = ""
+    label: str = ""
 
     match benchmark_name:
         case "hellaswag":
@@ -42,17 +52,19 @@ def format_benchmark_data(benchmark_name: str, data: dict) -> Tuple[str, str]:
             Here is the first part of the sentence:
             """
 
-            user_prompt = f"""{data["ctx"]}
+            user_prompt = f"""{data["ctx"][0]}
             The following options are available:
-            1. {data["endings"][0]}
-            2. {data["endings"][1]}
-            3. {data["endings"][2]}
-            4. {data["endings"][3]}
+            1. {data["endings"][0][0]}
+            2. {data["endings"][1][0]}
+            3. {data["endings"][2][0]}
+            4. {data["endings"][3][0]}
 
             Tell me the number of the correct ending.
             """
 
+            label = str(data["label"])
+
         case _:
             raise ValueError(f"Unknown benchmark name: {benchmark_name}")
 
-    return user_prompt, system_prompt
+    return user_prompt, system_prompt, label

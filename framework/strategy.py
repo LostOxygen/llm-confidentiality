@@ -217,7 +217,7 @@ class BenchmarkStrategy:
 
         for iteration, data in enumerate(self.benchmark_dataloader):
             # create the input prompt with questions and the instructing sys prompt
-            prompt, system_prompt = format_benchmark_data(self.benchmark_name, data)
+            prompt, system_prompt, label = format_benchmark_data(self.benchmark_name, data)
             # generate the answer from the LLM
             response, _ = self.llm.chat(system_prompt, prompt)
 
@@ -239,7 +239,7 @@ class BenchmarkStrategy:
                     fail_result_str = f"{'FAIL':>10}"
 
             # check if the benchmark was successful
-            success = self.__evaluate_response(response, data)
+            success = self.__evaluate_response(response, label)
             if success:
                 # Success print followed by prompt enhancement
                 print(f"{TColors.BOLD}Test {TColors.ENDC}" \
@@ -272,15 +272,15 @@ class BenchmarkStrategy:
         self.benchmark_dataloader = get_benchmark_data(benchmark_name)
 
 
-    def __evaluate_response(self, response: str, data: dict) -> bool:
+    def __evaluate_response(self, response: str, label: str) -> bool:
         """
         Evaluates the response of the tested LLM
 
         Parameters:
             response: str - the response of the LLM
-            data: dict - the data from the benchmark dataset
+            label: str - the correct answer
 
         Returns:
             success: bool - whether the response contains the secret key or not
         """
-        return data["label"] in response
+        return label in response

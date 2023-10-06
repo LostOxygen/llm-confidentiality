@@ -172,10 +172,10 @@ python evaluate.py [-h] [-b | --benchmarks BENCHMARKS_LIST] [-llm | --llm_type L
 | Argument | Type | Default Value | Description |
 |----------|------|---------------|-------------|
 | ```-h, --help``` | - | - | Show this help message and exit |
-| ```-b, --benchmarks``` | <b>List[str]</b> | ```hellaswag``` |Specifies the type of llm to prefix tune |
+| ```-b, --benchmarks``` | <b>List[str]</b> | ```hellaswag``` |Specifies the types of benchmarks to run against the model |
 | ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to prefix tune |
-| ```-t, --temperature``` | <b>float</b> | ```0.0``` | specifies the temperature for the LLM to control the randomness |
-| ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
+| ```-t, --temperature``` | <b>float</b> | ```0.0``` | Specifies the temperature for the LLM to control the randomness |
+| ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix to load custom models |
 | ```-i, --iterations``` | <b>int</b> | ```100``` | Specifies the number of iterations for evaluation per benchmark |
 
 

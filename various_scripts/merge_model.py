@@ -81,6 +81,8 @@ def main(base_llm: str, finetuned_model: str) -> None:
         save_config=True
     )
 
+    base_tokenizer.save_pretrained(save_path)
+
     print(f"=> {TColors.OKBLUE}{TColors.BOLD}Merged Model saved to:{TColors.ENDC}: {save_path}")
     print("Finished Merging")
 

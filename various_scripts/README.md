@@ -1,0 +1,1 @@
+This is a collection of various scripts which are not necessarily used by the framework but can be useful to test stuff. (e.g., finetune a model on netflix sentiment analysis or merge and unload PEFT finetuned models into a single model)

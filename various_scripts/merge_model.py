@@ -15,7 +15,7 @@ from transformers import (
 )
 from peft import PeftModel
 
-from framework.colors import TColors
+from various_scripts.colors import TColors
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 OUTPUT_DIR: Final[str] = "./merged_models/"

@@ -87,6 +87,8 @@ class LLM():
                                 use_fast=False,
                                 local_files_only=True,
                             )
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+
                 base_model = AutoModelForCausalLM.from_pretrained(
                             model_name,
                             device_map="auto",
@@ -150,6 +152,8 @@ class LLM():
                                 use_fast=False,
                                 local_files_only=True,
                             )
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+
                 base_model = AutoModelForCausalLM.from_pretrained(
                             model_name,
                             device_map="auto",

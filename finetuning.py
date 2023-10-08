@@ -293,7 +293,10 @@ def main(
     )
 
     trainer.train()
-    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
+    trainer.model.save_pretrained(os.path.join(OUTPUT_DIR, save_name),
+                                  safe_serialization=True,
+                                  save_adapter=True,
+                                  save_config=True)
     trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")

@@ -77,8 +77,7 @@ def main(base_llm: str, finetuned_model: str) -> None:
     merged_model.save_pretrained(
         save_path,
         safe_serialization=True,
-        save_adapter=True,
-        save_config=True
+        save_adapter=True
     )
 
     base_tokenizer.save_pretrained(save_path)

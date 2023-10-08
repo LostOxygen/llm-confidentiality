@@ -13,6 +13,7 @@ from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
 )
+from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 from peft import PeftModel
 
 from colors import TColors
@@ -20,7 +21,7 @@ from colors import TColors
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 OUTPUT_DIR: Final[str] = "./merged_models/"
 
-def main(base_llm: str, finetuned_model: str) -> None:
+def main(base_llm: str, finetuned_model: str, quantization: bool) -> None:
     """
     Merges the finetuned model with the original model and saves it to the
     OUTPUT_DIR directory
@@ -28,6 +29,7 @@ def main(base_llm: str, finetuned_model: str) -> None:
     Args:
         base_llm (str): the base LLM type
         finetuned_model (str): the path of the adapters to merge
+        quantization (bool): enables quantization
 
     Returns:
         None
@@ -47,9 +49,10 @@ def main(base_llm: str, finetuned_model: str) -> None:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Base-LLM{TColors.ENDC}: {base_llm}")
-
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Adapter/PEFT Model:{TColors.ENDC}: {adapter_name}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Adapter/PEFT Model{TColors.ENDC}: {adapter_name}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Save Path:{TColors.ENDC}: {save_path}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Quantization{TColors.ENDC}: {quantization}")
+    print("#"*os.get_terminal_size().columns+"\n")
 
 
     base_tokenizer = AutoTokenizer.from_pretrained(
@@ -82,6 +85,20 @@ def main(base_llm: str, finetuned_model: str) -> None:
 
     base_tokenizer.save_pretrained(save_path)
 
+    del base_model
+    del merged_model
+    del base_tokenizer
+
+    if quantization:
+        # save quantized model
+        quantize_config = BaseQuantizeConfig(
+            bits=4,  # quantize model to 4-bit
+            group_size=128,  # it is recommended to set the value to 128
+            desc_act=False,
+        )
+        model = AutoGPTQForCausalLM.from_pretrained(save_path, quantize_config)
+        model.save_quantized(save_path+"_quantized", use_safetensors=True)
+
     print(f"=> {TColors.OKBLUE}{TColors.BOLD}Merged Model saved to:{TColors.ENDC}: {save_path}")
     print("Finished Merging")
 
@@ -91,5 +108,7 @@ if __name__ == "__main__":
                         help="specifies the base LLM type")
     parser.add_argument("--finetuned_model", "-finetuned", type=str, required=True,
                         help="specifies the path of the adapters to merge")
+    parser.add_argument("--quantization", "-q", help="enables quantization",
+                        action="store_true", default=True)
     args = parser.parse_args()
     main(**vars(args))

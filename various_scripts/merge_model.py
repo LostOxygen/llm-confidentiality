@@ -15,7 +15,7 @@ from transformers import (
 )
 from peft import PeftModel
 
-from various_scripts.colors import TColors
+from colors import TColors
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 OUTPUT_DIR: Final[str] = "./merged_models/"
@@ -81,6 +81,8 @@ def main(base_llm: str, finetuned_model: str) -> None:
         save_config=True
     )
 
+    print(f"=> {TColors.OKBLUE}{TColors.BOLD}Merged Model saved to:{TColors.ENDC}: {save_path}")
+    print("Finished Merging")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")

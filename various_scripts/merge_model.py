@@ -87,9 +87,14 @@ def main(base_llm: str, finetuned_model: str, quantization: bool) -> None:
 
     del base_model
     del merged_model
-    del base_tokenizer
 
     if quantization:
+        examples = [
+            base_tokenizer(
+                "auto-gptq is an easy-to-use model quantization library with user-friendly apis," +\
+                "based on GPTQ algorithm."
+            )
+        ]
         # save quantized model
         quantize_config = BaseQuantizeConfig(
             bits=4,  # quantize model to 4-bit
@@ -97,6 +102,7 @@ def main(base_llm: str, finetuned_model: str, quantization: bool) -> None:
             desc_act=False,
         )
         model = AutoGPTQForCausalLM.from_pretrained(save_path, quantize_config)
+        model.quantize(examples)
         model.save_quantized(save_path+"_quantized", use_safetensors=True)
 
     print(f"=> {TColors.OKBLUE}{TColors.BOLD}Merged Model saved to:{TColors.ENDC}: {save_path}")

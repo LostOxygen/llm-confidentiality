@@ -32,7 +32,7 @@ def main(base_llm: str, finetuned_model: str) -> None:
     Returns:
         None
     """
-    adapter_name = finetuned_model.split("/")[-1]
+    adapter_name = finetuned_model[:-1].split("/")[-1]
     save_path = os.path.join(OUTPUT_DIR, adapter_name) + "_merged"
 
     # print system information
@@ -86,8 +86,8 @@ def main(base_llm: str, finetuned_model: str) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
-    parser.add_argument("--base_llm", "-llm", type=str, default="llama2-7b",
-                        help="specifies the base LLM type", required=True)
+    parser.add_argument("--base_llm", "-llm", type=str, default="meta-llama/Llama-2-7b-chat-hf",
+                        help="specifies the base LLM type")
     parser.add_argument("--finetuned_model", "-finetuned", type=str, required=True,
                         help="specifies the path of the adapters to merge")
     args = parser.parse_args()

@@ -115,6 +115,6 @@ if __name__ == "__main__":
     parser.add_argument("--finetuned_model", "-finetuned", type=str, required=True,
                         help="specifies the path of the adapters to merge")
     parser.add_argument("--quantization", "-q", help="enables quantization",
-                        action="store_true", default=True)
+                        action="store_true", default=False)
     args = parser.parse_args()
     main(**vars(args))

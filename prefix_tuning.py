@@ -48,7 +48,7 @@ from framework.llm import LLM
 
 # number of attack samples per attack type and main iteration
 NUM_ATTACK_SAMPLES: Final[int] = 1000
-DATA_PATH: Final[str] = "./datasets/system_prompts.json"
+DATA_PATH: Final[str] = "./datasets/system_prompts_train.json"
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 if not os.path.isdir(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR, exist_ok=True)

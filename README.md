@@ -121,6 +121,7 @@ python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERAT
 | ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to finetune |
 | ```-i, --iterations``` | <b>int</b> | ```1000``` | Specifies the number of iterations for the finetuning |
 | ```-tr, --train_robust``` | <b>bool</b> | ```False``` | Enable robustness finetuning |
+| ```-advs, --advs_train``` | <b>bool</b> | ```False``` | Utilizes the adversarial training to harden the finetuned LLM |
 | ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | Specifies the attacks which will be used to harden the llm during finetuning. Only has an effect if ```--train_robust``` is set to True. For supported attacks see the previous section |
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
 

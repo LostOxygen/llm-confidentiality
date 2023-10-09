@@ -210,7 +210,7 @@ def main(
     # setting the suffixes
     suffix: str = "robust" if train_robust else "finetuned"
     name_suffix: str = "-"+name_suffix if name_suffix != "" else ""
-    attack_suffix: str = "-"+"".join(attacks) if train_robust else ""
+    attack_suffix: str = "-"+"-".join(attacks) if train_robust else ""
     # combine the finale output save name
     save_name: str = llm_type + "-" + suffix + attack_suffix + name_suffix
 

@@ -429,9 +429,10 @@ def main(
 
 # ------------------------------ ADVS TRAINING ------------------------------ #
     if advs_train:
-        print(f">> Starting Adversarial Training with {steps_per_run} steps per iteration")
+        print(f"\n>> {TColors.OKBLUE}Starting Adversarial Training with {steps_per_run} "\
+              f"steps per iteration {TColors.ENDC}")
         for dataset_iter in range(1, 10):
-            print(f">> Advs. Train. Iteration {dataset_iter}")
+            print(f">> {TColors.OKBLUE}Advs. Train. Iteration {dataset_iter}{TColors.ENDC}")
             if dataset_iter > 1:
                 load_name = f"adv_temp_{dataset_iter-1}"
             else:
@@ -445,10 +446,10 @@ def main(
             # create first advs dataset
             advs_dataset = AdvsTrainDataset()
 
-            kbar = pkbar.Kbar(
+            progress_bar = pkbar.Pbar(
                 target=NUM_ATTACK_SAMPLES*steps_per_run,
                 width=40,
-                always_stateful=True
+                name="Generating Adversarial Training Dataset"
             )
             while len(advs_dataset) < NUM_ATTACK_SAMPLES*steps_per_run:
                 # while  the dataset is not big enough generate new attacks
@@ -470,7 +471,7 @@ def main(
                     )
                     if len(enh_system_prompt) > 40:
                         advs_dataset.add_prompt(enh_system_prompt)
-                        kbar.update(len(advs_dataset))
+                        progress_bar.update(len(advs_dataset))
 
             dataset = get_formatted_dataset(
                     is_robust=train_robust,

@@ -396,7 +396,7 @@ def main(
         training_args.max_steps = steps_per_run
 
 # ------------------------------ NORMAL FINETUNING ------------------------------ #
-    print(f">> Normal Finetuning for {steps_per_run} steps")
+    print(f">> {TColors.OKBLUE}Normal Finetuning for {steps_per_run} steps{TColors.ENDC}")
     # load the dataset
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
     prompt_dataset = PromptDataset(is_train=True)

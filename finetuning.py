@@ -458,13 +458,13 @@ def main(
                 response, history = chat(
                     prompt_dataset.get_random_prompt(),
                     curr_attack_prompt,
-                    trainer.llm,
+                    trainer.model,
                     trainer.tokenizer,
                 )
 
                 if SECRET_KEY in response:
                     enh_system_prompt = get_enhanced_system_prompt(
-                        trainer.llm,
+                        trainer.model,
                         trainer.tokenizer,
                         history
                     )

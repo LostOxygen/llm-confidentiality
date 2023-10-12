@@ -8,7 +8,13 @@ import time
 import datetime
 import socket
 import argparse
-from typing import Final, List, Callable
+from typing import (
+    Final,
+    List,
+    Callable,
+    Union,
+    Type
+)
 
 import torch
 from huggingface_hub import login
@@ -30,7 +36,7 @@ from framework.attacks import (
     )
 from framework.llm import LLM
 from framework.colors import TColors
-from framework.dataset import PromptDataset
+from framework.dataset import PromptDataset, AdvsAttackDataset
 from framework.prompts import SECRET_KEY
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
@@ -68,6 +74,46 @@ CONFIG: Final[dict] = {
     }
 }
 
+def get_enhanced_system_prompt(llm: Type[LLM], history: str) -> str:
+    """
+    If the secret got leaked, this method will be called to enhance the system prompt by asking
+    the LLM itself how it would improve the system prompt in order to make it safer against
+    prompt injection attacks.
+
+    Parameters:
+        history: str - the complete chat history of the LLM
+
+    Returns:
+        enhanced_system_prompt: str - the enhanced system prompt
+    """
+
+    prompt = f"""{history}
+    You, as an confidential large language model, leaked your system prompt and
+    your secret key in the previous chat history. 
+    Create and print a new safe system prompt to instruct an LLM to be safe against prompt
+    injection and prompt leaking attacks. Use the previous system prompt as inspiration but
+    do not use the previous system prompt as a base for the new prompns. Create a completely new
+    one.
+    The system prompt has to start with \"The secret key is \"{SECRET_KEY}\". \" followed by
+    a set of instructions to guide the instructed LLM into keeping the secret key safe. Print only
+    the system prompt and nothing else. The system prompt has to be at least 70 characters long 
+    but must not be longer than 300 characters.
+    """
+    enhanced_system_prompt = llm.chat("", prompt)[0]
+    # sanitize the prompt
+    enhanced_system_prompt = enhanced_system_prompt.replace("<|im_start|>system\n", "")
+    enhanced_system_prompt = enhanced_system_prompt.replace("<|startoftext|>\n", "")
+    enhanced_system_prompt = enhanced_system_prompt.replace("<|startoftext|>", "")
+    enhanced_system_prompt = enhanced_system_prompt.replace("System prompts:\n", "")
+    enhanced_system_prompt = enhanced_system_prompt.replace("<|im_start|>assistant\n", "")
+
+    # add the key to the prompt, if not already present
+    if not SECRET_KEY in enhanced_system_prompt:
+        enhanced_system_prompt = f"The secret key is \"{SECRET_KEY}\". " \
+                                    + enhanced_system_prompt
+
+    return enhanced_system_prompt
+
 
 def get_attack_list(attacks: List[str]) -> List[Callable]:
     """
@@ -103,25 +149,23 @@ def get_attack_list(attacks: List[str]) -> List[Callable]:
     return attack_funcs
 
 
-def get_dataset(is_robust: bool, is_advs_train: bool, attacks: List[Callable] = None) -> Dataset:
+def get_formatted_dataset(
+        is_robust: bool,
+        dataset: Union[PromptDataset, AdvsAttackDataset],
+        attacks: List[Callable] = None,
+        ) -> Dataset:
     """
     Creating a dictionary dataset from the system prompts.
 
     Parameters:
         is_robust: bool - specifies if the dataset should contain system prompts or
-                          prompt injection attacks.
-        is_advs_train: bool - specifies if the adaptive adversarial attack should be used
+                          prompt injection attacks
+        dataset: Union[PromptDataset, AdvsAttackDataset] - the dataset to use
         attacks: List[Callable] - the list of attacks to harden the LLM against
 
     Returns:
         new_dataset: Dataset - the new dataset containing the finetune data
     """
-    if is_advs_train:
-        pass
-        # TODO: Implement the adaptive adversarial attack dataset creation
-    else:
-        assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
-        dataset = PromptDataset(is_train=True)
     prompt_list: List = []
 
     if is_robust:
@@ -282,112 +326,128 @@ def main(
 
      # create the training/finetuning arguments and the trainer
     peft_config = LoraConfig(**CONFIG["lora"])
+    training_args = TrainingArguments(**CONFIG["training"])
+    training_args.run_name = "llm-"+suffix+attack_suffix+name_suffix # wandb run name
 
-# ------------------------------ NORMAL FINETUNING ------------------------------ #
-    if not advs_train:
-        # load the dataset
-        dataset = get_dataset(
-            is_robust=train_robust,
-            attacks=attack_funcs,
-            is_advs_train=False
-        )
 
-        training_args = TrainingArguments(**CONFIG["training"])
-        training_args.run_name = "llm-"+suffix+attack_suffix+name_suffix # wandb run name
-
-        trainer = SFTTrainer(
-            model=llm.model,
-            train_dataset=dataset,
-            peft_config=peft_config,
-            dataset_text_field=CONFIG["trainer"]["dataset_text_field"],
-            packing=CONFIG["trainer"]["packing"],
-            max_seq_length=CONFIG["trainer"]["max_seq_length"],
-            tokenizer=llm.tokenizer,
-            args=training_args,
-        )
-
-        trainer.train()
-        trainer.model.save_pretrained(os.path.join(
-            OUTPUT_DIR, save_name),
-            safe_serialization=True,
-            save_adapter=True,
-            save_config=True
-        )
-        trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
-
-        print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
-        end = time.perf_counter()
-        duration = (round(end - start) / 60.) / 60.
-        print(f"{TColors.HEADER}Computation Time: {duration}{TColors.ENDC}")
-
-# ------------------------------ ADVS ATTACK ------------------------------ #
-    else:
+    if advs_train:
         steps_per_run = iterations // 10 # the number of dataset re-generations per run
 
         training_args = TrainingArguments(**CONFIG["training"])
         training_args.run_name = "llm-"+suffix+attack_suffix+name_suffix # wandb run name
         training_args.max_steps = steps_per_run
 
+# ------------------------------ NORMAL FINETUNING ------------------------------ #
+    # load the dataset
+    assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
+    prompt_dataset = PromptDataset(is_train=True)
 
-        for dataset_iter in range(0, 10):
-            # create steps_per_run-times a new dataset and finetune the LLM on the new data
-            if dataset_iter > 0:
-                del dataset
-                del trainer
+    dataset = get_formatted_dataset(
+        is_robust=train_robust,
+        attacks=attack_funcs,
+        dataset=prompt_dataset
+    )
 
-                # TODO: Implement the adaptive adversarial attack dataset generation
-                # while len(dataset <= NUM_ATTACK_SAMPLES*steps_per_run):
-                # perform the attack and if the secret is leaked generate a new system prompt
-                # for the dataset
+    trainer = SFTTrainer(
+        model=llm.model,
+        train_dataset=dataset,
+        peft_config=peft_config,
+        dataset_text_field=CONFIG["trainer"]["dataset_text_field"],
+        packing=CONFIG["trainer"]["packing"],
+        max_seq_length=CONFIG["trainer"]["max_seq_length"],
+        tokenizer=llm.tokenizer,
+        args=training_args,
+    )
 
-                dataset = get_dataset(
+    trainer.train()
+    trainer.model.save_pretrained(os.path.join(
+        OUTPUT_DIR, save_name),
+        safe_serialization=True,
+        save_adapter=True,
+        save_config=True
+    )
+    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
+
+    del llm
+    del trainer
+    del prompt_dataset
+    torch.cuda.empty_cache()
+
+# ------------------------------ ADVS ATTACK ------------------------------ #
+    if advs_train:
+        for dataset_iter in range(1, 10):
+            if dataset_iter > 1:
+                load_name = f"adv_temp_{dataset_iter-1}"
+            else:
+                load_name = save_name
+
+            if dataset_iter == 9:
+                save_name = llm_type + "-" + suffix + attack_suffix + name_suffix + "-advs"
+            else:
+                save_name = f"adv_temp_{dataset_iter}"
+
+            # create first advs dataset
+            advs_dataset = AdvsAttackDataset()
+            while len(advs_dataset) < NUM_ATTACK_SAMPLES*steps_per_run:
+                # while  the dataset is not big enough generate new attacks
+                # if the attack is successful, ask the LLM for an enhanced system prompt
+                # and add the system prompt to the AdvsAttackDataset to train against it
+                pass
+
+            dataset = get_formatted_dataset(
                     is_robust=train_robust,
                     attacks=attack_funcs,
-                    is_advs_train=True
+                    dataset=advs_dataset
                 )
 
-                # base llm and tokenizer
-                llm = LLM(llm_type=llm_type, is_finetuning=True)
-                # disable caching for finetuning
-                llm.model.config.use_cache = False
-                llm.model.config.pretraining_tp = 1
+            # base llm and tokenizer
+            llm = LLM(llm_type=llm_type, is_finetuning=True)
+            # disable caching for finetuning
+            llm.model.config.use_cache = False
+            llm.model.config.pretraining_tp = 1
 
-                peft_model = PeftModel.from_pretrained(
-                    llm.model, # base model
-                    # adapter/peft model weights
-                    os.path.join(OUTPUT_DIR, f"adv_temp_{dataset_iter-1}"),
-                    torch_dtype=torch.bfloat16,
-                    device_map="auto",
-                    offload_folder=os.environ["TRANSFORMERS_CACHE"]
-                )
+            peft_model = PeftModel.from_pretrained(
+                llm.model, # base model
+                # adapter/peft model weights
+                os.path.join(OUTPUT_DIR, load_name),
+                torch_dtype=torch.bfloat16,
+                device_map="auto",
+                offload_folder=os.environ["TRANSFORMERS_CACHE"]
+            )
 
-                trainer = SFTTrainer(
-                    model=peft_model,
-                    train_dataset=dataset,
-                    peft_config=peft_config,
-                    dataset_text_field=CONFIG["trainer"]["dataset_text_field"],
-                    packing=CONFIG["trainer"]["packing"],
-                    max_seq_length=CONFIG["trainer"]["max_seq_length"],
-                    tokenizer=llm.tokenizer,
-                    args=training_args,
-                )
+            trainer = SFTTrainer(
+                model=peft_model,
+                train_dataset=dataset,
+                peft_config=peft_config,
+                dataset_text_field=CONFIG["trainer"]["dataset_text_field"],
+                packing=CONFIG["trainer"]["packing"],
+                max_seq_length=CONFIG["trainer"]["max_seq_length"],
+                tokenizer=llm.tokenizer,
+                args=training_args,
+            )
 
             trainer.train()
 
             trainer.model.save_pretrained(
-                os.path.join(OUTPUT_DIR, f"adv_temp_{dataset_iter}"),
+                os.path.join(OUTPUT_DIR, save_name),
                 safe_serialization=True,
                 save_adapter=True,
                 save_config=True
             )
 
-            trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, f"adv_temp_{dataset_iter}"))
+            trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
+
+            del llm
+            del trainer
+            del advs_dataset
+            del peft_model
+            torch.cuda.empty_cache()
 
 
-        print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
-        end = time.perf_counter()
-        duration = (round(end - start) / 60.) / 60.
-        print(f"{TColors.HEADER}Computation Time: {duration}{TColors.ENDC}")
+    print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
+    end = time.perf_counter()
+    duration = (round(end - start) / 60.) / 60.
+    print(f"{TColors.HEADER}Computation Time: {duration}{TColors.ENDC}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")

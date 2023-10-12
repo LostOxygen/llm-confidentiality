@@ -165,3 +165,47 @@ class ResponseDataset():
             raise FileNotFoundError(f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}")
         with open(self.data_path, "r", encoding="utf-8") as file:
             return json.load(file)
+
+
+class AdvsAttackDataset():
+    """
+    Implementation of a in-memory dataset for adversarial attacks.
+    This dataset will not be written to the file system but instead be kept and
+    updated in memory.
+    """
+
+    def __init__(self) -> None:
+        self.data: dict[str, str] = {}
+
+    def __len__(self) -> int:
+        return len(self.data)
+
+
+    def add_prompt(self, prompt: str) -> None:
+        """Adds a prompt to the dataset"""
+        self.data.update({str(len(self.data)): str(prompt)})
+
+
+    def get_first_prompt(self) -> str:
+        """Returns the first prompt in the dataset"""
+        return self.data["0"]
+
+
+    def get_last_prompt(self) -> str:
+        """Returns the last prompt in the dataset"""
+        return self.data[str(len(self.data) - 1)]
+
+
+    def get_random_prompt(self) -> str:
+        """Returns a random prompt from the dataset"""
+        return self.data[str(random.randint(0, len(self.data) - 1))]
+
+
+    def get_prompt_at_idx(self, idx: int) -> str:
+        """Returns the prompt at the given index"""
+        return self.data[str(idx)]
+
+
+    def reset_dataset(self) -> None:
+        """Resets the dataset"""
+        self.data = {}

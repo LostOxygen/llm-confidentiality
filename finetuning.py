@@ -432,7 +432,7 @@ def main(
         print(f"\n>> {TColors.OKBLUE}Starting Adversarial Training with {steps_per_run} "\
               f"steps per iteration {TColors.ENDC}")
         for dataset_iter in range(1, 10):
-            print(f">> {TColors.OKBLUE}Advs. Train. Iteration {dataset_iter}{TColors.ENDC}")
+            print(f">> Advs. Training Iteration: [{TColors.OKBLUE}{dataset_iter}{TColors.ENDC}]")
             if dataset_iter > 1:
                 load_name = f"adv_temp_{dataset_iter-1}"
             else:

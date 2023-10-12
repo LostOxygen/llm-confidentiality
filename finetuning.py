@@ -4,6 +4,7 @@
 
 import os
 import sys
+import random
 import time
 import datetime
 import socket
@@ -13,9 +14,11 @@ from typing import (
     List,
     Callable,
     Union,
-    Type
+    Type,
+    Tuple,
 )
 
+import pkbar
 import torch
 from huggingface_hub import login
 from datasets import Dataset
@@ -32,11 +35,11 @@ from framework.attacks import (
         chatml_abuse,
         masking,
         typoglycemia,
-        advs_suffix
+        advs_suffix,
     )
 from framework.llm import LLM
 from framework.colors import TColors
-from framework.dataset import PromptDataset, AdvsAttackDataset
+from framework.dataset import PromptDataset, AdvsTrainDataset
 from framework.prompts import SECRET_KEY
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
@@ -74,7 +77,56 @@ CONFIG: Final[dict] = {
     }
 }
 
-def get_enhanced_system_prompt(llm: Type[LLM], history: str) -> str:
+@torch.inference_mode(mode=True)
+def chat(
+        system_prompt: str,
+        user_prompt: str,
+        model: LLM,
+        tokenizer: Type[torch.nn.Module]
+    ) -> Tuple[str, str]:
+    """
+    predicts a response for a given prompt input 
+
+    Parameters:
+        system_prompt: str - the system prompt to initialize the LLM
+        user_prompt: str - the user prompt for the LLM to respond on
+
+    Returns:
+        response: str - the LLMs' response
+        history: str - the LLMs' history with the complete dialoge so far
+    """
+    formatted_messages = f"""<s>[INST] <<SYS>>
+        {system_prompt}
+        <</SYS>>
+        {user_prompt}
+        <</INST>>
+    """
+
+    with torch.no_grad():
+        inputs = tokenizer(formatted_messages, return_tensors="pt").to("cuda")
+        outputs = model.generate(
+                    inputs=inputs.input_ids,
+                    do_sample=True,
+                    temperature=0.1,
+                    max_length=4096
+                )
+        response = tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+        del inputs
+        del outputs
+
+    # remove the previous chat history from the response
+    # so only the models' actual response remains
+    history = "<s>"+response[0]+" </s>"
+    response = response[0].replace(formatted_messages.replace("<s>", ""), "")
+
+    return response, history
+
+
+def get_enhanced_system_prompt(
+        llm: Type[LLM],
+        tokenizer: Type[torch.nn.Module],
+        history: str
+    ) -> str:
     """
     If the secret got leaked, this method will be called to enhance the system prompt by asking
     the LLM itself how it would improve the system prompt in order to make it safer against
@@ -99,7 +151,13 @@ def get_enhanced_system_prompt(llm: Type[LLM], history: str) -> str:
     the system prompt and nothing else. The system prompt has to be at least 70 characters long 
     but must not be longer than 300 characters.
     """
-    enhanced_system_prompt = llm.chat("", prompt)[0]
+    enhanced_system_prompt, _ = chat(
+        "Follow the users follwing instructions!",
+        prompt,
+        llm,
+        tokenizer
+    )
+
     # sanitize the prompt
     enhanced_system_prompt = enhanced_system_prompt.replace("<|im_start|>system\n", "")
     enhanced_system_prompt = enhanced_system_prompt.replace("<|startoftext|>\n", "")
@@ -151,7 +209,7 @@ def get_attack_list(attacks: List[str]) -> List[Callable]:
 
 def get_formatted_dataset(
         is_robust: bool,
-        dataset: Union[PromptDataset, AdvsAttackDataset],
+        dataset: Union[PromptDataset, AdvsTrainDataset],
         attacks: List[Callable] = None,
         ) -> Dataset:
     """
@@ -160,7 +218,7 @@ def get_formatted_dataset(
     Parameters:
         is_robust: bool - specifies if the dataset should contain system prompts or
                           prompt injection attacks
-        dataset: Union[PromptDataset, AdvsAttackDataset] - the dataset to use
+        dataset: Union[PromptDataset, AdvsTrainDataset] - the dataset to use
         attacks: List[Callable] - the list of attacks to harden the LLM against
 
     Returns:
@@ -338,6 +396,7 @@ def main(
         training_args.max_steps = steps_per_run
 
 # ------------------------------ NORMAL FINETUNING ------------------------------ #
+    print(f">> Normal Finetuning for {steps_per_run} steps")
     # load the dataset
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
     prompt_dataset = PromptDataset(is_train=True)
@@ -368,14 +427,11 @@ def main(
     )
     trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
 
-    del llm
-    del trainer
-    del prompt_dataset
-    torch.cuda.empty_cache()
-
-# ------------------------------ ADVS ATTACK ------------------------------ #
+# ------------------------------ ADVS TRAINING ------------------------------ #
     if advs_train:
+        print(f">> Starting Adversarial Training with {steps_per_run} steps per iteration")
         for dataset_iter in range(1, 10):
+            print(f">> Advs. Train. Iteration {dataset_iter}")
             if dataset_iter > 1:
                 load_name = f"adv_temp_{dataset_iter-1}"
             else:
@@ -387,18 +443,45 @@ def main(
                 save_name = f"adv_temp_{dataset_iter}"
 
             # create first advs dataset
-            advs_dataset = AdvsAttackDataset()
+            advs_dataset = AdvsTrainDataset()
+
+            kbar = pkbar.Kbar(
+                target=NUM_ATTACK_SAMPLES*steps_per_run,
+                width=40,
+                always_stateful=True
+            )
             while len(advs_dataset) < NUM_ATTACK_SAMPLES*steps_per_run:
                 # while  the dataset is not big enough generate new attacks
                 # if the attack is successful, ask the LLM for an enhanced system prompt
-                # and add the system prompt to the AdvsAttackDataset to train against it
-                pass
+                # and add the system prompt to the AdvsTrainDataset to train against it
+                curr_attack_prompt = random.choice(attack_funcs)()
+                response, history = chat(
+                    prompt_dataset.get_random_prompt(),
+                    curr_attack_prompt,
+                    trainer.llm,
+                    trainer.tokenizer,
+                )
+
+                if SECRET_KEY in response:
+                    enh_system_prompt = get_enhanced_system_prompt(
+                        trainer.llm,
+                        trainer.tokenizer,
+                        history
+                    )
+                    if len(enh_system_prompt) > 40:
+                        advs_dataset.add_prompt(enh_system_prompt)
+                        kbar.update(len(advs_dataset))
 
             dataset = get_formatted_dataset(
                     is_robust=train_robust,
                     attacks=attack_funcs,
                     dataset=advs_dataset
                 )
+
+            del llm
+            del trainer
+            del peft_model
+            torch.cuda.empty_cache()
 
             # base llm and tokenizer
             llm = LLM(llm_type=llm_type, is_finetuning=True)
@@ -436,12 +519,6 @@ def main(
             )
 
             trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
-
-            del llm
-            del trainer
-            del advs_dataset
-            del peft_model
-            torch.cuda.empty_cache()
 
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")

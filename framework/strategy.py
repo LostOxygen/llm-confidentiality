@@ -144,7 +144,7 @@ class AttackStrategy:
         the system prompt and nothing else. The system prompt has to be at least 70 characters long 
         but must not be longer than 300 characters.
         """
-        enhanced_system_prompt = self.llm.chat("", prompt)[0]
+        enhanced_system_prompt = self.llm.chat("Follow the users follwing instructions!", prompt)[0]
         # sanitize the prompt
         enhanced_system_prompt = enhanced_system_prompt.replace("<|im_start|>system\n", "")
         enhanced_system_prompt = enhanced_system_prompt.replace("<|startoftext|>\n", "")

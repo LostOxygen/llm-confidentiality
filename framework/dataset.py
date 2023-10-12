@@ -167,9 +167,9 @@ class ResponseDataset():
             return json.load(file)
 
 
-class AdvsAttackDataset():
+class AdvsTrainDataset():
     """
-    Implementation of a in-memory dataset for adversarial attacks.
+    Implementation of a in-memory dataset for adversarial training.
     This dataset will not be written to the file system but instead be kept and
     updated in memory.
     """

@@ -451,6 +451,7 @@ def main(
                 width=40,
                 name="Generating Adversarial Training Dataset"
             )
+            progress_bar.update(0)
             while len(advs_dataset) < NUM_ATTACK_SAMPLES*steps_per_run:
                 # while  the dataset is not big enough generate new attacks
                 # if the attack is successful, ask the LLM for an enhanced system prompt
@@ -472,6 +473,10 @@ def main(
                     if len(enh_system_prompt) > 40:
                         advs_dataset.add_prompt(enh_system_prompt)
                         progress_bar.update(len(advs_dataset))
+                
+                del response
+                del enh_system_prompt
+                del history
 
             dataset = get_formatted_dataset(
                     is_robust=train_robust,

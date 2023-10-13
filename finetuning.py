@@ -387,7 +387,7 @@ def main(
     training_args = TrainingArguments(**CONFIG["training"])
     training_args.run_name = "llm-"+suffix+attack_suffix+name_suffix # wandb run name
 
-
+    steps_per_run = iterations
     if advs_train:
         steps_per_run = iterations // 10 # the number of dataset re-generations per run
 

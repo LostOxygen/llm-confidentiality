@@ -77,7 +77,7 @@ class LLM():
                         load_in_4bit=True,
                         bnb_4bit_quant_type="nf4",
                         bnb_4bit_use_double_quant=True,
-                        bnb_4bit_compute_dtype=torch.bfloat16
+                        bnb_4bit_compute_dtype=torch.float16
                     )
                 else:
                     config = None
@@ -102,7 +102,7 @@ class LLM():
                     base_model, # base model
                     finetuned_model, # local peft model
                     device_map="auto",
-                    torch_dtype=torch.bfloat16,
+                    torch_dtype=torch.float16,
                     quantization_config=config,
                     local_files_only=True,
                     return_dict=True,
@@ -143,7 +143,7 @@ class LLM():
                         load_in_4bit=True,
                         bnb_4bit_quant_type="nf4",
                         bnb_4bit_use_double_quant=True,
-                        bnb_4bit_compute_dtype=torch.bfloat16
+                        bnb_4bit_compute_dtype=torch.float16
                     )
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
@@ -167,7 +167,7 @@ class LLM():
                     finetuned_model, # local peft model
                     device_map="auto",
                     low_cpu_mem_usage=True,
-                    torch_dtype=torch.bfloat16,
+                    torch_dtype=torch.float16,
                     quantization_config=config,
                     local_files_only=True,
                     #return_dict=True,
@@ -184,7 +184,7 @@ class LLM():
                     load_in_4bit=True,
                     bnb_4bit_quant_type="nf4",
                     bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.bfloat16
+                    bnb_4bit_compute_dtype=torch.float16
                 )
 
                 # complete the model name for chat or normal models
@@ -231,7 +231,7 @@ class LLM():
                     load_in_4bit=True,
                     bnb_4bit_quant_type="nf4",
                     bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.bfloat16
+                    bnb_4bit_compute_dtype=torch.float16
                 )
 
                 if self.llm_type.split("-")[1] == "7b":
@@ -277,7 +277,7 @@ class LLM():
                     load_in_4bit=True,
                     bnb_4bit_quant_type="nf4",
                     bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.bfloat16
+                    bnb_4bit_compute_dtype=torch.float16
                 )
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
@@ -446,12 +446,15 @@ class LLM():
                     model_inputs = {key: val.to("cuda") for key, val in inputs.items()}
                     del inputs
 
-                    outputs = self.model.generate(
-                                            inputs=model_inputs["input_ids"],
-                                            do_sample=True,
-                                            temperature=self.temperature,
-                                            max_length=4096
-                                        )
+                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
+                                                        enable_math=False,
+                                                        enable_mem_efficient=False):
+                        outputs = self.model.generate(
+                                                inputs=model_inputs["input_ids"],
+                                                do_sample=True,
+                                                temperature=self.temperature,
+                                                max_length=4096
+                                            )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del model_inputs
                     del outputs

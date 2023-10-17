@@ -2,9 +2,19 @@
 import os
 import json
 import random
+from typing import Type, Final
 
 from framework.prompts import SYSTEM_PROMPTS, SECRET_KEY
 from framework.colors import TColors
+
+DATA_PATH: Final[str] = "./datasets/"
+
+class DatasetState():
+    TRAIN = 0
+    TEST = 1
+    NEW = 2
+    ADVERSARIAL = 3
+
 
 class PromptDataset():
     """
@@ -15,25 +25,41 @@ class PromptDataset():
     with testing data.
     """
 
-    def __init__(self, is_train: bool = True) -> None:
-        self.is_train = is_train
+    def __init__(self, state: Type[DatasetState] = DatasetState.TRAIN) -> None:
+        self.state = state
 
-        if self.is_train:
-            self.data_path: str = "./datasets/system_prompts_train.json"
-        else:
-            self.data_path: str = "./datasets/system_prompts_test.json"
+        match self.state:
+            case DatasetState.TRAIN:
+                self.data_path: str = "./datasets/system_prompts_train.json"
+                self.__initialize_dataset()
+            case DatasetState.TEST:
+                self.data_path: str = "./datasets/system_prompts_test.json"
+            case DatasetState.NEW:
+                self.data_path: str = "./datasets/system_prompts_new.json"
+            case DatasetState.ADVERSARIAL:
+                self.data_path: str = "./datasets/system_prompts_advs.json"
+            case _:
+                raise ValueError(f"{TColors.FAIL}Invalid dataset state.{TColors.ENDC}")
 
-        if not os.path.exists("./datasets"):
-            os.mkdir("./datasets")
-        if not os.path.isfile(self.data_path):
-            with open(self.data_path, "w", encoding="utf-8"):
-                pass
-            self.__initialize_dataset()
+        self.__init_path()
         # the actual dataset hold in memory
         self.data = self.__load_dataset()
 
+
     def __len__(self) -> int:
+        if self.data["0"] == "empty":
+            return 0
         return len(self.data)
+
+
+    def __init_path(self) -> None:
+        """Creates the path and file for the dataset"""
+        if not os.path.exists(DATA_PATH):
+            os.mkdir(DATA_PATH)
+        if not os.path.isfile(self.data_path):
+            with open(self.data_path, "w", encoding="utf-8") as file:
+                init_dict = {0: "empty"}
+                json.dump(init_dict, file, ensure_ascii=False, indent=4)
 
 
     def __initialize_dataset(self) -> None:
@@ -60,7 +86,10 @@ class PromptDataset():
 
     def add_prompt(self, prompt: str) -> None:
         """Adds a prompt to the dataset"""
-        self.data.update({str(len(self.data)): str(prompt)})
+        if self.data["0"] == "empty":
+            self.data["0"] = prompt
+        else:
+            self.data.update({str(len(self.data)): str(prompt)})
         self.__save_dataset()
 
 

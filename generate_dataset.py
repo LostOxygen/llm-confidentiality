@@ -95,7 +95,7 @@ def main(
     else:
         device = "cuda:0"
 
-    if not attacks:
+    if attacks:
         if "all" in attacks:
             attacks = ATTACK_LIST
 

@@ -202,7 +202,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
     parser.add_argument("--attacks", "-a", type=str, default=None,
                         help="specifies the attack types", nargs="+")
-    parser.add_argument("--dataset_size", "-a", type=int, default=1000,
+    parser.add_argument("--dataset_size", "-ds", type=int, default=1000,
                         help="specifies the size of the resulting dataset")
     parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
                         help="specifies the LLM to generate the dataset")

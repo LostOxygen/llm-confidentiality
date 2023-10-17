@@ -111,8 +111,7 @@ def main(
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Dataset Size{TColors.ENDC}: {dataset_size}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Type{TColors.ENDC}: {attacks}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: " \
-          f"{TColors.HEADER}{llm_type}{TColors.OKCYAN}{name_suffix}{TColors.ENDC}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {llm_type}{TColors.ENDC}")
     print("#"*os.get_terminal_size().columns+"\n")
 
     # initialize the dataset

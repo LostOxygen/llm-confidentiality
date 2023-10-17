@@ -41,8 +41,7 @@ os.environ["TRANSFORMERS_CACHE"] = "/data/"
 def main(
         attacks: List[str],
         dataset_size: int,
-        llm_type: str,
-        name_suffix: str
+        llm_type: str
     ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.

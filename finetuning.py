@@ -39,7 +39,11 @@ from framework.attacks import (
     )
 from framework.llm import LLM
 from framework.colors import TColors
-from framework.dataset import PromptDataset, AdvsTrainDataset
+from framework.dataset import (
+    PromptDataset,
+    AdvsTrainDataset,
+    DatasetState
+)
 from framework.prompts import SECRET_KEY
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
@@ -399,7 +403,7 @@ def main(
     print(f">> {TColors.OKBLUE}Normal Finetuning for {steps_per_run} steps{TColors.ENDC}")
     # load the dataset
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
-    prompt_dataset = PromptDataset(is_train=True)
+    prompt_dataset = PromptDataset(state=DatasetState.TRAIN)
 
     dataset = get_formatted_dataset(
         is_robust=train_robust,

@@ -90,7 +90,7 @@ class PromptDataset():
             self.data["0"] = prompt
         else:
             # check if prompt is already in the dataset
-            for key, value in dataset.data.items():
+            for _, value in self.data.items():
                 if prompt == value:
                     break
             self.data.update({str(len(self.data)): str(prompt)})

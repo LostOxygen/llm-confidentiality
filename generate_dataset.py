@@ -95,8 +95,9 @@ def main(
     else:
         device = "cuda:0"
 
-    if "all" in attacks:
-        attacks = ATTACK_LIST
+    if not attacks:
+        if "all" in attacks:
+            attacks = ATTACK_LIST
 
     # add '-' in front of the name suffix
     if name_suffix != "" and not name_suffix.startswith("-"):

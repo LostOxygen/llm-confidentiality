@@ -424,7 +424,9 @@ class LLM():
                                             inputs=inputs.input_ids,
                                             do_sample=True,
                                             temperature=self.temperature,
-                                            max_length=4096
+                                            max_length=4096,
+                                            repetition_penalty=1.1,
+                                            no_repeat_ngram_size=3,
                                         )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
@@ -453,7 +455,9 @@ class LLM():
                                                 inputs=model_inputs["input_ids"],
                                                 do_sample=True,
                                                 temperature=self.temperature,
-                                                max_length=4096
+                                                max_length=4096,
+                                                repetition_penalty=1.1,
+                                                no_repeat_ngram_size=3,
                                             )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del model_inputs
@@ -473,7 +477,9 @@ class LLM():
                                             inputs=inputs.input_ids,
                                             do_sample=True,
                                             temperature=self.temperature,
-                                            max_length=4096
+                                            max_length=4096,
+                                            repetition_penalty=1.1,
+                                            no_repeat_ngram_size=3,
                                         )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
@@ -493,7 +499,9 @@ class LLM():
                                             inputs=inputs.input_ids,
                                             do_sample=True,
                                             temperature=self.temperature,
-                                            max_length=4096
+                                            max_length=4096,
+                                            repetition_penalty=1.1,
+                                            no_repeat_ngram_size=3,
                                         )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs

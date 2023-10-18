@@ -91,9 +91,10 @@ class PromptDataset():
         else:
             # check if prompt is already in the dataset
             for _, value in self.data.items():
-                if prompt == value:
-                    break
-            self.data.update({str(len(self.data)): str(prompt)})
+                if prompt in value:
+                    return
+        
+        self.data.update({str(len(self.data)): str(prompt)})
         self.__save_dataset()
 
 

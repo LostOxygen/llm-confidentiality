@@ -131,7 +131,7 @@ def main(
         name="Generating System Prompt Dataset"
     )
     progress_bar.update(0)
-    for dataset_iter in range(size_per_attack):
+    while len(dataset) < dataset_size:
         # if there are no attacks, just ask the LLM to generate "safe" system prompts
         if not attacks:
             sys_prompt = """
@@ -193,7 +193,7 @@ def main(
         # add the response to the dataset
         dataset.add_prompt(response)
 
-        progress_bar.update(dataset_iter)
+        progress_bar.update(len(dataset))
 
 
     end = time.perf_counter()

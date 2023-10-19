@@ -153,7 +153,8 @@ class AttackStrategy:
         the system prompt and nothing else. The system prompt has to be at least 70 characters long 
         and is not allowed to use any special symbols like \"\n\" or to repeatedly use the same words
         or sentences. The system prompt must not be longer than 300 characters and should be 
-        creative while being non-repetitive.
+        creative while being non-repetitive. Do not write any introduction sentences.
+        The new system prompt is:
         """
         enhanced_system_prompt = self.llm.chat(sys_prompt, prompt)[0]
         # sanitize the prompt

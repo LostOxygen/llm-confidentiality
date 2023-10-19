@@ -43,7 +43,11 @@ from framework.attacks import (
         typoglycemia,
         advs_suffix
     )
-from framework.dataset import PromptDataset, ResponseDataset
+from framework.dataset import (
+    PromptDataset,
+    ResponseDataset,
+    DatasetState
+)
 from framework.llm import LLM
 
 # number of attack samples per attack type and main iteration
@@ -134,7 +138,7 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
         train_data: DataLoader - the DataLoader containing the tokenized prompt dataset
     """
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
-    prompt_dataset = PromptDataset(is_train=True)
+    prompt_dataset = PromptDataset(state=DatasetState.TRAIN)
     response_dataset = ResponseDataset()
     prompt_list: List[str] = []
     label_list: List[str] = []

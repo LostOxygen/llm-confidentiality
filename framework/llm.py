@@ -7,9 +7,11 @@ from openai import ChatCompletion
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
-    BitsAndBytesConfig
+    BitsAndBytesConfig,
+    StoppingCriteriaList
 )
 from framework.colors import TColors
+from framework.prompts import AttackStopping
 
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 MAX_RETRIES: int = 10 # number of retries for GPT based chat requests
@@ -34,6 +36,11 @@ class LLM():
         self.model: Type[AutoModelForCausalLM] = None
         self.tokenizer: Type[AutoTokenizer] = None
         self.is_finetuning: bool = is_finetuning
+        self.stop_list = [
+            "### End",
+            "\n\n\n",
+            "### Instruction",
+        ]
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
@@ -420,13 +427,22 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    outputs = self.model.generate(
-                                            inputs=inputs.input_ids,
-                                            do_sample=True,
-                                            temperature=self.temperature,
-                                            max_length=4096,
-                                            repetition_penalty=1.1,
-                                            no_repeat_ngram_size=3,
+                    stop_ids = [
+                        self.tokenizer(stop_seq, return_tensors="pt") for stop_seq in self.stop_list
+                    ]
+                    stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
+
+                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
+                                                        enable_math=False,
+                                                        enable_mem_efficient=False):
+                        outputs = self.model.generate(
+                                                inputs=inputs.input_ids,
+                                                do_sample=True,
+                                                temperature=self.temperature,
+                                                max_length=4096,
+                                                repetition_penalty=1.1,
+                                                no_repeat_ngram_size=4,
+                                                stopping_criteria=stopping_criteria,
                                         )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
@@ -444,6 +460,10 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
+                    stop_ids = [
+                        self.tokenizer(stop_seq, return_tensors="pt") for stop_seq in self.stop_list
+                    ]
+                    stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
 
                     model_inputs = {key: val.to("cuda") for key, val in inputs.items()}
                     del inputs
@@ -457,7 +477,8 @@ class LLM():
                                                 temperature=self.temperature,
                                                 max_length=4096,
                                                 repetition_penalty=1.1,
-                                                no_repeat_ngram_size=3,
+                                                no_repeat_ngram_size=4,
+                                                stopping_criteria=stopping_criteria,
                                             )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del model_inputs
@@ -473,14 +494,23 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    outputs = self.model.generate(
-                                            inputs=inputs.input_ids,
-                                            do_sample=True,
-                                            temperature=self.temperature,
-                                            max_length=4096,
-                                            repetition_penalty=1.1,
-                                            no_repeat_ngram_size=3,
-                                        )
+                    stop_ids = [
+                        self.tokenizer(stop_seq, return_tensors="pt") for stop_seq in self.stop_list
+                    ]
+                    stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
+
+                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
+                                                        enable_math=False,
+                                                        enable_mem_efficient=False):
+                        outputs = self.model.generate(
+                                                inputs=inputs.input_ids,
+                                                do_sample=True,
+                                                temperature=self.temperature,
+                                                max_length=4096,
+                                                repetition_penalty=1.1,
+                                                no_repeat_ngram_size=4,
+                                                stopping_criteria=stopping_criteria,
+                                            )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs
@@ -495,14 +525,23 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    outputs = self.model.generate(
-                                            inputs=inputs.input_ids,
-                                            do_sample=True,
-                                            temperature=self.temperature,
-                                            max_length=4096,
-                                            repetition_penalty=1.1,
-                                            no_repeat_ngram_size=3,
-                                        )
+                    stop_ids = [
+                        self.tokenizer(stop_seq, return_tensors="pt") for stop_seq in self.stop_list
+                    ]
+                    stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
+
+                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
+                                                        enable_math=False,
+                                                        enable_mem_efficient=False):
+                        outputs = self.model.generate(
+                                                inputs=inputs.input_ids,
+                                                do_sample=True,
+                                                temperature=self.temperature,
+                                                max_length=4096,
+                                                repetition_penalty=1.1,
+                                                no_repeat_ngram_size=4,
+                                                stopping_criteria=stopping_criteria,
+                                            )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs

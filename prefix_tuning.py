@@ -244,7 +244,7 @@ def main(
         if llm_type in ["llama2", "llama2-7b", "llama2-13b", "llama2-70b"]:
             sys.exit(1)
 
-    # setting devies and variables correctly
+    # set devices  correctly
     if not torch.cuda.is_available():
         device = "cpu"
     else:

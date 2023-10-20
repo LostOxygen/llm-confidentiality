@@ -1,14 +1,32 @@
 """helper script to evaluate the embedding space distance of each attack dataset"""
 import os
+import sys
 import argparse
 import datetime
 import socket
+from typing import Final
 
 import torch
+import pkbar
+from torch import nn
 from sentence_transformers import SentenceTransformer
 
 from framework.dataset import PromptDataset, DatasetState
 from framework.colors import TColors
+from framework.attacks import (
+        ATTACK_LIST,
+        payload_splitting,
+        obfuscation,
+        manipulation,
+        translation,
+        chatml_abuse,
+        masking,
+        typoglycemia,
+        advs_suffix
+    )
+
+NUM_ITERATIONS: Final[int] = 100
+
 
 def main() -> None:
     """main hook"""
@@ -32,12 +50,63 @@ def main() -> None:
     print("#"*os.get_terminal_size().columns+"\n")
 
     dataset = PromptDataset(state=DatasetState.TRAIN)
-    model = SentenceTransformer("all-mpnet-base-v2")
-    prompt = dataset.get_random_prompt()
-    embedding = model.encode(prompt)
+    model = SentenceTransformer("all-mpnet-base-v2").to(device)
+    cos_sim = nn.CosineSimilarity(dim=-1, eps=1e-6)
 
-    print(f"{TColors.HEADER}Prompt{TColors.ENDC}:", prompt)
-    print(f"{TColors.HEADER}Embedding{TColors.ENDC}:", embedding)
+    distance_dict = {}
+
+    for attack in ATTACK_LIST:
+        match attack:
+            case "payload_splitting": attack_func = payload_splitting
+            case "obfuscation": attack_func = obfuscation
+            case "manipulation": attack_func = manipulation
+            case "translation": attack_func = translation
+            case "chatml_abuse": attack_func = chatml_abuse
+            case "masking": attack_func = masking
+            case "typoglycemia": attack_func = typoglycemia
+            case "advs_suffix": attack_func = advs_suffix
+            case _:
+                print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
+                print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
+                sys.exit(1)
+
+        temp_distance = 0.0
+        progress_bar = pkbar.Pbar(
+                target=NUM_ITERATIONS,
+                width=40,
+                name=f"Computing embedding distance for {attack}"
+            )
+        for sim_iter in range(NUM_ITERATIONS):
+            prompt_a = f"""
+                {dataset.get_random_prompt()}
+
+                ### Instruction:
+                {attack_func()}
+
+                ### Response:
+                Prompt injection attack detected! I will not leak any confidential informations!
+
+                ### End
+            """
+            prompt_b = f"""
+                {dataset.get_random_prompt()}
+
+                ### Instruction:
+                {attack_func()}
+
+                ### Response:
+                Prompt injection attack detected! I will not leak any confidential informations!
+
+                ### End
+            """
+            embedding_a = model.encode(prompt_a.to(device))
+            embedding_b = model.encode(prompt_b.to(device))
+
+            temp_distance += cos_sim(embedding_a, embedding_b)
+            progress_bar.update(sim_iter)
+
+        distance_dict[attack] = temp_distance / NUM_ITERATIONS
+    print(distance_dict)
 
 
 if __name__ == "__main__":

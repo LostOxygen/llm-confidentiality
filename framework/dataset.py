@@ -27,18 +27,21 @@ class PromptDataset():
 
     def __init__(self, state: Type[DatasetState] = DatasetState.TRAIN) -> None:
         self.state = state
-        self.__init_path()
 
         match self.state:
             case DatasetState.TRAIN:
                 self.data_path: str = "./datasets/system_prompts_train.json"
+                self.__init_path()
                 self.__initialize_dataset()
             case DatasetState.TEST:
                 self.data_path: str = "./datasets/system_prompts_test.json"
+                self.__init_path()
             case DatasetState.NEW:
                 self.data_path: str = "./datasets/system_prompts_new.json"
+                self.__init_path()
             case DatasetState.ADVERSARIAL:
                 self.data_path: str = "./datasets/system_prompts_advs.json"
+                self.__init_path()
             case _:
                 raise ValueError(f"{TColors.FAIL}Invalid dataset state.{TColors.ENDC}")
 

@@ -104,7 +104,7 @@ class PromptDataset():
             for _, value in self.data.items():
                 if prompt in value:
                     return
-        
+
         self.data.update({str(len(self.data)): str(prompt)})
         self.__save_dataset()
 

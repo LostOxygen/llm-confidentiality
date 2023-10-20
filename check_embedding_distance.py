@@ -99,8 +99,8 @@ def main() -> None:
 
                 ### End
             """
-            embedding_a = model.encode(prompt_a.to(device))
-            embedding_b = model.encode(prompt_b.to(device))
+            embedding_a = model.encode(prompt_a)
+            embedding_b = model.encode(prompt_b)
 
             temp_distance += cos_sim(embedding_a, embedding_b)
             progress_bar.update(sim_iter)

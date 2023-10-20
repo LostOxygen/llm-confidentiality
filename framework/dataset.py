@@ -31,7 +31,6 @@ class PromptDataset():
         match self.state:
             case DatasetState.TRAIN:
                 self.data_path: str = "./datasets/system_prompts_train.json"
-                self.__initialize_dataset()
             case DatasetState.TEST:
                 self.data_path: str = "./datasets/system_prompts_test.json"
             case DatasetState.NEW:
@@ -44,6 +43,7 @@ class PromptDataset():
         self.__init_path()
         # the actual dataset hold in memory
         self.data = self.__load_dataset()
+        self.__initialize_dataset()
 
 
     def __len__(self) -> int:

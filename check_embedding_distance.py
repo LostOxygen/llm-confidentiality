@@ -10,6 +10,7 @@ import torch
 import pkbar
 from torch import nn
 from sentence_transformers import SentenceTransformer
+import matplotlib.pyplot as plt
 
 from framework.dataset import PromptDataset, DatasetState
 from framework.colors import TColors
@@ -112,6 +113,10 @@ def main() -> None:
     print(f"\n>> Mean Similarity over {NUM_ITERATIONS} random prompts:")
     for attack, distance in distance_dict.items():
         print(f"{TColors.OKCYAN}{attack}{TColors.ENDC}: {distance: >20}")
+
+    plt.bar(range(len(distance_dict)), list(distance_dict.values()), align="center")
+    plt.xticks(range(len(distance_dict)), list(distance_dict.keys()))
+    plt.title("Embedding Space Distance (Cosine Similarity)")
 
 
 if __name__ == "__main__":

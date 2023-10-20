@@ -72,7 +72,7 @@ CONFIG: Final[dict] = {
         "learning_rate": 2e-4,
         "logging_steps": 10,
         "max_steps": 1000,
-        "per_device_train_batch_size": 4,
+        "per_device_train_batch_size": 1,
     },
     "trainer": {
         "max_seq_length": 4096,

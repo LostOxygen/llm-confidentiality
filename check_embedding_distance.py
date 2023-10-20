@@ -115,7 +115,7 @@ def main() -> None:
         print(f"{TColors.OKCYAN}{attack}{TColors.ENDC}: {distance: >20}")
 
     plt.bar(range(len(distance_dict)), list(distance_dict.values()), align="center")
-    plt.xticks(range(len(distance_dict)), list(distance_dict.keys()))
+    plt.xticks(range(len(distance_dict)), list(distance_dict.keys()), rotation="vertical")
     plt.title("Embedding Space Distance (Cosine Similarity)")
 
     if not os.path.isdir("./plots"):

@@ -27,6 +27,7 @@ class PromptDataset():
 
     def __init__(self, state: Type[DatasetState] = DatasetState.TRAIN) -> None:
         self.state = state
+        self.__init_path()
 
         match self.state:
             case DatasetState.TRAIN:
@@ -41,7 +42,6 @@ class PromptDataset():
             case _:
                 raise ValueError(f"{TColors.FAIL}Invalid dataset state.{TColors.ENDC}")
 
-        self.__init_path()
         # the actual dataset hold in memory
         self.data = self.__load_dataset()
 
@@ -69,7 +69,8 @@ class PromptDataset():
         push the existing SYSTEM_PROMPTS to the dataset
         """
         with open(self.data_path, "a", encoding="utf-8") as file:
-            json.dump(SYSTEM_PROMPTS, file, ensure_ascii=False, indent=4)
+            if self.data["0"] == "empty":
+                json.dump(SYSTEM_PROMPTS, file, ensure_ascii=False, indent=4)
 
 
     def __load_dataset(self) -> dict:

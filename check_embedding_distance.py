@@ -118,6 +118,9 @@ def main() -> None:
     plt.xticks(range(len(distance_dict)), list(distance_dict.keys()))
     plt.title("Embedding Space Distance (Cosine Similarity)")
 
+    if not os.path.isdir("/plots/"):
+        os.mkdir("/plots/")
+    plt.savefig("./plots/embedding_distance.png")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Embedding Space Distance")

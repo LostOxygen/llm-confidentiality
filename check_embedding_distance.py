@@ -32,7 +32,7 @@ def main() -> None:
     print("#"*os.get_terminal_size().columns+"\n")
 
     dataset = PromptDataset(state=DatasetState.TRAIN)
-    model = SentenceTransformer("all-mpnet-base-v2 ")
+    model = SentenceTransformer("all-mpnet-base-v2")
     prompt = dataset.get_random_prompt()
     embedding = model.encode(prompt)
 

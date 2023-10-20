@@ -109,9 +109,9 @@ def main() -> None:
 
         distance_dict[attack] = temp_distance / NUM_ITERATIONS
 
-    print("\n>> Dinstances:")
+    print(f"\n>> Mean Similarity over {NUM_ITERATIONS} random prompts:")
     for attack, distance in distance_dict.items():
-        print(f"{TColors.OKCYAN}{attack}{TColors.ENDC}: {distance}")
+        print(f"{TColors.OKCYAN}{attack}{TColors.ENDC}: {distance: >20}")
 
 
 if __name__ == "__main__":

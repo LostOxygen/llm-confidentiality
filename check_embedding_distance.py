@@ -51,6 +51,8 @@ def main() -> None:
 
     dataset = PromptDataset(state=DatasetState.TRAIN)
     model = SentenceTransformer("all-mpnet-base-v2").to(device)
+    # using cosine similarity for similrity measurement
+    # 1 would be "similar", 0 would be "independent/orthogonal"
     cos_sim = nn.CosineSimilarity(dim=-1, eps=1e-6)
 
     distance_dict = {}
@@ -106,7 +108,10 @@ def main() -> None:
             progress_bar.update(sim_iter)
 
         distance_dict[attack] = temp_distance / NUM_ITERATIONS
-    print(distance_dict)
+
+    print("\n>> Dinstances:")
+    for attack, distance in distance_dict.items():
+        print(f"{TColors.OKCYAN}{attack}{TColors.ENDC}: {distance}")
 
 
 if __name__ == "__main__":

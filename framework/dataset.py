@@ -31,20 +31,17 @@ class PromptDataset():
         match self.state:
             case DatasetState.TRAIN:
                 self.data_path: str = "./datasets/system_prompts_train.json"
-                self.__init_path()
                 self.__initialize_dataset()
             case DatasetState.TEST:
                 self.data_path: str = "./datasets/system_prompts_test.json"
-                self.__init_path()
             case DatasetState.NEW:
                 self.data_path: str = "./datasets/system_prompts_new.json"
-                self.__init_path()
             case DatasetState.ADVERSARIAL:
                 self.data_path: str = "./datasets/system_prompts_advs.json"
-                self.__init_path()
             case _:
                 raise ValueError(f"{TColors.FAIL}Invalid dataset state.{TColors.ENDC}")
 
+        self.__init_path()
         # the actual dataset hold in memory
         self.data = self.__load_dataset()
 
@@ -71,9 +68,19 @@ class PromptDataset():
         This method is meant to be called only once when the dataset is created to
         push the existing SYSTEM_PROMPTS to the dataset
         """
-        with open(self.data_path, "a", encoding="utf-8") as file:
-            if self.data["0"] == "empty":
-                json.dump(SYSTEM_PROMPTS, file, ensure_ascii=False, indent=4)
+        match self.state:
+            case DatasetState.TRAIN:
+                with open(self.data_path, "a", encoding="utf-8") as file:
+                    if self.data["0"] == "empty":
+                        json.dump(SYSTEM_PROMPTS, file, ensure_ascii=False, indent=4)
+            case DatasetState.TEST:
+                pass
+            case DatasetState.NEW:
+                pass
+            case DatasetState.ADVERSARIAL:
+                pass
+            case _:
+                raise ValueError(f"{TColors.FAIL}Invalid dataset state.{TColors.ENDC}")
 
 
     def __load_dataset(self) -> dict:

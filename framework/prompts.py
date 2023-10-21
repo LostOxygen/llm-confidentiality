@@ -1,13 +1,13 @@
 """libary for prompt classes and helper functions"""
 
 import re
-from typing import Final, Union, List
+from typing import Final, Union, List, Type
 
 import torch
 from langchain.agents import Tool, AgentOutputParser
 from langchain.prompts import StringPromptTemplate
 from langchain.schema import AgentAction, AgentFinish, OutputParserException
-from transformers import StoppingCriteria
+from transformers import StoppingCriteria, AutoTokenizer
 
 SECRET_KEY: Final[str] = "1337"
 
@@ -90,25 +90,33 @@ SYSTEM_PROMPTS: Final[dict] = {
 
 class AttackStopping(StoppingCriteria):
     """Custom stopping criteria class to prevent responses to be too long"""
-    def __init__(self, stops: List[torch.LongTensor]):
+    def __init__(self, stops: List[torch.LongTensor], tokenizer: Type[AutoTokenizer]):
         super().__init__()
         self.stops = stops
+        self.tokenizer = tokenizer
 
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor):
         # get the generated text as a string
         for stop in self.stops:
             curr_stop = stop["input_ids"][0] # cut of the attention mask
 
-            for search_iter in range(len(input_ids[0])):
-                input_ids_slice = input_ids[0][search_iter:search_iter+len(curr_stop)]
+        #     for search_iter in range(len(input_ids[0])):
+        #         input_ids_slice = input_ids[0][search_iter:search_iter+len(curr_stop)]
 
-                if len(input_ids_slice) != len(curr_stop):
-                    # reached/overflowed the end of the tensor without finding the stop
-                    return False
+        #         if len(input_ids_slice) != len(curr_stop):
+        #             # reached/overflowed the end of the tensor without finding the stop
+        #             return False
 
-                if torch.all(curr_stop == input_ids_slice).item():
-                    # found the stop in the input_ids tensor
-                    return True
+        #         if torch.all(curr_stop == input_ids_slice).item():
+        #             # found the stop in the input_ids tensor
+        #             return True
+        # return False
+
+            decoded_stop = self.tokenizer.decode(curr_stop)
+            decoded_input_ids = self.tokenizer.decode(input_ids[0])
+            if decoded_stop in decoded_input_ids:
+                return True
+
         return False
 
 

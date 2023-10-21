@@ -94,7 +94,7 @@ class AttackStopping(StoppingCriteria):
         super().__init__()
         self.stops = stops
 
-    def __call__(self, input_ids: torch.LongTensor, **kwargs):
+    def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor):
         # get the generated text as a string
         for stop in self.stops:
             if torch.all((stop == input_ids[0][-len(stop):])).item():

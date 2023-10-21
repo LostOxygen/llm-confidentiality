@@ -428,12 +428,12 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    stop_ids = [
-                        self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
-                        for stop_seq in self.stop_list
-                    ]
+                    # stop_ids = [
+                    #     self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
+                    #     for stop_seq in self.stop_list
+                    # ]
                     stopping_criteria = StoppingCriteriaList([
-                        AttackStopping(stops=stop_ids, tokenizer=self.tokenizer)
+                        AttackStopping(stops=self.stop_list)
                         ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,
@@ -462,11 +462,13 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    stop_ids = [
-                        self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
-                        for stop_seq in self.stop_list
-                    ]
-                    stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
+                    # stop_ids = [
+                    #     self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
+                    #     for stop_seq in self.stop_list
+                    # ]
+                    stopping_criteria = StoppingCriteriaList([
+                        AttackStopping(stops=self.stop_list)
+                    ])
 
                     model_inputs = {key: val.to("cuda") for key, val in inputs.items()}
                     del inputs
@@ -495,11 +497,13 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    stop_ids = [
-                        self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
-                        for stop_seq in self.stop_list
-                    ]
-                    stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
+                    # stop_ids = [
+                    #     self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
+                    #     for stop_seq in self.stop_list
+                    # ]
+                    stopping_criteria = StoppingCriteriaList([
+                        AttackStopping(stops=self.stop_list)
+                    ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,
                                                         enable_math=False,
@@ -525,11 +529,13 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    stop_ids = [
-                        self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
-                        for stop_seq in self.stop_list
-                    ]
-                    stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
+                    # stop_ids = [
+                    #     self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
+                    #     for stop_seq in self.stop_list
+                    # ]
+                    stopping_criteria = StoppingCriteriaList([
+                        AttackStopping(stops=self.stop_list)
+                    ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,
                                                         enable_math=False,

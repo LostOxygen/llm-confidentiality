@@ -90,7 +90,7 @@ SYSTEM_PROMPTS: Final[dict] = {
 
 class AttackStopping(StoppingCriteria):
     """Custom stopping criteria class to prevent responses to be too long"""
-    def __init__(self, stops: List[torch.LongTensor], tokenizer: Type[AutoTokenizer]):
+    def __init__(self, stops: List, tokenizer: Type[AutoTokenizer]):
         super().__init__()
         self.stops = stops
         self.tokenizer = tokenizer
@@ -98,7 +98,7 @@ class AttackStopping(StoppingCriteria):
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor):
         # get the generated text as a string
         for stop in self.stops:
-            curr_stop = stop["input_ids"][0] # cut of the attention mask
+        #    curr_stop = stop["input_ids"][0] # cut of the attention mask
 
         #     for search_iter in range(len(input_ids[0])):
         #         input_ids_slice = input_ids[0][search_iter:search_iter+len(curr_stop)]
@@ -112,11 +112,11 @@ class AttackStopping(StoppingCriteria):
         #             return True
         # return False
 
-            decoded_stop = self.tokenizer.decode(curr_stop)
+        #   decoded_stop = self.tokenizer.decode(curr_stop)
             decoded_input_ids = self.tokenizer.decode(input_ids[0])
-            print("decoded_stop: ", decoded_stop)
+            print("stop: ", stop)
             print("decoded_input_ids: ", decoded_input_ids)
-            if decoded_stop in decoded_input_ids:
+            if stop in decoded_input_ids:
                 return True
 
         return False

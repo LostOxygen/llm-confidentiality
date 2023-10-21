@@ -98,9 +98,17 @@ class AttackStopping(StoppingCriteria):
         # get the generated text as a string
         for stop in self.stops:
             curr_stop = stop["input_ids"] # cut of the attention mask
-            if torch.all((curr_stop == input_ids[0][-len(curr_stop):])).item():
-                return True
 
+            for search_iter in range(len(input_ids[0])):
+                input_ids_slice = input_ids[0][search_iter:search_iter+len(curr_stop)]
+
+                if len(input_ids_slice) != len(curr_stop):
+                    # reached/overflowed the end of the tensor without finding the stop
+                    return False
+
+                if torch.all(curr_stop == input_ids_slice).item():
+                    # found the stop in the input_ids tensor
+                    return True
         return False
 
 

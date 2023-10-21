@@ -114,6 +114,8 @@ class AttackStopping(StoppingCriteria):
 
             decoded_stop = self.tokenizer.decode(curr_stop)
             decoded_input_ids = self.tokenizer.decode(input_ids[0])
+            print("decoded_stop: ", decoded_stop)
+            print("decoded_input_ids: ", decoded_input_ids)
             if decoded_stop in decoded_input_ids:
                 return True
 

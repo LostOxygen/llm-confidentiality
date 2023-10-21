@@ -432,7 +432,9 @@ class LLM():
                         self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
                         for stop_seq in self.stop_list
                     ]
-                    stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
+                    stopping_criteria = StoppingCriteriaList([
+                        AttackStopping(stops=stop_ids, tokenizer=self.tokenizer)
+                        ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,
                                                         enable_math=False,

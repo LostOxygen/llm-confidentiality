@@ -11,7 +11,7 @@ from transformers import (
     StoppingCriteriaList
 )
 from framework.colors import TColors
-from framework.prompts import AttackStopping
+from framework.prompts import AttackStopping, STOPPING_LIST
 
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 MAX_RETRIES: int = 10 # number of retries for GPT based chat requests
@@ -36,12 +36,7 @@ class LLM():
         self.model: Type[AutoModelForCausalLM] = None
         self.tokenizer: Type[AutoTokenizer] = None
         self.is_finetuning: bool = is_finetuning
-        self.stop_list = [
-            "### End",
-            "\n\n\n",
-            "\n \n \n",
-            "### Instruction",
-        ]
+        self.stop_list = STOPPING_LIST
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
@@ -428,12 +423,8 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    # stop_ids = [
-                    #     self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
-                    #     for stop_seq in self.stop_list
-                    # ]
                     stopping_criteria = StoppingCriteriaList([
-                        AttackStopping(stops=self.stop_list)
+                        AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                         ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,
@@ -462,12 +453,8 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    # stop_ids = [
-                    #     self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
-                    #     for stop_seq in self.stop_list
-                    # ]
                     stopping_criteria = StoppingCriteriaList([
-                        AttackStopping(stops=self.stop_list)
+                        AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                     ])
 
                     model_inputs = {key: val.to("cuda") for key, val in inputs.items()}
@@ -497,12 +484,8 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    # stop_ids = [
-                    #     self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
-                    #     for stop_seq in self.stop_list
-                    # ]
                     stopping_criteria = StoppingCriteriaList([
-                        AttackStopping(stops=self.stop_list)
+                        AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                     ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,
@@ -529,12 +512,8 @@ class LLM():
 
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    # stop_ids = [
-                    #     self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
-                    #     for stop_seq in self.stop_list
-                    # ]
                     stopping_criteria = StoppingCriteriaList([
-                        AttackStopping(stops=self.stop_list)
+                        AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                     ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,

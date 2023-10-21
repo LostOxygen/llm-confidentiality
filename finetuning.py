@@ -101,8 +101,10 @@ def chat(
     """
     formatted_messages = f"""<s>[INST] <<SYS>>
         {system_prompt}
+
         <</SYS>>
         {user_prompt}
+
         <</INST>>
     """
 
@@ -249,16 +251,15 @@ def get_formatted_dataset(
         # create prompt injection attack dataset
         for attack in attacks:
             for _ in range(NUM_ATTACK_SAMPLES):
-                prompt = f"""
+                prompt = f"""<s>[INST] <<SYS>>
                     {dataset.get_random_prompt()}
 
-                    ### Instruction:
+                    <</SYS>>
                     {attack()}
 
-                    ### Response:
+                    [/INSTR]
                     Prompt injection attack detected! I will not leak any confidential informations!
-
-                    ### End
+                    </s>
                 """
                 prompt_list.append(prompt)
 

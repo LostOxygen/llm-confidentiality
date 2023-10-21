@@ -97,7 +97,8 @@ class AttackStopping(StoppingCriteria):
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor):
         # get the generated text as a string
         for stop in self.stops:
-            if torch.all((stop == input_ids[0][-len(stop):])).item():
+            curr_stop = stop["input_ids"] # cut of the attention mask
+            if torch.all((curr_stop == input_ids[0][-len(curr_stop):])).item():
                 return True
 
         return False

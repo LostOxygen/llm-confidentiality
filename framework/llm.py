@@ -39,6 +39,7 @@ class LLM():
         self.stop_list = [
             "### End",
             "\n\n\n",
+            "\n \n \n",
             "### Instruction",
         ]
 
@@ -428,7 +429,8 @@ class LLM():
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     stop_ids = [
-                        self.tokenizer(stop_seq, return_tensors="pt") for stop_seq in self.stop_list
+                        self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
+                        for stop_seq in self.stop_list
                     ]
                     stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
 
@@ -461,7 +463,8 @@ class LLM():
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     stop_ids = [
-                        self.tokenizer(stop_seq, return_tensors="pt") for stop_seq in self.stop_list
+                        self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
+                        for stop_seq in self.stop_list
                     ]
                     stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
 
@@ -495,7 +498,8 @@ class LLM():
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     stop_ids = [
-                        self.tokenizer(stop_seq, return_tensors="pt") for stop_seq in self.stop_list
+                        self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
+                        for stop_seq in self.stop_list
                     ]
                     stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
 
@@ -526,7 +530,8 @@ class LLM():
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     stop_ids = [
-                        self.tokenizer(stop_seq, return_tensors="pt") for stop_seq in self.stop_list
+                        self.tokenizer(stop_seq, return_tensors="pt").to("cuda") \
+                        for stop_seq in self.stop_list
                     ]
                     stopping_criteria = StoppingCriteriaList([AttackStopping(stops=stop_ids)])
 

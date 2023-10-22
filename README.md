@@ -162,7 +162,7 @@ accelerate launch prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epo
 
 
 # Evaluation using various LLM Benchmarks (WIP and not functional yet!!!)
-## See (this)[https://github.com/EleutherAI/lm-evaluation-harness] for a working evaluation harness
+## See [this](https://github.com/EleutherAI/lm-evaluation-harness) for a working evaluation harness
 This section covers the evaluation of LLMs using various benchmarks [see here](https://www.whytryai.com/p/llm-benchmarks). The LLMs are tested on different question or completion tasks.
 
 ### Usage

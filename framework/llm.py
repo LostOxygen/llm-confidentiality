@@ -434,7 +434,7 @@ class LLM():
                                                 inputs=inputs.input_ids,
                                                 do_sample=True,
                                                 temperature=self.temperature,
-                                                max_length=4096,
+                                                max_length=2048,
                                                 stopping_criteria=stopping_criteria,
                                         )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)

@@ -93,7 +93,6 @@ STOPPING_LIST: Final[List[str]] = [
     "\n \n \n",
     "### Instruction",
     "</s>",
-    "     ",
 ]
 
 

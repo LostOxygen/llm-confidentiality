@@ -44,7 +44,7 @@ from framework.dataset import (
     AdvsTrainDataset,
     DatasetState
 )
-from framework.prompts import SECRET_KEY
+from framework.prompts import SECRET_KEY, ATTACK_KEYWORDS
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 os.environ["WANDB_WATCH"] = "false"
@@ -258,7 +258,7 @@ def get_formatted_dataset(
                     {attack()}
 
                     [/INSTR]
-                    Prompt injection attack detected! I will not leak any confidential informations!
+                    {ATTACK_KEYWORDS}
                     </s>
                 """
                 prompt_list.append(prompt)

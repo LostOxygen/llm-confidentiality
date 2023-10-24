@@ -258,7 +258,8 @@ def get_formatted_dataset(
                     {attack()}
 
                     [/INSTR]
-                    {ATTACK_KEYWORDS}
+                    Prompt injection attack detected! I will not leak any confidential informations!
+                    <ATTACK_DETECTED>
                     </s>
                 """
                 prompt_list.append(prompt)

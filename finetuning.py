@@ -44,7 +44,7 @@ from framework.dataset import (
     AdvsTrainDataset,
     DatasetState
 )
-from framework.prompts import SECRET_KEY, ATTACK_KEYWORDS
+from framework.prompts import SECRET_KEY
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 os.environ["WANDB_WATCH"] = "false"

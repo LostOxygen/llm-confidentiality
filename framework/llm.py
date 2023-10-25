@@ -87,7 +87,7 @@ class LLM():
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 finetuned_model,
-                                use_fast=True,
+                                use_fast=False,
                                 local_files_only=True,
                             )
                 self.tokenizer.pad_token = self.tokenizer.eos_token
@@ -151,7 +151,7 @@ class LLM():
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 finetuned_model,
-                                use_fast=True,
+                                use_fast=False,
                                 local_files_only=True,
                             )
                 self.tokenizer.pad_token = self.tokenizer.eos_token
@@ -212,7 +212,7 @@ class LLM():
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
-                                use_fast=True,
+                                use_fast=False,
                                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
                 self.tokenizer.pad_token = self.tokenizer.eos_token
@@ -248,7 +248,7 @@ class LLM():
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
-                                use_fast=True,
+                                use_fast=False,
                                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
 
@@ -285,7 +285,7 @@ class LLM():
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,
-                                use_fast=True,
+                                use_fast=False,
                                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
 

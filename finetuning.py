@@ -128,17 +128,14 @@ def chat(
     return response, history
 
 
-def get_enhanced_system_prompt(
-        llm: Type[LLM],
-        tokenizer: Type[torch.nn.Module],
-        history: str
-    ) -> str:
+def get_enhanced_system_prompt(gpt_llm: Type[LLM], history: str) -> str:
     """
     If the secret got leaked, this method will be called to enhance the system prompt by asking
     the LLM itself how it would improve the system prompt in order to make it safer against
     prompt injection attacks.
 
     Parameters:
+        gpt_llm: Type[LLM] - the ChatGPT API instance to ask for an enhanced system prompt
         history: str - the complete chat history of the LLM
 
     Returns:
@@ -165,11 +162,9 @@ def get_enhanced_system_prompt(
     creative while being non-repetitive. Do not write any introduction sentences.
     The new system prompt is:
     """
-    enhanced_system_prompt, _ = chat(
+    enhanced_system_prompt, _ = gpt_llm.chat(
         sys_prompt,
         prompt,
-        llm,
-        tokenizer
     )
 
     # sanitize the prompt
@@ -449,6 +444,11 @@ def main(
 
 # ------------------------------ ADVS TRAINING ------------------------------ #
     if advs_train:
+        gpt_llm = LLM(
+                llm_type="gpt-3.5-turbo",
+                temperature=0.0,
+                llm_suffix=""
+            )
         print(f"\n>> {TColors.OKBLUE}Starting Adversarial Training with {steps_per_run} "\
               f"steps per iteration {TColors.ENDC}")
         for dataset_iter in range(1, 10):
@@ -485,11 +485,8 @@ def main(
                 )
 
                 if SECRET_KEY in response:
-                    enh_system_prompt = get_enhanced_system_prompt(
-                        trainer.model,
-                        trainer.tokenizer,
-                        history
-                    )
+                    enh_system_prompt = get_enhanced_system_prompt(gpt_llm, history)
+
                     if len(enh_system_prompt) > 40:
                         advs_dataset.add_prompt(enh_system_prompt)
                         progress_bar.update(len(advs_dataset))

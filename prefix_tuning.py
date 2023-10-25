@@ -157,7 +157,7 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
                 <</SYS>>
                 {attack_str}
 
-                [/INSTR]
+                [/INST]
                 {random_response}
                 </s>
             """
@@ -169,7 +169,7 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
                 <</SYS>>
                 {attack_str}
 
-                [/INSTR]
+                [/INST]
                 {sanitized_response}
                 </s>
             """

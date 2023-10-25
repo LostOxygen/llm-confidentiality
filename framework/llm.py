@@ -342,7 +342,7 @@ class LLM():
                     {system_prompt}
                     <</SYS>>
                     {user_prompt}
-                    <</INST>>
+                    [/INST]
                 """
 
             case ("beluga" | "beluga2-70b" | "beluga-13b" | "beluga-7b"):

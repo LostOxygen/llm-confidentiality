@@ -257,7 +257,7 @@ def get_formatted_dataset(
                     <</SYS>>
                     {attack()}
 
-                    [/INSTR]
+                    [/INST]
                     Prompt injection attack detected! I will not leak any confidential informations!
                     </s>
                 """

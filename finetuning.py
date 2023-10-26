@@ -472,10 +472,7 @@ def main(
               f"steps per iteration {TColors.ENDC}")
         for dataset_iter in range(1, 10):
             print(f">> Advs. Training Iteration: [{TColors.OKBLUE}{dataset_iter}{TColors.ENDC}]")
-            if dataset_iter > 1:
-                load_name = f"adv_temp_{dataset_iter-1}"
-            else:
-                load_name = save_name
+            load_name = f"adv_temp_{dataset_iter-1}"
 
             if dataset_iter == 9:
                 save_name = llm_type + "-" + suffix + attack_suffix + name_suffix + "-advs"
@@ -524,8 +521,7 @@ def main(
 
             peft_model = PeftModel.from_pretrained(
                 llm.model, # base model
-                f"adv_temp_{dataset_iter-1}", # adapter/peft model weights
-                os.path.join(OUTPUT_DIR, load_name),
+                os.path.join(OUTPUT_DIR, load_name), # adapter/peft model weights
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
                 offload_folder=os.environ["TRANSFORMERS_CACHE"]

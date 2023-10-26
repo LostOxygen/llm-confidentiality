@@ -488,7 +488,7 @@ def main(
                 width=40,
                 name="Generating Adversarial Training Dataset"
             )
-            progress_bar.update(0)
+
             while len(advs_dataset) < NUM_ATTACK_SAMPLES*steps_per_run:
                 # while  the dataset is not big enough generate new attacks
                 # if the attack is successful, ask the LLM for an enhanced system prompt
@@ -513,11 +513,6 @@ def main(
                     attacks=attack_funcs,
                     dataset=advs_dataset
                 )
-
-            del llm
-            del trainer
-            del peft_model
-            torch.cuda.empty_cache()
 
             # base llm and tokenizer
             llm = LLM(llm_type=llm_type, is_finetuning=True)

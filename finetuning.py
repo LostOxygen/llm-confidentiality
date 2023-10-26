@@ -502,16 +502,19 @@ def main(
 
                 if SECRET_KEY in response:
                     enh_system_prompt = get_enhanced_system_prompt(gpt_llm, history)
+                    advs_dataset.add_prompt(enh_system_prompt)
+                    progress_bar.update(len(advs_dataset))
+                    del enh_system_prompt
 
-                    if len(enh_system_prompt) > 40:
-                        advs_dataset.add_prompt(enh_system_prompt)
-                        progress_bar.update(len(advs_dataset))
+                del response
+                del history
 
             dataset = get_formatted_dataset(
                     is_robust=train_robust,
                     attacks=attack_funcs,
                     dataset=advs_dataset
                 )
+            del advs_dataset
 
             # base llm and tokenizer
             llm = LLM(llm_type=llm_type, is_finetuning=True)

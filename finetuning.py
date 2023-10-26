@@ -491,10 +491,6 @@ def main(
                         advs_dataset.add_prompt(enh_system_prompt)
                         progress_bar.update(len(advs_dataset))
 
-                del response
-                del enh_system_prompt
-                del history
-
             dataset = get_formatted_dataset(
                     is_robust=train_robust,
                     attacks=attack_funcs,

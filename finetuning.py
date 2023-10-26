@@ -424,7 +424,7 @@ def main(
     steps_per_run = iterations
     if advs_train:
         steps_per_run = iterations // 10 # the number of dataset re-generations per run
-
+        steps_per_run = 1 if steps_per_run == 0 else steps_per_run
         training_args = TrainingArguments(**CONFIG["training"])
         training_args.run_name = "llm-"+suffix+attack_suffix+name_suffix # wandb run name
         training_args.max_steps = steps_per_run
@@ -524,7 +524,8 @@ def main(
                 os.path.join(OUTPUT_DIR, load_name), # adapter/peft model weights
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
-                offload_folder=os.environ["TRANSFORMERS_CACHE"]
+                offload_folder=os.environ["TRANSFORMERS_CACHE"],
+                is_trainable=True,
             )
 
             trainer = SFTTrainer(

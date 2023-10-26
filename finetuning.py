@@ -354,6 +354,8 @@ def main(
     attack_suffix: str = "-"+"-".join(attacks) if train_robust else ""
     # combine the finale output save name
     save_name: str = llm_type + "-" + suffix + attack_suffix + name_suffix
+    # add advs suffix
+    save_name: str = save_name + "-advs" if advs_train else save_name
 
     # update the default config
     CONFIG["training"]["max_steps"] = iterations
@@ -452,12 +454,12 @@ def main(
 
     trainer.train()
     trainer.model.save_pretrained(os.path.join(
-        OUTPUT_DIR, save_name),
+        OUTPUT_DIR, "adv_temp_0"),
         safe_serialization=True,
         save_adapter=True,
         save_config=True
     )
-    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
+    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, "adv_temp_0"))
 
 # ------------------------------ ADVS TRAINING ------------------------------ #
     if advs_train:
@@ -522,7 +524,7 @@ def main(
 
             peft_model = PeftModel.from_pretrained(
                 llm.model, # base model
-                # adapter/peft model weights
+                f"adv_temp_{dataset_iter-1}", # adapter/peft model weights
                 os.path.join(OUTPUT_DIR, load_name),
                 torch_dtype=torch.bfloat16,
                 device_map="auto",

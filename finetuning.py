@@ -355,7 +355,7 @@ def main(
     # combine the finale output save name
     save_name: str = llm_type + "-" + suffix + attack_suffix + name_suffix
     # add advs suffix
-    save_name: str = save_name + "-advs" if advs_train else save_name
+    save_name_tmp: str = save_name + "-advs" if advs_train else save_name
 
     # update the default config
     CONFIG["training"]["max_steps"] = iterations
@@ -376,7 +376,7 @@ def main(
     if train_robust:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Attacks: {TColors.ENDC}: {attacks}")
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Advs. Attack: {TColors.ENDC}: {advs_train}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Output Name{TColors.ENDC}: {save_name}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Output Name{TColors.ENDC}: {save_name_tmp}")
 
     # print the finetuning parameters
     print(f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Finetuning Parameters " \
@@ -454,12 +454,12 @@ def main(
 
     trainer.train()
     trainer.model.save_pretrained(os.path.join(
-        OUTPUT_DIR, "adv_temp_0"),
+        OUTPUT_DIR, save_name),
         safe_serialization=True,
         save_adapter=True,
         save_config=True
     )
-    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, "adv_temp_0"))
+    trainer.tokenizer.save_pretrained(os.path.join(OUTPUT_DIR, save_name))
 
 # ------------------------------ ADVS TRAINING ------------------------------ #
     if advs_train:
@@ -472,7 +472,11 @@ def main(
               f"steps per iteration {TColors.ENDC}")
         for dataset_iter in range(1, 10):
             print(f">> Advs. Training Iteration: [{TColors.OKBLUE}{dataset_iter}{TColors.ENDC}]")
-            load_name = f"adv_temp_{dataset_iter-1}"
+
+            if dataset_iter == 1:
+                load_name = save_name
+            else:
+                load_name = f"adv_temp_{dataset_iter-1}"
 
             if dataset_iter == 9:
                 save_name = llm_type + "-" + suffix + attack_suffix + name_suffix + "-advs"

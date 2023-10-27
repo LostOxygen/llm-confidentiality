@@ -115,7 +115,7 @@ def chat(
                     inputs=inputs.input_ids,
                     do_sample=True,
                     temperature=0.1,
-                    max_length=4096
+                    max_length=2048
                 )
         response = tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
         del inputs
@@ -124,7 +124,7 @@ def chat(
     # remove the previous chat history from the response
     # so only the models' actual response remains
     history = "<s>"+response[0]+" </s>"
-    response = response[0].replace(formatted_messages.replace("<s>", ""), "")
+    response = response[0].replace(formatted_messages.replace("<s>", ""), "", 1)
 
     return response, history
 

@@ -18,7 +18,7 @@ from framework.attacks import (
         ATTACK_LIST,
         payload_splitting,
         obfuscation,
-        manipulation,
+        jailbreak,
         translation,
         chatml_abuse,
         masking,
@@ -62,7 +62,7 @@ def main() -> None:
         match attack:
             case "payload_splitting": attack_func = payload_splitting
             case "obfuscation": attack_func = obfuscation
-            case "manipulation": attack_func = manipulation
+            case "jailbreak": attack_func = jailbreak
             case "translation": attack_func = translation
             case "chatml_abuse": attack_func = chatml_abuse
             case "masking": attack_func = masking

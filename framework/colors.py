@@ -17,7 +17,7 @@ class TColors():
 ATTACK_NAMES: Final[dict[str, str]] = {
     "chat_base": "Chat Baseline Questions",
     "payload_splitting": "Payload Splitting",
-    "obfuscation": "Base64 Obfuscation",
+    "obfuscation": "Base16/32/64/85 Obfuscation",
     "indirect": "Indirect",
     "jailbreak": "Jailbreak",
     "llm": "LLM",

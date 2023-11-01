@@ -31,7 +31,7 @@ from framework.attacks import (
         ATTACK_LIST,
         payload_splitting,
         obfuscation,
-        manipulation,
+        jailbreak,
         translation,
         chatml_abuse,
         masking,
@@ -210,7 +210,7 @@ def get_attack_list(attacks: List[str]) -> List[Callable]:
         match attack:
             case "payload_splitting": attack_funcs.append(payload_splitting)
             case "obfuscation": attack_funcs.append(obfuscation)
-            case "manipulation": attack_funcs.append(manipulation)
+            case "jailbreak": attack_funcs.append(jailbreak)
             case "translation": attack_funcs.append(translation)
             case "chatml_abuse": attack_funcs.append(chatml_abuse)
             case "masking": attack_funcs.append(masking)

@@ -15,10 +15,11 @@ class TColors():
 
 
 ATTACK_NAMES: Final[dict[str, str]] = {
+    "chat_base": "Chat Baseline Questions",
     "payload_splitting": "Payload Splitting",
     "obfuscation": "Base64 Obfuscation",
     "indirect": "Indirect",
-    "manipulation": "Manipulation",
+    "jailbreak": "Jailbreak",
     "llm": "LLM",
     "translation": "Translation",
     "chatml_abuse": "ChatML-Abuse",

@@ -1,6 +1,5 @@
 """library for LLM models, functions and helper stuff"""
 import os
-import time
 from typing import Tuple, Final, Type
 import torch
 from openai import ChatCompletion
@@ -10,7 +9,12 @@ from transformers import (
     BitsAndBytesConfig,
     StoppingCriteriaList
 )
-from framework.colors import TColors
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_random_exponential,
+)
+
 from framework.prompts import AttackStopping, STOPPING_LIST
 
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
@@ -362,6 +366,7 @@ class LLM():
         return formatted_messages
 
     @torch.inference_mode(mode=True)
+    @retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_random_exponential(min=1, max=60))
     def chat(self, system_prompt: str, user_prompt: str) -> Tuple[str, str]:
         """
         predicts a response for a given prompt input 
@@ -384,25 +389,12 @@ class LLM():
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ]
-                retries = 1
-                while retries <= MAX_RETRIES:
-                    try:
-                        completion = ChatCompletion.create(
-                                        model=self.llm_type,
-                                        messages=messages,
-                                        temperature=self.temperature
-                                    )
-                        break
-                    except TimeoutError as e:
-                        if retries == MAX_RETRIES:
-                            raise e
-                        else:
-                            retries += 1
-                            print(f"{TColors.FAIL}Timeout during {self.llm_type} request!"
-                                f"{TColors.ENDC}{TColors.OKBLUE} {MAX_RETRIES-retries} retries left"
-                                f"{TColors.ENDC}")
-                            time.sleep(5)
 
+                completion = ChatCompletion.create(
+                    model=self.llm_type,
+                    messages=messages,
+                    temperature=self.temperature
+                )
 
                 response = completion.choices[0].message.content
                 history = f"""<|im_start|>system

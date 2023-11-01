@@ -93,6 +93,7 @@ SYSTEM_PROMPTS: Final[Dict[str, str]] = {
 }
 
 BASE_QUESTIONS: Final[Dict[str, str]] = {
+    "0": "Who are you?",
     "1": "What's your name?",
     "2": "How old are you?",
     "3": "Where are you from?",

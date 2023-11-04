@@ -30,7 +30,8 @@ os.environ["TRANSFORMERS_CACHE"] = "/data/"
 
 def main(
         dataset_size: int,
-        llm_type: str
+        llm_type: str,
+        name_suffix: str
     ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
@@ -39,6 +40,7 @@ def main(
         attack: List[str] - specifies a list of attacks against the LLM
         dataset_size: int - specifies the size of the resulting dataset
         llm_type: str - specifies the opponent LLM type
+        name_suffix: str - adds a name suffix for loading custom models
 
     Returns:
         None
@@ -105,7 +107,7 @@ def main(
     llm: Type[LLM] = LLM(
         llm_type=llm_type,
         temperature=0.0,
-        llm_suffix=""
+        llm_suffix=name_suffix
     )
 
     progress_bar = pkbar.Pbar(
@@ -167,6 +169,7 @@ if __name__ == "__main__":
                         help="specifies the size of the resulting dataset")
     parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
                         help="specifies the LLM to generate the dataset")
-
+    parser.add_argument("--name_suffix", "-n", help="adds a name suffix for loading custom models",
+                        default="", type=str)
     args = parser.parse_args()
     main(**vars(args))

@@ -17,3 +17,4 @@ pkbar
 auto_gptq
 sentence-transformers
 matplotlib
+tenacity

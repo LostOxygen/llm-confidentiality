@@ -106,7 +106,7 @@ def chat(
         <</SYS>>
         {user_prompt}
 
-        <</INST>>
+        [/INST]
     """
 
     with torch.no_grad():

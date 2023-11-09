@@ -7,7 +7,8 @@ from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
     BitsAndBytesConfig,
-    StoppingCriteriaList
+    StoppingCriteriaList,
+    LogitsProcessorList,
 )
 from tenacity import (
     retry,
@@ -15,7 +16,11 @@ from tenacity import (
     wait_random_exponential,
 )
 
-from framework.prompts import AttackStopping, STOPPING_LIST
+from framework.prompts import (
+    AttackStopping,
+    EosTokenRewardLogitsProcessor,
+    STOPPING_LIST,
+)
 
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 MAX_RETRIES: int = 10 # number of retries for GPT based chat requests
@@ -417,7 +422,13 @@ class LLM():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
                     stopping_criteria = StoppingCriteriaList([
                         AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
-                        ])
+                    ])
+                    logits_processor = LogitsProcessorList([
+                        EosTokenRewardLogitsProcessor(
+                            eos_token_id=self.tokenizer.eos_token_id,
+                            max_length=2048
+                        )
+                    ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,
                                                         enable_math=False,
@@ -428,6 +439,7 @@ class LLM():
                                                 temperature=self.temperature,
                                                 max_length=2048,
                                                 stopping_criteria=stopping_criteria,
+                                                logits_processor=logits_processor,
                                         )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
@@ -448,6 +460,12 @@ class LLM():
                     stopping_criteria = StoppingCriteriaList([
                         AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                     ])
+                    logits_processor = LogitsProcessorList([
+                        EosTokenRewardLogitsProcessor(
+                            eos_token_id=self.tokenizer.eos_token_id,
+                            max_length=4096
+                        )
+                    ])
 
                     model_inputs = {key: val.to("cuda") for key, val in inputs.items()}
                     del inputs
@@ -461,6 +479,7 @@ class LLM():
                                                 temperature=self.temperature,
                                                 max_length=4096,
                                                 stopping_criteria=stopping_criteria,
+                                                logits_processor=logits_processor,
                                             )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del model_inputs
@@ -479,6 +498,12 @@ class LLM():
                     stopping_criteria = StoppingCriteriaList([
                         AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                     ])
+                    logits_processor = LogitsProcessorList([
+                        EosTokenRewardLogitsProcessor(
+                            eos_token_id=self.tokenizer.eos_token_id,
+                            max_length=4096
+                        )
+                    ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,
                                                         enable_math=False,
@@ -489,6 +514,7 @@ class LLM():
                                                 temperature=self.temperature,
                                                 max_length=4096,
                                                 stopping_criteria=stopping_criteria,
+                                                logits_processor=logits_processor,
                                             )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
@@ -507,6 +533,12 @@ class LLM():
                     stopping_criteria = StoppingCriteriaList([
                         AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                     ])
+                    logits_processor = LogitsProcessorList([
+                        EosTokenRewardLogitsProcessor(
+                            eos_token_id=self.tokenizer.eos_token_id,
+                            max_length=4096
+                        )
+                    ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,
                                                         enable_math=False,
@@ -517,6 +549,7 @@ class LLM():
                                                 temperature=self.temperature,
                                                 max_length=4096,
                                                 stopping_criteria=stopping_criteria,
+                                                logits_processor=logits_processor,
                                             )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs

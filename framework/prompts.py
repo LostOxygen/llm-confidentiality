@@ -426,7 +426,7 @@ class EosTokenRewardLogitsProcessor(LogitsProcessor):
 
     def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor) -> torch.FloatTensor:
         cur_len = input_ids.shape[-1]
-        # start to increese the reward of the eos_token from 80% max length progressively on length
+        # start to increse the reward of the eos_token from 80% max length progressively on length
         for cur_len in (max(0,int(self.max_length*0.8)), self.max_length ):
             ratio = cur_len/self.max_length
             num_tokens = scores.shape[1] # size of vocab

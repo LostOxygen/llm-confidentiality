@@ -87,6 +87,7 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 |[Typoglycemia](https://twitter.com/lauriewired/status/1682825103594205186?s=20) | ```typoglycemia``` | |
 |[Adversarial Suffix](https://llm-attacks.org/) | ```advs_suffix``` | |
 |Base Chat | ```base_chat``` | |
+
 The ```base_chat``` attack consists of normal questions to test of the model spills it's context and confidential information even without a real attack.
 
 

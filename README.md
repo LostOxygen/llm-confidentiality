@@ -12,7 +12,7 @@ This kinda framework was developed to study the confidentiality of Large Languag
 ## Setup
 Before running the code, install the requirements:
 ```
-python -m pip install -U -r requirements.txt
+python -m pip install -u -r requirements.txt
 ```
 Create both a ```key.txt``` file containing your OpenAI API key as well as a ```hf_token.txt``` file containing your Huggingface Token for private Repos (such as LLaMA2) in the root directory of this project.
 

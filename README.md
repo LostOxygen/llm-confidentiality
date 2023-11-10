@@ -25,12 +25,12 @@ huggingface-cli login
 # Attacks and Defenses
 ## Usage
 ```
-python attack.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFENSE] [-llm | --llm_type LLM_TYPE] [-m | --max_level MAX_LEVEL] [-t | --temperature TEMPERATURE]
+python attack.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFENSE] [-llm | --llm_type LLM_TYPE] [-m | --iterations ITERATIONS] [-t | --temperature TEMPERATURE]
 ```
 
 ## Example Usage
 ```python
-python attack.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging" --max_level 15 --llm_type "llama2" --temperature 0.7
+python attack.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging" --iterations 15 --llm_type "llama2" --temperature 0.7
 ```
 
 ## Arguments

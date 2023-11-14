@@ -398,7 +398,8 @@ class LLM():
                 completion = ChatCompletion.create(
                     model=self.llm_type,
                     messages=messages,
-                    temperature=self.temperature
+                    temperature=self.temperature,
+                    seed=1337
                 )
 
                 response = completion.choices[0].message.content

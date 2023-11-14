@@ -62,8 +62,8 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 ## Supported Large Language Models
 | Model | Parameter Specifier | Link | Compute Instance |
 |-------|------|-----|-----|
-| GPT-3.5-Turbo | ```gpt-3.5-turbo``` / ```gpt-3.5-turbo-0301``` / ```gpt-3.5-turbo-0613``` | [Link](https://platform.openai.com/docs/models/gpt-3-5)| OpenAI API |
-| GPT-4 | ```gpt-4``` / ```gpt-4-0613``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
+| GPT-3.5-Turbo | ```gpt-3.5``` / ```gpt-3.5-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-3-5)| OpenAI API |
+| GPT-4-Turbo | ```gpt-4``` / ```gpt-4-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
 | LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 | LLaMA2 (base) | ```llama2-7b-base``` / ```llama2-13b-base``` / ```llama2-70b-base``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 | LLaMA2 (chat) Finetuned | ```llama2-7b-finetuned``` / ```llama2-13b-finetuned``` / ```llama2-70b-finetuned``` | [Link](https://huggingface.co/meta-llama) | Local Inference |

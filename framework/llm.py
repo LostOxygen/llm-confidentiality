@@ -49,10 +49,7 @@ class LLM():
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
-            case (
-                    "gpt-3.5-turbo" | "gpt-3.5-turbo-0301" |
-                    "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"
-                ):
+            case ("gpt-4" | "gpt-3.5-turbo" | "gpt-4" | "gpt-4-turbo"):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
 
             case (
@@ -386,17 +383,18 @@ class LLM():
         """
 
         match self.llm_type:
-            case (
-                    "gpt-3.5-turbo" | "gpt-3.5-turbo-0301" |
-                    "gpt-3.5-turbo-0613" | "gpt-4" | "gpt-4-0613"
-                ):
+            case ("gpt-3.5" | "gpt-3.5-turbo" | "gpt-4" | "gpt-4-turbo"):
                 messages = [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ]
+                if self.llm == "gpt-3":
+                    model = "gpt-3.5-turbo"
+                elif self.llm == "gpt-4" or self.llm == "gpt-4-turbo":
+                    model = "gpt-4-1106-preview"
 
                 completion = ChatCompletion.create(
-                    model=self.llm_type,
+                    model=model,
                     messages=messages,
                     temperature=self.temperature,
                     seed=1337

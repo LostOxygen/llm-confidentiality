@@ -389,7 +389,7 @@ class LLM():
                     {"role": "user", "content": user_prompt},
                 ]
 
-                if self.llm_type in ("gpt-3.5", "gpt-3.5-turbo "):
+                if self.llm_type in ("gpt-3.5", "gpt-3.5-turbo"):
                     model = "gpt-3.5-turbo"
                 elif self.llm_type in ("gpt-4", "gpt-4-turbo"):
                     model = "gpt-4-1106-preview"

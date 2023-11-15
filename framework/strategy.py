@@ -120,6 +120,7 @@ class AttackStrategy:
                     defense_name=self.defense_func.__name__,
                     iteration=iteration,
                     prompt=mal_prompt,
+                    sys_prompt=system_prompt,
                     response=response,
                     success=self.__evaluate_response(response, secret_key)
                 )
@@ -283,6 +284,7 @@ class BenchmarkStrategy:
                     benchmark_name=self.benchmark_name,
                     iteration=iteration,
                     prompt=prompt,
+                    sys_prompt=system_prompt,
                     response=response,
                     success=success
                 )

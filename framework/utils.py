@@ -11,6 +11,7 @@ def log_conversation(
         defense_name: str,
         iteration: int,
         prompt: str,
+        sys_prompt: str,
         response: str,
         success: bool
     ) -> None:
@@ -24,6 +25,7 @@ def log_conversation(
         defense_name: str - the name of the defense
         iteration: int - the iteration of the attack
         prompt: str - the prompt sent to the opponent LLM
+        sys_prompt: str - the system prompt to initialize the opponent LLM
         response: str - the response of the opponent LLM
         success: bool - whether the response contains the secret key or not
 
@@ -43,6 +45,7 @@ def log_conversation(
         f.write(f">>Defense: {defense_name}\n")
         f.write(f">>iteration: {iteration}\n")
         f.write(f">>Success: {success}\n")
+        f.write(f">>System Prompt: \n{sys_prompt}\n")
         f.write(f">>Prompt: \n{prompt}\n")
         f.write(f">>Response: \n{response}\n")
         f.write("\n"+"#"*100)
@@ -53,6 +56,7 @@ def log_benchmark_conversation(
         benchmark_name: str,
         iteration: int,
         prompt: str,
+        sys_prompt: str,
         response: str,
         success: bool
     ) -> None:
@@ -65,6 +69,7 @@ def log_benchmark_conversation(
         benchmark: str - the name of the benchmark
         iteration: int - the iteration of the attack
         prompt: str - the prompt sent to the opponent LLM
+        sys_prompt: str - the system prompt to initialize the opponent LLM
         response: str - the response of the opponent LLM
         success: bool - whether the response was correct or not 
 
@@ -83,6 +88,7 @@ def log_benchmark_conversation(
         f.write(f">>Benchmark: {benchmark_name}\n")
         f.write(f">>iteration: {iteration}\n")
         f.write(f">>Success: {success}\n")
+        f.write(f">>System Prompt: \n{sys_prompt}\n")
         f.write(f">>Prompt: \n{prompt}\n")
         f.write(f">>Response: \n{response}\n")
         f.write("\n"+"#"*100)

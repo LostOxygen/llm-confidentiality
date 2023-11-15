@@ -1,5 +1,6 @@
 """libary for prompt classes and helper functions and lists of static prompts"""
 
+import random
 from typing import Final, List, Type, Dict
 
 import torch
@@ -7,6 +8,12 @@ import torch
 from transformers import StoppingCriteria, AutoTokenizer, LogitsProcessor
 
 SECRET_KEY: Final[str] = "1337"
+
+@staticmethod
+def get_random_secret_key() -> str:
+    """Returns a random secret key"""
+    return "".join([str(random.randint(0,9)) for _ in range(4)])
+
 
 ATTACK_KEYWORDS: Final[List[str]] = [
     "<ATTACK_DETECTED>",

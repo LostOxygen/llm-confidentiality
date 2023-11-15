@@ -30,7 +30,7 @@ import torch
 from torch.utils.data import DataLoader
 from accelerate import Accelerator
 
-from framework.prompts import SECRET_KEY
+from framework.prompts import get_random_secret_key
 from framework.colors import TColors
 from framework.attacks import (
         ATTACK_LIST,
@@ -148,7 +148,6 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
         for _ in range(NUM_ATTACK_SAMPLES):
             random_prompt = prompt_dataset.get_random_prompt()
             random_response = response_dataset.get_random_response()
-            sanitized_response = random_response.replace(SECRET_KEY, "#"*len(SECRET_KEY))
             attack_str = attack()
 
             prompt = f"""<s>[INST] <<SYS>>
@@ -170,7 +169,7 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
                 {attack_str}
 
                 [/INST]
-                {sanitized_response}
+                {random_response}
                 </s>
             """
             label_list.append(label)

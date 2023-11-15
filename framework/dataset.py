@@ -4,7 +4,7 @@ import json
 import random
 from typing import Type, Final
 
-from framework.prompts import SYSTEM_PROMPTS, SECRET_KEY
+from framework.prompts import SYSTEM_PROMPTS, get_random_secret_key
 from framework.colors import TColors
 
 DATA_PATH: Final[str] = "./datasets/"
@@ -161,7 +161,7 @@ class ResponseDataset():
         This method is meant to be called only once when the dataset is created to
         initialize the dataset
         """
-        tmp_data = {"0": f"The secret key is {SECRET_KEY}"}
+        tmp_data = {"0": f"The secret key is {get_random_secret_key()}"}
         with open(self.data_path, "a", encoding="utf-8") as file:
             json.dump(tmp_data, file, ensure_ascii=False, indent=4)
 

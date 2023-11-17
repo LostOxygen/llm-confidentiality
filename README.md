@@ -82,7 +82,7 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 |[Jailbreak](https://learnprompting.org/docs/prompt_hacking/jailbreaking) | ```jailbreak``` |[Heuristic/Filtering Defense](https://learnprompting.org/docs/prompt_hacking/defensive_measures/filtering) | ```heuristic_defense``` |
 |Translation | ```translation``` |[Sandwich Defense](https://learnprompting.org/docs/prompt_hacking/defensive_measures/sandwich_defense) | ```sandwiching``` |
 |[ChatML Abuse](https://www.robustintelligence.com/blog-posts/prompt-injection-attack-on-gpt-4) | ```chatml_abuse``` | [LLM Evaluation](https://learnprompting.org/docs/prompt_hacking/defensive_measures/llm_eval) | ```llm_eval``` |
-|[Masking](https://learnprompting.org/docs/prompt_hacking/offensive_measures/obfuscation) | ```masking``` | |
+|[Masking](https://learnprompting.org/docs/prompt_hacking/offensive_measures/obfuscation) | ```masking``` | [Perplexity Detection](https://arxiv.org/abs/2308.14132) | ```ppl_detection```
 |[Typoglycemia](https://twitter.com/lauriewired/status/1682825103594205186?s=20) | ```typoglycemia``` | |
 |[Adversarial Suffix](https://llm-attacks.org/) | ```advs_suffix``` | |
 |Base Chat | ```base_chat``` | |

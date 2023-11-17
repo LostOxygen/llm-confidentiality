@@ -34,7 +34,8 @@ from framework.defenses import (
         heuristic_defense,
         sandwiching,
         llm_eval,
-        identity_prompt
+        identity_prompt,
+        ppl_detection
     )
 from framework.colors import TColors
 from framework.utils import log_results
@@ -165,6 +166,7 @@ def main(
             case "heuristic_defense": defense_func = heuristic_defense
             case "sandwiching": defense_func = sandwiching
             case "llm_eval": defense_func = llm_eval
+            case "ppl_detection": defense_func = ppl_detection
             case ("None" | "none"): defense_func = identity_prompt
             case _: defense_func = identity_prompt
 

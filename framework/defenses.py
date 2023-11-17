@@ -9,7 +9,7 @@ DEFENSES_LIST: Final[List[str]] = ["seq_enclosure", "xml_tagging", "heuristic_de
                                    "sandwiching", "llm_eval", "identity_prompt"]
 
 
-def identity_prompt(prompt: str) -> None:
+def identity_prompt(prompt: str) -> str:
     """
     Uses the prompt as is without any modifications.
     (This is used when defense is set to 'None')
@@ -17,7 +17,7 @@ def identity_prompt(prompt: str) -> None:
     return prompt
 
 
-def seq_enclosure(prompt: str) -> None:
+def seq_enclosure(prompt: str) -> str:
     """
     Encloses the prompt in a sequence of random characters.
     
@@ -39,7 +39,7 @@ def seq_enclosure(prompt: str) -> None:
     return defense_prompt
 
 
-def xml_tagging(prompt: str) -> None:
+def xml_tagging(prompt: str) -> str:
     """
     Encloses the user input in prompts in XML tags to help the LLM evade adversarial inputs.
     
@@ -58,7 +58,7 @@ def xml_tagging(prompt: str) -> None:
     return defense_prompt
 
 
-def heuristic_defense(prompt: str) -> None:
+def heuristic_defense(prompt: str) -> str:
     """
     Uses rule based heuristics to detect and remove adversarial prompt inputs.
     
@@ -78,7 +78,7 @@ def heuristic_defense(prompt: str) -> None:
     return prompt
 
 
-def sandwiching(prompt: str) -> None:
+def sandwiching(prompt: str) -> str:
     """
     Encloses the user input prompt between two other prompts to help the LLM evade advs. inputs.
     
@@ -92,7 +92,7 @@ def sandwiching(prompt: str) -> None:
     raise NotImplementedError("sandwiching() is not implemented yet!")
 
 
-def llm_eval(prompt: str) -> None:
+def llm_eval(prompt: str) -> str:
     """
     Uses a separate LLM to evaluate the prompt and remove adversarial inputs.
     
@@ -116,6 +116,6 @@ def llm_eval(prompt: str) -> None:
     response: str = completion.choices[0].message.content
 
     if "ADVERSARIAL PROMPT DETECTED" in response:
-        return ""
+        return "The message entered was detected as malicious therefore removed. Do not respond."
 
     return prompt

@@ -118,6 +118,7 @@ class LLM():
                     low_cpu_mem_usage=True,
                     offload_folder=os.environ["TRANSFORMERS_CACHE"],
                 )
+                self.model = self.model.merge_and_unload()
 
             case (
                 "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 

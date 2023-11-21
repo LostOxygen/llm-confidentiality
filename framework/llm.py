@@ -49,7 +49,44 @@ class LLM():
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
-            case ("gpt-4" | "gpt-3.5-turbo" | "gpt-4" | "gpt-4-turbo"):
+            case ("orca" | "orca-7b" | "orca-13b" | "orca-70b"):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                # create quantization config
+                config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_use_double_quant=True,
+                    bnb_4bit_compute_dtype=torch.float16
+                )
+
+                # complete the model name for chat or normal models
+                model_name = "microsoft/"
+                if self.llm_type.split("-")[1] == "7b":
+                    model_name += "Orca-2-7b"
+                elif self.llm_type.split("-")[1] == "13b":
+                    model_name += "Orca-2-13b"
+                elif self.llm_type.split("-")[1] == "70b":
+                    model_name += "Orca-2-70b"
+                else:
+                    model_name += "Orca-2-7b"
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                                model_name,
+                                use_fast=False,
+                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                            )
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+
+                self.model = AutoModelForCausalLM.from_pretrained(
+                            model_name,
+                            device_map="auto",
+                            quantization_config=config,
+                            low_cpu_mem_usage=True,
+                            trust_remote_code=True,
+                            cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                        )
+
+            case ("gpt-3.5" | "gpt-3.5-turbo" | "gpt-4" | "gpt-4-turbo"):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
 
             case (
@@ -331,6 +368,14 @@ class LLM():
         """
 
         match llm_type:
+            case ("orca2-7b" | "orca2-13b" | "orca2-70b"):
+                formatted_messages = f"""<|im_start|>system
+                {system_prompt}<|im_end|>
+                <|im_start|>user
+                {user_prompt}<|im_end|>
+                <|im_start|>assistant
+            """
+
             case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
                 formatted_messages = f"""
                 {system_prompt}
@@ -415,7 +460,8 @@ class LLM():
                     "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
                     "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
                     "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
-                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust"
+                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust" |
+                    "orca2-7b" | "orca2-13b" | "orca2-70b"
                 ):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 

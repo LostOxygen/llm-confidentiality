@@ -204,6 +204,7 @@ def get_attack_list(attacks: List[str]) -> List[Callable]:
 
     if "all" in attacks:
         attacks = ATTACK_LIST
+        attacks.remove("chat_base")
 
     for attack in attacks:
         # set the attack function

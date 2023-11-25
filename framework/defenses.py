@@ -137,7 +137,7 @@ def ppl_detection(prompt: str) -> str:
     """
     model = AutoModelForCausalLM.from_pretrained("gpt2")
     tokenizer = AutoTokenizer.from_pretrained("gpt2")
-    inputs = tokenizer(prompt, return_tensors = "pt")
+    inputs = tokenizer(prompt, return_tensors="pt", truncation=True)
     loss = model(input_ids=inputs["input_ids"], labels=inputs["input_ids"]).loss
     ppl = torch.exp(loss)
 

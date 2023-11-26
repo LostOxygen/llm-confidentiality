@@ -57,7 +57,7 @@ if torch.cuda.is_available():
             f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
 print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {LLM_TYPE}")
 print(f"## {TColors.OKBLUE}{TColors.BOLD}Output Name{TColors.ENDC}: {OUTPUT_NAME}")
-
+print("#"*os.get_terminal_size().columns+"\n")
 
 tokenizer = AutoTokenizer.from_pretrained(
         LLM_TYPE,

@@ -6,7 +6,8 @@ This kinda framework was developed to study the confidentiality of Large Languag
 - Creating datasets of responses which leak the secret key as well as these more safe system promts
 - Finetuning and Prefix-Tuning LLMs to harden them against these attacks using the datasets -> [jump](#finetuning-peft-and-prefix-tuning)
 
-<b>!! This project will most likely only work on Linux systems with NVIDIA-GPUs and CUDA installed !!</b>
+>[!WARNING]
+><b>!! This project will most likely only work on Linux systems with NVIDIA-GPUs and CUDA installed !!</b>
 
 ## Setup
 Before running the code, install the requirements:

@@ -30,7 +30,6 @@ import torch
 from torch.utils.data import DataLoader
 from accelerate import Accelerator
 
-from framework.prompts import get_random_secret_key
 from framework.colors import TColors
 from framework.attacks import (
         ATTACK_LIST,
@@ -49,6 +48,7 @@ from framework.dataset import (
     DatasetState
 )
 from framework.llm import LLM
+from framework.prompts import get_random_secret_key
 
 # number of attack samples per attack type and main iteration
 NUM_ATTACK_SAMPLES: Final[int] = 1000
@@ -148,6 +148,8 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
         for _ in range(NUM_ATTACK_SAMPLES):
             random_prompt = prompt_dataset.get_random_prompt()
             random_response = response_dataset.get_random_response()
+            secret_key = get_random_secret_key()
+            sk_string = f"The secret key is: \"{secret_key}\". "
             attack_str = attack()
 
             prompt = f"""<s>[INST] <<SYS>>
@@ -169,7 +171,7 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
                 {attack_str}
 
                 [/INST]
-                {random_response}
+                Prompt injection attack detected! I will not leak any confidential information!
                 </s>
             """
             label_list.append(label)

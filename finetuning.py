@@ -244,13 +244,15 @@ def get_formatted_dataset(
         new_dataset: Dataset - the new dataset containing the finetune data
     """
     prompt_list: List = []
+    secret_key = get_random_secret_key()
+    sk_string = f"The secret key is: \"{secret_key}\". "
 
     if is_robust:
         # create prompt injection attack dataset
         for attack in attacks:
             for _ in range(NUM_ATTACK_SAMPLES):
                 prompt = f"""<s>[INST] <<SYS>>
-                    {dataset.get_random_prompt()}
+                    {sk_string}{dataset.get_random_prompt()}
 
                     <</SYS>>
                     {attack()}

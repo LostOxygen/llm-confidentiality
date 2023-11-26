@@ -23,6 +23,7 @@ import evaluate
 
 from colors import TColors
 
+os.environ["TRANSFORMERS_CACHE"] = "/data/"
 LLM_TYPE = "meta-llama/Llama-2-7b-chat-hf"
 OUTPUT_NAME= "llama2-7b-yelp"
 

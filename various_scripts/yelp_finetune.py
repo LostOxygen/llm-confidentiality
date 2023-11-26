@@ -120,7 +120,7 @@ trainer = SFTTrainer(
     max_seq_length=2048,
     dataset_text_field="text",
     packing=False,
-    peft_args=peft_args,
+    peft_config=peft_args,
 )
 
 trainer.train()

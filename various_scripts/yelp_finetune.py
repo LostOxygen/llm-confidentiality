@@ -86,7 +86,6 @@ model = AutoModelForSequenceClassification.from_pretrained(
         cache_dir=os.environ["TRANSFORMERS_CACHE"],
         num_labels=5
     )
-model = model.to(device)
 
 # disable caching for finetuning
 model.config.use_cache = False

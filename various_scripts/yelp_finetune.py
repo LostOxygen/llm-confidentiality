@@ -19,6 +19,7 @@ from transformers import (
 )
 
 from trl import SFTTrainer
+from peft import LoraConfig
 from datasets import load_dataset
 import evaluate
 
@@ -103,12 +104,23 @@ training_args = TrainingArguments(
     per_device_train_batch_size=1,
 )
 
+peft_args = LoraConfig(
+    lora_alpha=16,
+    lora_dropout=0.1,
+    r=64,
+    bias="none",
+)
+
 trainer = SFTTrainer(
     model=model,
     args=training_args,
     train_dataset=tokenized_dataset["train"].shuffle(seed=42).select(range(10)),
     eval_dataset=tokenized_dataset["test"].shuffle(seed=42).select(range(10)),
     compute_metrics=compute_metrics,
+    max_seq_length=2048,
+    dataset_text_field="text",
+    packing=False,
+    peft_args=peft_args,
 )
 
 trainer.train()

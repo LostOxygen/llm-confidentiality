@@ -97,14 +97,15 @@ tokenized_dataset = dataset.map(tokenize_function, batched=True)
 
 training_args = TrainingArguments(
     output_dir="test_trainer",
-    evaluation_strategy="epoch"
+    evaluation_strategy="epoch",
+    per_device_train_batch_size=1,
 )
 
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=tokenized_dataset["train"].shuffle(seed=42),
-    eval_dataset=tokenized_dataset["test"].shuffle(seed=42),
+    train_dataset=tokenized_dataset["train"].shuffle(seed=42).select(range(1000)),
+    eval_dataset=tokenized_dataset["test"].shuffle(seed=42).select(range(1000)),
     compute_metrics=compute_metrics,
 )
 

@@ -35,7 +35,12 @@ def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray]) -> dict:
 
 
 def tokenize_function(data: str) -> str:
-    return tokenizer(data["text"], padding="max_length", truncation=True)
+    return tokenizer(
+        data["text"],
+        padding="max_length",
+        truncation=True,
+        max_length=512,
+    )
 
 
 # setting devies and variables correctly
@@ -61,7 +66,7 @@ print("#"*os.get_terminal_size().columns+"\n")
 
 tokenizer = AutoTokenizer.from_pretrained(
         LLM_TYPE,
-        use_fast=False
+        use_fast=False,
     )
 tokenizer.pad_token = tokenizer.eos_token
 

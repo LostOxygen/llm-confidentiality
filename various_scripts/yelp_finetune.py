@@ -16,8 +16,9 @@ from transformers import (
     AutoModelForSequenceClassification,
     BitsAndBytesConfig,
     TrainingArguments,
-    SFTTrainer,
 )
+
+from trl import SFTTrainer
 from datasets import load_dataset
 import evaluate
 

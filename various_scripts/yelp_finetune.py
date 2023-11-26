@@ -68,7 +68,7 @@ tokenizer = AutoTokenizer.from_pretrained(
         LLM_TYPE,
         use_fast=False,
     )
-tokenizer.pad_token = tokenizer.eos_token
+tokenizer.pad_token = tokenizer.unk_token
 
 config = BitsAndBytesConfig(
     load_in_4bit=True,
@@ -86,10 +86,12 @@ model = AutoModelForSequenceClassification.from_pretrained(
         cache_dir=os.environ["TRANSFORMERS_CACHE"],
         num_labels=5
     )
+model = model.to(device)
 
 # disable caching for finetuning
 model.config.use_cache = False
 model.config.pretraining_tp = 1
+model.config.pad_token_id = tokenizer.pad_token_id
 metric = evaluate.load("accuracy")
 
 dataset = load_dataset("yelp_review_full")
@@ -104,8 +106,8 @@ training_args = TrainingArguments(
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=tokenized_dataset["train"].shuffle(seed=42).select(range(1000)),
-    eval_dataset=tokenized_dataset["test"].shuffle(seed=42).select(range(1000)),
+    train_dataset=tokenized_dataset["train"].shuffle(seed=42).select(range(10)),
+    eval_dataset=tokenized_dataset["test"].shuffle(seed=42).select(range(10)),
     compute_metrics=compute_metrics,
 )
 

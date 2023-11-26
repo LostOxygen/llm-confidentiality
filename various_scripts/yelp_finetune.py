@@ -23,7 +23,7 @@ import evaluate
 
 from colors import TColors
 
-LLM_TYPE = "llama2-7b"
+LLM_TYPE = "meta-llama/Llama-2-7b-chat-hf"
 OUTPUT_NAME= "llama2-7b-yelp"
 
 

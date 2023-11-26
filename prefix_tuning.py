@@ -153,7 +153,7 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
             attack_str = attack()
 
             prompt = f"""<s>[INST] <<SYS>>
-                {random_prompt}
+                {sk_string}{random_prompt}
 
                 <</SYS>>
                 {attack_str}

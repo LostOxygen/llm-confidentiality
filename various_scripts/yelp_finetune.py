@@ -113,6 +113,7 @@ peft_args = LoraConfig(
 
 trainer = SFTTrainer(
     model=model,
+    tokenizer=tokenizer,
     args=training_args,
     train_dataset=tokenized_dataset["train"].shuffle(seed=42).select(range(10)),
     eval_dataset=tokenized_dataset["test"].shuffle(seed=42).select(range(10)),

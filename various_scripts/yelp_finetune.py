@@ -16,7 +16,7 @@ from transformers import (
     AutoModelForSequenceClassification,
     BitsAndBytesConfig,
     TrainingArguments,
-    Trainer,
+    SFTTrainer,
 )
 from datasets import load_dataset
 import evaluate
@@ -24,7 +24,7 @@ import evaluate
 from colors import TColors
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
-LLM_TYPE = "meta-llama/Llama-2-7b-chat-hf"
+LLM_TYPE = "meta-llama/Llama-2-7b-hf"
 OUTPUT_NAME= "llama2-7b-yelp"
 
 
@@ -102,7 +102,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=1,
 )
 
-trainer = Trainer(
+trainer = SFTTrainer(
     model=model,
     args=training_args,
     train_dataset=tokenized_dataset["train"].shuffle(seed=42).select(range(10)),

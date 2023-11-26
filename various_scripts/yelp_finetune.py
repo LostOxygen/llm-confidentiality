@@ -85,7 +85,7 @@ model = AutoModelForSequenceClassification.from_pretrained(
 # disable caching for finetuning
 model.config.use_cache = False
 model.config.pretraining_tp = 1
-metric = evaluate.load_metric("accuracy")
+metric = evaluate.load("accuracy")
 
 dataset = load_dataset("yelp_review_full")
 tokenized_dataset = dataset.map(tokenize_function, batched=True)

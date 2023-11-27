@@ -13,7 +13,7 @@ import numpy as np
 import torch
 from transformers import (
     AutoTokenizer,
-    AutoModelForSequenceClassification,
+    AutoModelForCausalLM,
     BitsAndBytesConfig,
     TrainingArguments,
 )
@@ -27,7 +27,7 @@ from colors import TColors
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 LLM_TYPE = "meta-llama/Llama-2-7b-hf"
-OUTPUT_NAME= "llama2-7b-yelp"
+OUTPUT_NAME= "llama2-7b-specific"
 
 
 def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray]) -> dict:
@@ -41,7 +41,7 @@ def tokenize_function(data: str) -> str:
         data["text"],
         padding="max_length",
         truncation=True,
-        max_length=512,
+        max_length=2048,
     )
 
 
@@ -79,14 +79,13 @@ config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.float16
 )
 
-model = AutoModelForSequenceClassification.from_pretrained(
+model = AutoModelForCausalLM.from_pretrained(
         LLM_TYPE,
         device_map="auto",
         quantization_config=config,
         low_cpu_mem_usage=True,
         trust_remote_code=True,
         cache_dir=os.environ["TRANSFORMERS_CACHE"],
-        num_labels=5
     )
 
 # disable caching for finetuning
@@ -95,8 +94,8 @@ model.config.pretraining_tp = 1
 model.config.pad_token_id = tokenizer.pad_token_id
 metric = evaluate.load("accuracy")
 
-dataset = load_dataset("yelp_review_full")
-tokenized_dataset = dataset.map(tokenize_function, batched=True)
+dataset = load_dataset("imdb", split="train")
+#tokenized_dataset = dataset.map(tokenize_function, batched=True)
 
 training_args = TrainingArguments(
     output_dir="test_trainer",
@@ -115,13 +114,14 @@ trainer = SFTTrainer(
     model=model,
     tokenizer=tokenizer,
     args=training_args,
-    train_dataset=tokenized_dataset["train"].shuffle(seed=42).select(range(10)),
-    eval_dataset=tokenized_dataset["test"].shuffle(seed=42).select(range(10)),
-    compute_metrics=compute_metrics,
+    train_dataset=dataset,
+    #train_dataset=tokenized_dataset["train"].shuffle(seed=42).select(range(10)),
+    #eval_dataset=tokenized_dataset["test"].shuffle(seed=42).select(range(10)),
+    #compute_metrics=compute_metrics,
     max_seq_length=2048,
     dataset_text_field="text",
-    packing=False,
-    peft_config=peft_args,
+    packing=True,
+    #peft_config=peft_args,
 )
 
 trainer.train()

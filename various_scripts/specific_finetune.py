@@ -41,7 +41,7 @@ def tokenize_function(data: str) -> str:
         data["text"],
         padding="max_length",
         truncation=True,
-        max_length=2048,
+        max_length=512,
     )
 
 
@@ -98,7 +98,7 @@ dataset = load_dataset("imdb", split="train")
 #tokenized_dataset = dataset.map(tokenize_function, batched=True)
 
 training_args = TrainingArguments(
-    output_dir="test_trainer",
+    #output_dir="test_trainer",
     evaluation_strategy="epoch",
     per_device_train_batch_size=1,
 )
@@ -118,7 +118,7 @@ trainer = SFTTrainer(
     #train_dataset=tokenized_dataset["train"].shuffle(seed=42).select(range(10)),
     #eval_dataset=tokenized_dataset["test"].shuffle(seed=42).select(range(10)),
     #compute_metrics=compute_metrics,
-    max_seq_length=2048,
+    max_seq_length=512,
     dataset_text_field="text",
     packing=True,
     #peft_config=peft_args,

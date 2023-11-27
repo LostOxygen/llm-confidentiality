@@ -98,7 +98,7 @@ dataset = load_dataset("imdb", split="train")
 #tokenized_dataset = dataset.map(tokenize_function, batched=True)
 
 training_args = TrainingArguments(
-    #output_dir="test_trainer",
+    output_dir="trainer",
     evaluation_strategy="epoch",
     per_device_train_batch_size=1,
 )

@@ -87,7 +87,6 @@ dataset = load_dataset("imdb", split="train")
 
 training_args = TrainingArguments(
     output_dir="/data/trainer",
-    evaluation_strategy="epoch",
     per_device_train_batch_size=1,
     save_steps=100000,
 )

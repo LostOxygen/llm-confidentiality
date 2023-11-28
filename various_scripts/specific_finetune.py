@@ -18,6 +18,7 @@ from transformers import (
     TrainingArguments,
 )
 
+from peft import prepare_model_for_kbit_training, LoraConfig
 from trl import SFTTrainer
 from datasets import load_dataset
 import evaluate
@@ -75,7 +76,15 @@ config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_quant_type="nf4",
     bnb_4bit_use_double_quant=True,
-    bnb_4bit_compute_dtype=torch.float16
+    bnb_4bit_compute_dtype=torch.bfloat16
+)
+
+peft_config = LoraConfig(
+    lora_alpha=16,
+    lora_dropout=0.1,
+    r=64,
+    bias=None,
+    task_type="CAUSAL_LM",
 )
 
 model = AutoModelForCausalLM.from_pretrained(
@@ -91,10 +100,11 @@ model = AutoModelForCausalLM.from_pretrained(
 model.config.use_cache = False
 model.config.pretraining_tp = 1
 model.config.pad_token_id = tokenizer.pad_token_id
+model = prepare_model_for_kbit_training(model)
 metric = evaluate.load("accuracy")
 
 dataset = load_dataset("imdb", split="train")
-#tokenized_dataset = dataset.map(tokenize_function, batched=True)
+eval_dataset = load_dataset("imdb", split="test")
 
 training_args = TrainingArguments(
     output_dir="/data/trainer",
@@ -103,15 +113,17 @@ training_args = TrainingArguments(
     save_steps=100000,
 )
 
-
 trainer = SFTTrainer(
     model=model,
     tokenizer=tokenizer,
     args=training_args,
     train_dataset=dataset,
     max_seq_length=512,
+    eval_dataset=eval_dataset,
+    compute_metrics=compute_metrics,
     dataset_text_field="text",
-    packing=True,
+    packing=False,
+    peft_config=peft_config,
 )
 
 trainer.train()

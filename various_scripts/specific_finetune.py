@@ -19,7 +19,6 @@ from transformers import (
 )
 
 from trl import SFTTrainer
-from peft import LoraConfig
 from datasets import load_dataset
 import evaluate
 

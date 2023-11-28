@@ -5,11 +5,7 @@
 import os
 import datetime
 import socket
-from typing import (
-    Tuple,
-)
 
-import numpy as np
 import torch
 from transformers import (
     AutoTokenizer,
@@ -21,28 +17,12 @@ from transformers import (
 from peft import prepare_model_for_kbit_training, LoraConfig
 from trl import SFTTrainer
 from datasets import load_dataset
-import evaluate
 
 from colors import TColors
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 LLM_TYPE = "meta-llama/Llama-2-7b-hf"
 OUTPUT_NAME= "llama2-7b-specific"
-
-
-def compute_metrics(eval_pred: Tuple[np.ndarray, np.ndarray]) -> dict:
-    logits, labels = eval_pred
-    predictions = np.argmax(logits, axis=-1)
-    return metric.compute(predictions=predictions, references=labels)
-
-
-def tokenize_function(data: str) -> str:
-    return tokenizer(
-        data["text"],
-        padding="max_length",
-        truncation=True,
-        max_length=512,
-    )
 
 
 # setting devies and variables correctly
@@ -69,6 +49,7 @@ print("#"*os.get_terminal_size().columns+"\n")
 tokenizer = AutoTokenizer.from_pretrained(
         LLM_TYPE,
         use_fast=False,
+        cache_dir=os.environ["TRANSFORMERS_CACHE"],
     )
 tokenizer.pad_token = tokenizer.unk_token
 
@@ -76,7 +57,7 @@ config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_quant_type="nf4",
     bnb_4bit_use_double_quant=True,
-    bnb_4bit_compute_dtype=torch.bfloat16
+    bnb_4bit_compute_dtype=torch.float16,
 )
 
 peft_config = LoraConfig(
@@ -101,10 +82,8 @@ model.config.use_cache = False
 model.config.pretraining_tp = 1
 model.config.pad_token_id = tokenizer.pad_token_id
 model = prepare_model_for_kbit_training(model)
-metric = evaluate.load("accuracy")
 
 dataset = load_dataset("imdb", split="train")
-eval_dataset = load_dataset("imdb", split="test")
 
 training_args = TrainingArguments(
     output_dir="/data/trainer",
@@ -119,8 +98,6 @@ trainer = SFTTrainer(
     args=training_args,
     train_dataset=dataset,
     max_seq_length=512,
-    eval_dataset=eval_dataset,
-    compute_metrics=compute_metrics,
     dataset_text_field="text",
     packing=False,
     peft_config=peft_config,

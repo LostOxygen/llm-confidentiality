@@ -83,7 +83,7 @@ peft_config = LoraConfig(
     lora_alpha=16,
     lora_dropout=0.1,
     r=64,
-    bias=None,
+    bias="none",
     task_type="CAUSAL_LM",
 )
 

@@ -83,7 +83,7 @@ model.config.pretraining_tp = 1
 model.config.pad_token_id = tokenizer.pad_token_id
 model = prepare_model_for_kbit_training(model)
 
-dataset = load_dataset("imdb", split="train").shuffle(42).select(20000)
+dataset = load_dataset("imdb", split="train").select(20000)
 
 training_args = TrainingArguments(
     output_dir="/data/trainer",

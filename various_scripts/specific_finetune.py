@@ -22,7 +22,7 @@ from colors import TColors
 
 os.environ["TRANSFORMERS_CACHE"] = "/data/"
 LLM_TYPE = "meta-llama/Llama-2-7b-hf"
-OUTPUT_NAME= "llama2-7b-specific"
+OUTPUT_NAME= "llama2-7b-robust-specific"
 
 
 # setting devies and variables correctly
@@ -83,7 +83,7 @@ model.config.pretraining_tp = 1
 model.config.pad_token_id = tokenizer.pad_token_id
 model = prepare_model_for_kbit_training(model)
 
-dataset = load_dataset("imdb", split="train")
+dataset = load_dataset("imdb", split="train").shuffle(42).select(20000)
 
 training_args = TrainingArguments(
     output_dir="/data/trainer",

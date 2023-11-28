@@ -98,30 +98,21 @@ dataset = load_dataset("imdb", split="train")
 #tokenized_dataset = dataset.map(tokenize_function, batched=True)
 
 training_args = TrainingArguments(
-    output_dir="trainer",
+    output_dir="/data/trainer",
     evaluation_strategy="epoch",
     per_device_train_batch_size=1,
+    save_steps=100000,
 )
 
-peft_args = LoraConfig(
-    lora_alpha=16,
-    lora_dropout=0.1,
-    r=64,
-    bias="none",
-)
 
 trainer = SFTTrainer(
     model=model,
     tokenizer=tokenizer,
     args=training_args,
     train_dataset=dataset,
-    #train_dataset=tokenized_dataset["train"].shuffle(seed=42).select(range(10)),
-    #eval_dataset=tokenized_dataset["test"].shuffle(seed=42).select(range(10)),
-    #compute_metrics=compute_metrics,
     max_seq_length=512,
     dataset_text_field="text",
     packing=True,
-    #peft_config=peft_args,
 )
 
 trainer.train()

@@ -83,12 +83,13 @@ model.config.pretraining_tp = 1
 model.config.pad_token_id = tokenizer.pad_token_id
 model = prepare_model_for_kbit_training(model)
 
-dataset = load_dataset("imdb", split="train").shuffle(42).select(range(20000))
+dataset = load_dataset("imdb", split="train")
 
 training_args = TrainingArguments(
     output_dir="/data/trainer",
     per_device_train_batch_size=1,
     save_steps=100000,
+    max_steps=10000,
 )
 
 trainer = SFTTrainer(

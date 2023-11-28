@@ -75,7 +75,7 @@ class LLM():
                                 use_fast=False,
                                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
-                self.tokenizer.pad_token = self.tokenizer.eos_token
+                self.tokenizer.pad_token = self.tokenizer.unk_token
 
                 self.model = AutoModelForCausalLM.from_pretrained(
                             model_name,
@@ -133,7 +133,7 @@ class LLM():
                                 use_fast=False,
                                 local_files_only=True,
                             )
-                self.tokenizer.pad_token = self.tokenizer.eos_token
+                self.tokenizer.pad_token = self.tokenizer.unk_token
 
                 base_model = AutoModelForCausalLM.from_pretrained(
                             model_name,
@@ -198,7 +198,7 @@ class LLM():
                                 use_fast=False,
                                 local_files_only=True,
                             )
-                self.tokenizer.pad_token = self.tokenizer.eos_token
+                self.tokenizer.pad_token = self.tokenizer.unk_token
 
                 base_model = AutoModelForCausalLM.from_pretrained(
                             model_name,
@@ -259,7 +259,7 @@ class LLM():
                                 use_fast=False,
                                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
-                self.tokenizer.pad_token = self.tokenizer.eos_token
+                self.tokenizer.pad_token = self.tokenizer.unk_token
 
                 self.model = AutoModelForCausalLM.from_pretrained(
                             model_name,

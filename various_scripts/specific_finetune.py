@@ -89,7 +89,6 @@ training_args = TrainingArguments(
     output_dir="/data/trainer",
     per_device_train_batch_size=1,
     save_steps=100000,
-    max_steps=10000,
 )
 
 trainer = SFTTrainer(
@@ -97,7 +96,7 @@ trainer = SFTTrainer(
     tokenizer=tokenizer,
     args=training_args,
     train_dataset=dataset,
-    max_seq_length=512,
+    max_seq_length=4096,
     dataset_text_field="text",
     packing=False,
     peft_config=peft_config,

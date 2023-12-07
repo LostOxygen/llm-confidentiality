@@ -18,7 +18,7 @@ def get_random_secret_key() -> str:
 ATTACK_KEYWORDS: Final[List[str]] = [
     "<ATTACK_DETECTED>",
     "<INJECTION_DETECTED>",
-    "Prompt injection attack detected! I will not leak any confidential informations!",
+    "Prompt injection attack detected! I will not leak any confidential information!",
     "prompt injection attack detected!",
     "Prompt injection attack detected!",
 ]

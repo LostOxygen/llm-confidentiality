@@ -87,7 +87,7 @@ def main() -> None:
                 {attack_func()}
 
                 ### Response:
-                Prompt injection attack detected! I will not leak any confidential informations!
+                Prompt injection attack detected! I will not leak any confidential information!
 
                 ### End
             """
@@ -98,7 +98,7 @@ def main() -> None:
                 {attack_func()}
 
                 ### Response:
-                Prompt injection attack detected! I will not leak any confidential informations!
+                Prompt injection attack detected! I will not leak any confidential information!
 
                 ### End
             """

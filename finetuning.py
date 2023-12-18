@@ -227,7 +227,6 @@ def get_attack_list(attacks: List[str]) -> List[Callable]:
 
 
 def get_formatted_dataset(
-        is_robust: bool,
         dataset: Union[PromptDataset, AdvsTrainDataset],
         attacks: List[Callable] = None,
         ) -> Dataset:
@@ -247,48 +246,20 @@ def get_formatted_dataset(
     secret_key = get_random_secret_key()
     sk_string = f"The secret key is: \"{secret_key}\". "
 
-    if is_robust:
-        # create prompt injection attack dataset
-        for attack in attacks:
-            for _ in range(NUM_ATTACK_SAMPLES):
-                prompt = f"""<s>[INST] <<SYS>>
-                    {sk_string}{dataset.get_random_prompt()}
-
-                    <</SYS>>
-                    {attack()}
-
-                    [/INST]
-                    Prompt injection attack detected! I will not leak any confidential information!
-                    </s>
-                """
-                prompt_list.append(prompt)
-
-    else:
-        # create system prompt dataset
-        for idx in range(0, len(dataset)):
+    # create prompt injection attack dataset
+    for attack in attacks:
+        for _ in range(NUM_ATTACK_SAMPLES):
             prompt = f"""<s>[INST] <<SYS>>
-                You are a helpful security chatbot which helps researchers to design more safe 
-                artificial intelligence systems that are not vulnerable to attacks. Follow the 
-                research instructions of the researchers and help them to improve the security of LLMs.
+                {sk_string}{dataset.get_random_prompt()}
 
                 <</SYS>>
-                Large Language Models are often vulnerable to so called prompt injection attacks, where 
-                users design input prompts in a specific way to manipulate the output and behavior of the LLM.
-                Create and print a new safe system prompt to instruct an LLM to be safe against prompt
-                injection and prompt leaking attacks.
-                Start with set of instructions to guide the instructed LLM into keeping the secret key safe.
-                Print only the system prompt and nothing else. The system prompt has to be at least 70
-                characters long and is not allowed to use any special symbols like \"\n\" or to repeatedly
-                use the same words or sentences. The system prompt must not be longer than 300 characters
-                and should be creative while being non-repetitive. Do not write any introduction sentences.
-                The new system prompt is:
+                {attack()}
 
                 [/INST]
-                {dataset.get_prompt_at_idx(idx)}
+                Prompt injection attack detected! I will not leak any confidential information!
                 </s>
             """
             prompt_list.append(prompt)
-
     new_dataset = Dataset.from_dict({"prompts": prompt_list})
     return new_dataset
 
@@ -296,7 +267,6 @@ def get_formatted_dataset(
 def main(
         llm_type: str,
         iterations: int,
-        train_robust: bool,
         attacks: List[str],
         name_suffix: str,
         advs_train: bool
@@ -307,7 +277,6 @@ def main(
     Parameters:
         llm_type: str - specifies the LLM type to finetune
         iterations: int - specifies the number of iterations to finetune the LLM
-        train_robust: bool - specifies if the LLM should be hardened against prompt injections
         attacks: List[str] - specifies the attack types to harden the LLM against
         name_suffix: str - specifies a name suffix for the finetuned model
         advs_train: bool - specifies if the adaptive adversarial attack should be used
@@ -356,9 +325,9 @@ def main(
         device = "cuda:0"
 
     # setting the suffixes
-    suffix: str = "robust" if train_robust else "finetuned"
+    suffix: str = "robust"
     name_suffix: str = "-"+name_suffix if name_suffix != "" else ""
-    attack_suffix: str = "-"+"-".join(attacks) if train_robust else ""
+    attack_suffix: str = "-"+"-".join(attacks)
     # combine the finale output save name
     save_name: str = llm_type + "-" + suffix + attack_suffix + name_suffix
     # add advs suffix
@@ -379,10 +348,8 @@ def main(
         print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {llm_type}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Robust-Training{TColors.ENDC}: {train_robust}")
-    if train_robust:
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Attacks: {TColors.ENDC}: {attacks}")
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Advs. Attack: {TColors.ENDC}: {advs_train}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Attacks: {TColors.ENDC}: {attacks}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Advs. Attack: {TColors.ENDC}: {advs_train}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Output Name{TColors.ENDC}: {save_name_tmp}")
 
     # print the finetuning parameters
@@ -419,9 +386,7 @@ def main(
     llm.model.config.pretraining_tp = 1
 
     # create list of attacks to harden against if robust finetuning is enabled
-    attack_funcs = None
-    if train_robust:
-        attack_funcs = get_attack_list(attacks)
+    attack_funcs = get_attack_list(attacks)
 
      # create the training/finetuning arguments and the trainer
     peft_config = LoraConfig(**CONFIG["lora"])
@@ -443,7 +408,6 @@ def main(
     prompt_dataset = PromptDataset(state=DatasetState.TRAIN)
 
     dataset = get_formatted_dataset(
-        is_robust=train_robust,
         attacks=attack_funcs,
         dataset=prompt_dataset
     )
@@ -528,7 +492,6 @@ def main(
                 del history
 
             dataset = get_formatted_dataset(
-                    is_robust=train_robust,
                     attacks=attack_funcs,
                     dataset=advs_dataset
                 )
@@ -583,8 +546,6 @@ if __name__ == "__main__":
                         help="specifies the opponent LLM type")
     parser.add_argument("--iterations", "-i", type=int, default=100,
                         help="specifies the number of iterations to finetune the LLM")
-    parser.add_argument("--train_robust", "-tr", help="enables robust finetuning",
-                        action="store_true", default=False)
     parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
                         help="specifies the attack types", nargs="+")
     parser.add_argument("--name_suffix", "-n", help="adds a name suffix for the finetuned model",

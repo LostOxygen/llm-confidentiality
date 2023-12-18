@@ -12,7 +12,7 @@ This kinda framework was developed to study the confidentiality of Large Languag
 ## Setup
 Before running the code, install the requirements:
 ```
-python -m pip install -u -r requirements.txt
+python -m pip install --upgrade -r requirements.txt
 ```
 Create both a ```key.txt``` file containing your OpenAI API key as well as a ```hf_token.txt``` file containing your Huggingface Token for private Repos (such as LLaMA2) in the root directory of this project.
 
@@ -20,6 +20,16 @@ Sometimes it can be necessary to login to your Huggingface account via the CLI:
 ```
 git config --global credential.helper store
 huggingface-cli login
+```
+
+### Distributed Training
+All scripts are able to work on multiple GPUs/CPUs using the [accelerate](https://huggingface.co/docs/accelerate/index) library. To do so, run:
+```
+accelerate config
+```
+to configure the distributed training capabilities of your system and start the scripts with:
+```
+accelerate launch [parameters] <script.py> [script parameters]
 ```
 
 # Attacks and Defenses
@@ -30,7 +40,7 @@ python attack.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DE
 
 ## Example Usage
 ```python
-python attack.py --attacks "prompt_injection" "obfuscation" --defense "xml_tagging" --iterations 15 --llm_type "llama2" --temperature 0.7
+python attack.py --attacks "payload_splitting" "obfuscation" --defense "xml_tagging" --iterations 15 --llm_type "llama2-7b" --temperature 0.7
 ```
 
 ## Arguments

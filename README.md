@@ -124,7 +124,7 @@ The first finetuning option is on a dataset consisting of system prompts to safe
 
 ### Usage
 ```python
-python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERATIONS] [-tr | --train_robust TRAIN_ROBUST] [-a | --attacks ATTACKS_LIST] [-n | --name_suffix NAME_SUFFIX]
+python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERATIONS] [-a | --attacks ATTACKS_LIST] [-n | --name_suffix NAME_SUFFIX]
 ```
 
 ### Arguments
@@ -133,7 +133,6 @@ python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERAT
 | ```-h, --help``` | - | - | Show this help message and exit |
 | ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to finetune |
 | ```-i, --iterations``` | <b>int</b> | ```10000``` | Specifies the number of iterations for the finetuning |
-| ```-tr, --train_robust``` | <b>bool</b> | ```False``` | Enable robustness finetuning |
 | ```-advs, --advs_train``` | <b>bool</b> | ```False``` | Utilizes the adversarial training to harden the finetuned LLM |
 | ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | Specifies the attacks which will be used to harden the llm during finetuning. Only has an effect if ```--train_robust``` is set to True. For supported attacks see the previous section |
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
@@ -172,3 +171,15 @@ accelerate launch prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epo
 | Model | Parameter Specifier | Link | Compute Instance |
 |-------|------|-----|-----|
 | LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+
+
+# Generate System Prompt Datasets
+Simply run the ```generate_dataset.py``` script to create new system prompts as a json file using LLMs.
+
+### Arguments
+| Argument | Type | Default Value | Description |
+|----------|------|---------------|-------------|
+| ```-h, --help``` | - | - | Show this help message and exit |
+| ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to prefix tune |
+| ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the model name if you want to use a custom model |
+| ```-ds, --dataset_size``` | <b>int</b> | ```1000``` | Size of the resulting system prompt dataset |

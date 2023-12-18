@@ -166,6 +166,11 @@ class LLM():
 
                 # complete the model name for chat or normal models
                 model_name = "meta-llama/"
+                if "-" not in self.llm_type:
+                    raise NotImplementedError(
+                        f"LLM specifier {self.llm_type} not complete." +\
+                        f"Did you mean {self.llm_type}-7b-prefix?"
+                    )
                 if self.llm_type.split("-")[1] == "7b":
                     if "base" in self.llm_type:
                         model_name += "Llama-2-7b-hf"
@@ -222,8 +227,8 @@ class LLM():
                 )
 
             case (
-                    "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
-                    "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base"
+                    "llama2-7b" | "llama2-13b" | "llama2-70b" |
+                    "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
@@ -236,6 +241,11 @@ class LLM():
 
                 # complete the model name for chat or normal models
                 model_name = "meta-llama/"
+                if "-" not in self.llm_type:
+                    raise NotImplementedError(
+                        f"LLM specifier {self.llm_type} not complete." +\
+                        f"Did you mean {self.llm_type}-7b?"
+                    )
                 if self.llm_type.split("-")[1] == "7b":
                     if "base" in self.llm_type:
                         model_name += "Llama-2-7b-hf"
@@ -270,7 +280,7 @@ class LLM():
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
 
-            case ("beluga2" | "beluga2-70b" | "beluga-13b" | "beluga-7b"):
+            case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 self.temperature = max(0.01, min(self.temperature, 2.0))
                 model_name = "stabilityai/"
                 # create quantization config
@@ -280,7 +290,11 @@ class LLM():
                     bnb_4bit_use_double_quant=True,
                     bnb_4bit_compute_dtype=torch.float16
                 )
-
+                if "-" not in self.llm_type:
+                    raise NotImplementedError(
+                        f"LLM specifier {self.llm_type} not complete." +\
+                        f"Did you mean {self.llm_type}-7b?"
+                    )
                 if self.llm_type.split("-")[1] == "7b":
                     model_name += "StableBeluga-7b"
                 elif self.llm_type.split("-")[1] == "13b":
@@ -306,10 +320,15 @@ class LLM():
                         )
 
 
-            case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
+            case ("vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
                 self.temperature = max(0.01, min(self.temperature, 2.0))
 
                 model_name = "lmsys/"
+                if "-" not in self.llm_type:
+                    raise NotImplementedError(
+                        f"LLM specifier {self.llm_type} not complete." +\
+                        f"Did you mean {self.llm_type}-7b?"
+                    )
                 if self.llm_type.split("-")[1] == "7b":
                     model_name += "vicuna-7b-v1.3"
                 elif self.llm_type.split("-")[1] == "13b":

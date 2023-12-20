@@ -7,7 +7,7 @@ This kinda framework was developed to study the confidentiality of Large Languag
 - Finetuning and Prefix-Tuning LLMs to harden them against these attacks using the datasets -> [jump](#finetuning-peft-and-prefix-tuning)
 
 >[!WARNING]
-><b>!! This project will most likely only work on Linux systems with NVIDIA-GPUs and CUDA installed !!</b>
+><b>GPU utilization is based on the [accelerate](https://huggingface.co/docs/accelerate/index) library and therefore not support for Windows machines currently</b>
 
 ## Setup
 Before running the code, install the requirements:

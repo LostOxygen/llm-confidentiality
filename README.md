@@ -2,12 +2,11 @@
 This kinda framework was developed to study the confidentiality of Large Language Models (LLMs). The framework contains several features:
 - A set of attacks against LLMs, where the LLM is not allowed to leak a secret key -> [jump](#attacks-and-defenses)
 - A set of defenses against the aforementioned attacks -> [jump](#attacks-and-defenses)
-- Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe 
-- Creating datasets of responses which leak the secret key as well as these more safe system promts
+- Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe -> [jump](#generate-system-prompt-datasets)
 - Finetuning and Prefix-Tuning LLMs to harden them against these attacks using the datasets -> [jump](#finetuning-peft-and-prefix-tuning)
 
 >[!WARNING]
-><b>GPU utilization is based on the [accelerate](https://huggingface.co/docs/accelerate/index) library and is therefore not support for Windows machines currently</b>
+><b>GPU utilization is based on the [accelerate](https://huggingface.co/docs/accelerate/index) library and is therefore currently not supported for Windows machines</b>
 
 ## Setup
 Before running the code, install the requirements:

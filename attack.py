@@ -50,6 +50,7 @@ def main(
         attacks: List[str],
         defenses: List[str],
         llm_type: str,
+        llm_eval: bool,
         temperature: float,
         iterations: int,
         create_prompt_dataset: bool,
@@ -63,6 +64,7 @@ def main(
         attack: List[str] - specifies a list of attacks against the LLM
         defenses: List[str] - specifies the defense type
         llm_type: str - specifies the opponent LLM type
+        llm_eval: bool - specifies whether to use the LLM eval to guess the secret or not
         temperature: float - specifies the opponent LLM temperature to control randomness
         iterations: int - number of attack iterations to test system prompts against
         create_prompt_dataset: bool - specifies whether to create a system prompt dataset or not
@@ -152,6 +154,7 @@ def main(
                 defense_func=None,
                 llm_type=llm_type,
                 llm_suffix=name_suffix,
+                llm_eval=llm_eval,
                 temperature=temperature,
                 iterations=iterations,
                 create_prompt_dataset=create_prompt_dataset,
@@ -221,6 +224,8 @@ if __name__ == "__main__":
                         help="specifies the defense type", nargs="+")
     parser.add_argument("--llm_type", "-llm", type=str, default="gpt-3.5-turbo-0301",
                         help="specifies the opponent LLM type")
+    parser.add_argument("--llm_eval", "-le", help="enables LLM eval. to guess the secret",
+                        action="store_true", default=False)
     parser.add_argument("--temperature", "-t", type=float, default=0.0,
                         help="specifies the opponent LLM temperature")
     parser.add_argument("--iterations", "-i", type=int, default=100,

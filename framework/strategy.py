@@ -127,6 +127,7 @@ class AttackStrategy:
                     sys_prompt=system_prompt,
                     response=response,
                     success=curr_success,
+                    secret_key=secret_key,
                 )
 
         return num_successes

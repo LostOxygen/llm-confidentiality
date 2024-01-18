@@ -13,7 +13,8 @@ def log_conversation(
         prompt: str,
         sys_prompt: str,
         response: str,
-        success: bool
+        success: bool,
+        secret_key: str
     ) -> None:
     """
     Logs the conversation between the user and the opponent LLM into 
@@ -28,6 +29,7 @@ def log_conversation(
         sys_prompt: str - the system prompt to initialize the opponent LLM
         response: str - the response of the opponent LLM
         success: bool - whether the response contains the secret key or not
+        secret_key: str - the secret key
 
     Returns:
         None
@@ -45,6 +47,7 @@ def log_conversation(
         f.write(f">>Defense: {defense_name}\n")
         f.write(f">>iteration: {iteration}\n")
         f.write(f">>Success: {success}\n")
+        f.write(f">>Key: {secret_key}\n")
         f.write(f">>System Prompt: \n{sys_prompt}\n")
         f.write(f">>Prompt: \n{prompt}\n")
         f.write(f">>Response: \n{response}\n")

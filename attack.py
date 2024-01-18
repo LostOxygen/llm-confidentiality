@@ -225,7 +225,7 @@ if __name__ == "__main__":
                         help="specifies the defense type", nargs="+")
     parser.add_argument("--llm_type", "-llm", type=str, default="gpt-3.5-turbo-0301",
                         help="specifies the opponent LLM type")
-    parser.add_argument("--llm_eval", "-le", help="enables LLM eval. to guess the secret",
+    parser.add_argument("--llm_guessing", "-lg", help="uses a second LLM to guess the secret",
                         action="store_true", default=False)
     parser.add_argument("--temperature", "-t", type=float, default=0.0,
                         help="specifies the opponent LLM temperature")

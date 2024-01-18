@@ -49,7 +49,7 @@ python attack.py --attacks "payload_splitting" "obfuscation" --defense "xml_tagg
 | ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | specifies the attacks which will be utilized against the LLM |
 | ```-d, --defense``` | <b>str</b> | ```None``` | specifies the defense for the LLM |
 | ```-llm, --llm_type``` | <b>str</b> | ```gpt-3.5-turbo``` | specifies the type of opponent |
-| ```-le, --llm_eval``` | <b>bool</b> | ```False``` | specifies whether LLM eval to guess the secret key off the normal response should be used or not|
+| ```-le, --llm_guessing``` | <b>bool</b> | ```False``` | specifies whether a second LLM is used to guess the secret key off the normal response or not|
 | ```-t, --temperature``` | <b>float</b> | ```0.0``` | specifies the temperature for the LLM to control the randomness |
 | ```-cp, --create_prompt_dataset``` | <b>bool</b> | ```False``` | specifies whether a new dataset of enhanced system prompts should be created |
 | ```-cr, --create_response_dataset``` | <b>bool</b> | ```False``` | specifies whether a new dataset of secret leaking responses should be created |

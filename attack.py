@@ -34,7 +34,8 @@ from framework.defenses import (
         heuristic_defense,
         sandwiching,
         identity_prompt,
-        ppl_detection
+        ppl_detection,
+        llm_eval
     )
 from framework.colors import TColors
 from framework.utils import log_results
@@ -49,7 +50,7 @@ def main(
         attacks: List[str],
         defenses: List[str],
         llm_type: str,
-        llm_eval: bool,
+        llm_guessing: bool,
         temperature: float,
         iterations: int,
         create_prompt_dataset: bool,
@@ -63,7 +64,7 @@ def main(
         attack: List[str] - specifies a list of attacks against the LLM
         defenses: List[str] - specifies the defense type
         llm_type: str - specifies the opponent LLM type
-        llm_eval: bool - specifies whether to use the LLM eval to guess the secret or not
+        llm_guessing: bool - specifies whether to use the LLM eval to guess the secret or not
         temperature: float - specifies the opponent LLM temperature to control randomness
         iterations: int - number of attack iterations to test system prompts against
         create_prompt_dataset: bool - specifies whether to create a system prompt dataset or not
@@ -154,7 +155,7 @@ def main(
                 defense_func=None,
                 llm_type=llm_type,
                 llm_suffix=name_suffix,
-                llm_eval=llm_eval,
+                llm_guessing=llm_guessing,
                 temperature=temperature,
                 iterations=iterations,
                 create_prompt_dataset=create_prompt_dataset,

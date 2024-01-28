@@ -1,6 +1,5 @@
 sentencepiece
 protobuf
-langchain
 openai
 accelerate
 tokenizers==0.13.3

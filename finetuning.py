@@ -544,7 +544,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
     parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
                         help="specifies the opponent LLM type")
-    parser.add_argument("--iterations", "-i", type=int, default=100,
+    parser.add_argument("--iterations", "-i", type=int, default=1000,
                         help="specifies the number of iterations to finetune the LLM")
     parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
                         help="specifies the attack types", nargs="+")

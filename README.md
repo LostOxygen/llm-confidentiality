@@ -1,6 +1,6 @@
 # Whispers in the Machine: Confidentiality in LLM-integrated Systems
 This is the code repository accompaning our paper [Whispers in the Machine: Confidentiality in LLM-integrated Systems](https://arxiv.org/abs/2402.06922).
-> Large Language Models (LLMs) are increasingly integrated with external tools. While these integrations can significantly improve the functionality of LLMs, they also create a new attack surface where confidential data may be disclosed between different components. Specifically, malicious tools can exploit vulnerabilities in the LLM itself to manipulate the model and compromise the data of other services, raising the question of how private data can be protected in the context of LLM integrations.<br><br> In this work, we provide a systematic way of evaluating confidentiality in LLM-integrated systems. For this, we formalize a "secret key" game that can capture the ability of a model to conceal private information. This enables us to compare the vulnerability of a model against confidentiality attacks and also the effectiveness of different defense strategies. In this framework, we evaluate eight previously published attacks and four defenses. We find that current defenses lack generalization across attack strategies. Building on this analysis, we propose a method for robustness fine-tuning, inspired by adversarial training. <br><br>This approach is effective in lowering the success rate of attackers and in improving the system's resilience against unknown attacks. 
+> Large Language Models (LLMs) are increasingly integrated with external tools. While these integrations can significantly improve the functionality of LLMs, they also create a new attack surface where confidential data may be disclosed between different components. Specifically, malicious tools can exploit vulnerabilities in the LLM itself to manipulate the model and compromise the data of other services, raising the question of how private data can be protected in the context of LLM integrations.<br><br> In this work, we provide a systematic way of evaluating confidentiality in LLM-integrated systems. For this, we formalize a "secret key" game that can capture the ability of a model to conceal private information. This enables us to compare the vulnerability of a model against confidentiality attacks and also the effectiveness of different defense strategies. In this framework, we evaluate eight previously published attacks and four defenses. We find that current defenses lack generalization across attack strategies. Building on this analysis, we propose a method for robustness fine-tuning, inspired by adversarial training. <br>This approach is effective in lowering the success rate of attackers and in improving the system's resilience against unknown attacks. 
 
 If you want to cite our work, please use the [this](#citation) BibTeX entry.
 
@@ -192,12 +192,10 @@ Simply run the ```generate_dataset.py``` script to create new system prompts as 
 # Citation
 If you want to cite our work, please use the following BibTeX entry:
 ```bibtex
-@misc{evertz2024whispers,
-      title={Whispers in the Machine: Confidentiality in LLM-integrated Systems}, 
-      author={Jonathan Evertz and Merlin Chlosta and Lea Schönherr and Thorsten Eisenhofer},
-      year={2024},
-      eprint={2402.06922},
-      archivePrefix={arXiv},
-      primaryClass={cs.CR}
+@article{evertz-24-whispers,
+	title    =  {{Whispers in the Machine: Confidentiality in LLM-integrated Systems}}, 
+	author   =  {Jonathan Evertz and Merlin Chlosta and Lea Schönherr and Thorsten Eisenhofer},
+	year     =  {2024},
+	journal  =  {Computing Research Repository (CoRR)}
 }
 ``````

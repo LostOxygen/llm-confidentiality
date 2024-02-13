@@ -38,7 +38,9 @@ class AttackStrategy:
                 temperature=temperature,
                 llm_suffix=llm_suffix
             )
-        self.llm_guessing: bool = llm_guessing # whether to use the llm to guess the secret key or not
+        # whether to use the llm to guess the secret key or not
+        self.llm_guessing: bool = llm_guessing
+
         self.iterations: int = iterations
         self.create_prompt_dataset: bool = create_prompt_dataset
         self.create_response_dataset: bool = create_response_dataset

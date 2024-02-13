@@ -1,5 +1,10 @@
-# Attacks and Defenses against the Confidentiality of Large Language Models
-This kinda framework was developed to study the confidentiality of Large Language Models (LLMs). The framework contains several features:
+# Whispers in the Machine: Confidentiality in LLM-integrated Systems
+This is the code repository accompaning our paper [Whispers in the Machine: Confidentiality in LLM-integrated Systems](https://arxiv.org/abs/2402.06922).
+> Large Language Models (LLMs) are increasingly integrated with external tools. While these integrations can significantly improve the functionality of LLMs, they also create a new attack surface where confidential data may be disclosed between different components. Specifically, malicious tools can exploit vulnerabilities in the LLM itself to manipulate the model and compromise the data of other services, raising the question of how private data can be protected in the context of LLM integrations.<br><br> In this work, we provide a systematic way of evaluating confidentiality in LLM-integrated systems. For this, we formalize a "secret key" game that can capture the ability of a model to conceal private information. This enables us to compare the vulnerability of a model against confidentiality attacks and also the effectiveness of different defense strategies. In this framework, we evaluate eight previously published attacks and four defenses. We find that current defenses lack generalization across attack strategies. Building on this analysis, we propose a method for robustness fine-tuning, inspired by adversarial training. <br><br>This approach is effective in lowering the success rate of attackers and in improving the system's resilience against unknown attacks. 
+
+If you want to cite our work, please use the [this](#) BibTeX entry.
+
+This framework was developed to study the confidentiality of Large Language Models (LLMs). The framework contains several features:
 - A set of attacks against LLMs, where the LLM is not allowed to leak a secret key -> [jump](#attacks-and-defenses)
 - A set of defenses against the aforementioned attacks -> [jump](#attacks-and-defenses)
 - Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe -> [jump](#generate-system-prompt-datasets)
@@ -183,3 +188,16 @@ Simply run the ```generate_dataset.py``` script to create new system prompts as 
 | ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to prefix tune |
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the model name if you want to use a custom model |
 | ```-ds, --dataset_size``` | <b>int</b> | ```1000``` | Size of the resulting system prompt dataset |
+
+# Citation
+If you want to cite our work, please use the following BibTeX entry:
+```bibtex
+@misc{evertz2024whispers,
+      title={Whispers in the Machine: Confidentiality in LLM-integrated Systems}, 
+      author={Jonathan Evertz and Merlin Chlosta and Lea Schönherr and Thorsten Eisenhofer},
+      year={2024},
+      eprint={2402.06922},
+      archivePrefix={arXiv},
+      primaryClass={cs.CR}
+}
+``````

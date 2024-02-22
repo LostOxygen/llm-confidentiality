@@ -49,6 +49,36 @@ class LLM():
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
+            case ("gemma-2b" | "gemma-7b"):
+                # create quantization config
+                config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_use_double_quant=True,
+                    bnb_4bit_compute_dtype=torch.float16
+                )
+                model_name = "google/"
+                if self.llm_type.split("-")[1] == "2b":
+                    model_name += "gemma-2b-it"
+                elif self.llm_type.split("-")[1] == "7b":
+                    model_name += "gemma-7b-it"
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                                model_name,
+                                use_fast=False,
+                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                            )
+                self.tokenizer.pad_token = self.tokenizer.unk_token
+
+                self.model = AutoModelForCausalLM.from_pretrained(
+                            model_name,
+                            device_map="auto",
+                            quantization_config=config,
+                            low_cpu_mem_usage=True,
+                            trust_remote_code=True,
+                            cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                        )
+
             case ("orca" | "orca-7b" | "orca-13b" | "orca-70b"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
@@ -387,13 +417,19 @@ class LLM():
         """
 
         match llm_type:
+            case ("gemma-2b" | "gemma-7b"):
+                formatted_messages = f"""<start_of_turn>user
+                {system_prompt}{user_prompt}<end_of_turn>
+                <start_of_turn>model
+                """
+
             case ("orca2-7b" | "orca2-13b" | "orca2-70b"):
                 formatted_messages = f"""<|im_start|>system
                 {system_prompt}<|im_end|>
                 <|im_start|>user
                 {user_prompt}<|im_end|>
                 <|im_start|>assistant
-            """
+                """
 
             case ("vicuna" | "vicuna-7b" | "vicuna-13b" | "vicuna-33b"):
                 formatted_messages = f"""
@@ -403,18 +439,18 @@ class LLM():
                 """
 
             case (
-                    "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
-                    "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
-                    "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
-                    "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust" |
-                    "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix"
+                "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |
+                "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
+                "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
+                "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust" |
+                "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix"
                 ):
                 formatted_messages = f"""<s>[INST] <<SYS>>
                     {system_prompt}
                     <</SYS>>
                     {user_prompt}
                     [/INST]
-                """
+                    """
 
             case ("beluga" | "beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 formatted_messages = f"""
@@ -448,6 +484,42 @@ class LLM():
         """
 
         match self.llm_type:
+            case ("gemma-2b" | "gemma-7b"):
+                formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
+                with torch.no_grad():
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
+                    stopping_criteria = StoppingCriteriaList([
+                        AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
+                    ])
+                    logits_processor = LogitsProcessorList([
+                        EosTokenRewardLogitsProcessor(
+                            eos_token_id=self.tokenizer.eos_token_id,
+                            max_length=4096
+                        )
+                    ])
+
+                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
+                                                        enable_math=False,
+                                                        enable_mem_efficient=False):
+                        outputs = self.model.generate(
+                                                inputs=inputs.input_ids,
+                                                do_sample=True,
+                                                temperature=self.temperature,
+                                                max_length=4096,
+                                                stopping_criteria=stopping_criteria,
+                                                logits_processor=logits_processor,
+                                        )
+                    response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+                    del inputs
+                    del outputs
+
+                # remove the previous chat history from the response
+                # so only the models' actual response remains
+                history = response[0]+"<end_of_turn>"
+                print("formatted_messages", formatted_messages)
+                print("response", response)
+                response = response[0].replace(formatted_messages.replace("<s>", ""), "", 1)
+
             case ("gpt-3.5" | "gpt-3.5-turbo" | "gpt-4" | "gpt-4-turbo"):
                 messages = [
                     {"role": "system", "content": system_prompt},

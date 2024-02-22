@@ -50,6 +50,7 @@ class LLM():
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
             case ("gemma-2b" | "gemma-7b"):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
                 config = BitsAndBytesConfig(
                     load_in_4bit=True,

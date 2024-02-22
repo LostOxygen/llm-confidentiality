@@ -2,8 +2,8 @@ sentencepiece
 protobuf
 openai
 accelerate
-tokenizers==0.13.3
-transformers
+tokenizers>=0.13.3
+transformers>=4.38.0
 huggingface-hub
 bitsandbytes
 einops

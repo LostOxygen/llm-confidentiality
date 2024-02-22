@@ -489,15 +489,6 @@ class LLM():
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
                 with torch.no_grad():
                     inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    stopping_criteria = StoppingCriteriaList([
-                        AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
-                    ])
-                    logits_processor = LogitsProcessorList([
-                        EosTokenRewardLogitsProcessor(
-                            eos_token_id=self.tokenizer.eos_token_id,
-                            max_length=4096
-                        )
-                    ])
 
                     with torch.backends.cuda.sdp_kernel(enable_flash=True,
                                                         enable_math=False,
@@ -507,8 +498,6 @@ class LLM():
                                                 do_sample=True,
                                                 temperature=self.temperature,
                                                 max_length=4096,
-                                                stopping_criteria=stopping_criteria,
-                                                logits_processor=logits_processor,
                                         )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
@@ -516,10 +505,10 @@ class LLM():
 
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
-                history = response[0]+"<end_of_turn>"
+                history = "<start_of_turn>"+response[0]+"<end_of_turn>"
                 print("formatted_messages", formatted_messages)
                 print("response", response)
-                response = response[0].replace(formatted_messages.replace("<s>", ""), "", 1)
+                response = response[0].replace(formatted_messages.replace("<start_of_turn>", ""), "", 1)
 
             case ("gpt-3.5" | "gpt-3.5-turbo" | "gpt-4" | "gpt-4-turbo"):
                 messages = [

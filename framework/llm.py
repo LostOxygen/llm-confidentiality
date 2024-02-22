@@ -506,11 +506,9 @@ class LLM():
                 # remove the previous chat history from the response
                 # so only the models' actual response remains
                 history = "<start_of_turn>"+response[0]+"<end_of_turn>"
-                print("formatted_messages", formatted_messages)
                 response = response[0].replace(
                     formatted_messages.replace("<start_of_turn>", "").replace("<end_of_turn>", "")
                 , "", 1)
-                print("response", response)
 
             case ("gpt-3.5" | "gpt-3.5-turbo" | "gpt-4" | "gpt-4-turbo"):
                 messages = [

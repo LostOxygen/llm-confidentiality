@@ -140,7 +140,7 @@ def main(
           f"{TColors.HEADER}{llm_type}{TColors.OKCYAN}{name_suffix}{TColors.ENDC}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Iterations{TColors.ENDC}: {iterations}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM Guessing{TColors.ENDC}: {llm_eval}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM Guessing{TColors.ENDC}: {llm_guessing}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Creating System Prompt Dataset{TColors.ENDC}: " \
           f"{create_prompt_dataset}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Creating Responses Dataset{TColors.ENDC}: " \

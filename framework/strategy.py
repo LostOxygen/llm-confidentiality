@@ -1,8 +1,8 @@
 """library for strategy pattern implementations"""
 from typing import Callable, Type
 
-from framework.utils import log_conversation, log_benchmark_conversation
-from framework.colors import TColors, ATTACK_NAMES, BENCHMARK_NAMES
+from framework.utils import log_conversation
+from framework.colors import TColors, ATTACK_NAMES
 from framework.prompts import get_random_secret_key, ATTACK_KEYWORDS
 from framework.api import ChatAPI
 from framework.llm import LLM
@@ -11,7 +11,6 @@ from framework.dataset import (
     ResponseDataset,
     DatasetState
 )
-from framework.benchmarks import get_benchmark_data, format_benchmark_data
 
 class AttackStrategy:
     """Strategy pattern interface for attacking and defending LLMs"""

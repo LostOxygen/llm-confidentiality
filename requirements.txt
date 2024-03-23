@@ -17,3 +17,4 @@ auto_gptq
 sentence-transformers
 matplotlib
 tenacity
+langchain

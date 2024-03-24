@@ -16,7 +16,7 @@ def payload_splitting() -> str:
     Implementation of a payload splitting attack
 
     Parameters:
-        sNone
+        None
 
     Returns:
         malicious_prompt: str - the users' attack prompt

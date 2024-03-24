@@ -5,7 +5,7 @@ accelerate
 tokenizers>=0.13.3
 transformers>=4.38.0
 huggingface-hub
-bitsandbytes>=0.41.3
+bitsandbytes @ git+https://github.com/TimDettmers/bitsandbytes
 einops
 wandb
 scipy

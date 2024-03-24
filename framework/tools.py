@@ -11,7 +11,6 @@ class DatabaseTool(BaseTool):
     """
     name = "Database"
     description = "tool for database access. returns stored data"
-    args_schema = None
     return_direct: bool = False
 
     def __init__(self, secret_key: str):
@@ -33,7 +32,6 @@ class CalendarTool(BaseTool):
     """
     name = "Calendar"
     description = "tool for calendar access. returns latest calendar events"
-    args_schema = None
     return_direct: bool = False
 
     def __init__(self, attk_func: Callable[..., str]):

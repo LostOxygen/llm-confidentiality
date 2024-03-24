@@ -239,7 +239,7 @@ if __name__ == "__main__":
                         help="specifies the attack types", nargs="+")
     parser.add_argument("--defenses", "-d", type=str, default=["none"],
                         help="specifies the defense type", nargs="+")
-    parser.add_argument("--llm_type", "-llm", type=str, default="gpt-3.5-turbo-0301",
+    parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
                         help="specifies the opponent LLM type")
     parser.add_argument("--llm_guessing", "-lg", help="uses a second LLM to guess the secret",
                         action="store_true", default=False)

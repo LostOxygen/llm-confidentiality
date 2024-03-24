@@ -18,7 +18,8 @@ from framework.tools import (
 )
 
 from transformers import GenerationConfig, pipeline
-from langchain import HuggingFacePipeline, PromptTemplate
+from langchain_core.prompts import PromptTemplate
+from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
 from langchain.chains import LLMChain
 from langchain.agents import AgentExecutor, LLMSingleActionAgent
 

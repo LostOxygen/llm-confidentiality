@@ -56,7 +56,7 @@ def main(
         create_prompt_dataset: bool,
         create_response_dataset: bool,
         name_suffix: str,
-        strategy_name: str
+        strategy: str
     ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
@@ -71,7 +71,7 @@ def main(
         create_prompt_dataset: bool - specifies whether to create a system prompt dataset or not
         create_response_dataset: bool - specifies whether to create a responses dataset or not
         name_suffix: str - adds a name suffix for loading custom models
-        strategy_name: str - specifies the attack strategy to use (secretkey or langchain)
+        strategy: str - specifies the attack strategy to use (secretkey or langchain)
 
     Returns:
         None
@@ -143,7 +143,7 @@ def main(
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Iterations{TColors.ENDC}: {iterations}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM Guessing{TColors.ENDC}: {llm_guessing}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Strategy{TColors.ENDC}: {strategy_name}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Strategy{TColors.ENDC}: {strategy}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Creating System Prompt Dataset{TColors.ENDC}: " \
           f"{create_prompt_dataset}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Creating Responses Dataset{TColors.ENDC}: " \
@@ -153,8 +153,8 @@ def main(
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
     # initialize the strategy
-    if strategy_name in ["langchain"]:
-        strategy = LangchainAttackStrategy(
+    if strategy in ["langchain", "LangChain", "lang_chain", "lang-chain"]:
+        attack_strategy = LangchainAttackStrategy(
                     attack_func=None,
                     defense_func=None,
                     llm_type=llm_type,
@@ -166,7 +166,7 @@ def main(
                     create_response_dataset=create_response_dataset
                 )
     else:
-        strategy = SecretKeyAttackStrategy(
+        attack_strategy = SecretKeyAttackStrategy(
                     attack_func=None,
                     defense_func=None,
                     llm_type=llm_type,
@@ -208,10 +208,10 @@ def main(
                     sys.exit(1)
 
             # set the attack and defense functions
-            strategy.set_attack_func(attack_func)
-            strategy.set_defense_func(defense_func)
+            attack_strategy.set_attack_func(attack_func)
+            attack_strategy.set_defense_func(defense_func)
             # run the attack
-            total_successes[attack] = strategy.execute()
+            total_successes[attack] = attack_strategy.execute()
             torch.cuda.empty_cache()
 
         # print and log the results
@@ -253,7 +253,7 @@ if __name__ == "__main__":
                         action="store_true", default=False)
     parser.add_argument("--name_suffix", "-n", help="adds a name suffix for loading custom models",
                         default="", type=str)
-    parser.add_argument("--strategy_name", "-sn", help="which strategy to use (secretkey or langchain)",
+    parser.add_argument("--strategy", "-s", help="which strategy to use (secretkey or langchain)",
                         default="secretkey", type=str)
     args = parser.parse_args()
     main(**vars(args))

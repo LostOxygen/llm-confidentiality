@@ -9,6 +9,8 @@ from transformers import (
     BitsAndBytesConfig,
     StoppingCriteriaList,
     LogitsProcessorList,
+    GenerationConfig,
+    pipeline
 )
 from tenacity import (
     retry,
@@ -49,6 +51,68 @@ class LLM():
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
+            case (
+                    "llama2-7b-pipe" | "llama2-13b-pipe" | "llama2-70b-pipe"
+                ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                # create quantization config
+                config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_use_double_quant=True,
+                    bnb_4bit_compute_dtype=torch.float16
+                )
+
+                # complete the model name for chat or normal models
+                model_name = "meta-llama/"
+                if "-" not in self.llm_type:
+                    raise NotImplementedError(
+                        f"LLM specifier {self.llm_type} not complete." +\
+                        f"Did you mean {self.llm_type}-7b?"
+                    )
+                if self.llm_type.split("-")[1] == "7b":
+                    model_name += "Llama-2-7b-chat-hf"
+                elif self.llm_type.split("-")[1] == "13b":
+                    model_name += "Llama-2-13b-chat-hf"
+                elif self.llm_type.split("-")[1] == "70b":
+                    model_name += "Llama-2-70b-chat-hf"
+                else:
+                    model_name += "Llama-2-7b-chat-hf"
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                                model_name,
+                                use_fast=False,
+                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                            )
+                self.tokenizer.pad_token = self.tokenizer.unk_token
+
+                gen_config = GenerationConfig.from_pretrained(
+                        model_name,
+                        token=os.environ["HF_TOKEN"],
+                        cache_dir="/data/"
+                    )
+                gen_config.max_new_tokens = 2048
+                gen_config.temperature = self.temperature
+                gen_config.do_sample = True
+
+                self.model = pipeline(
+                    "text-generation",
+                    model=model_name,
+                    tokenizer=self.tokenizer,
+                    generation_config=gen_config,
+                    device_map="auto",
+                    num_return_sequences=1,
+                    torch_dtype=torch.float16,
+                    do_sample=True,
+                    trust_remote_code=True,
+                    eos_token_id=self.tokenizer.eos_token_id,
+                    # cache_dir="/data/",
+                    token=os.environ["HF_TOKEN"],
+                    # quantization_config=config,
+                    # low_cpu_mem_usage=True,
+                )
+
+
             case ("gemma-2b" | "gemma-7b"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config

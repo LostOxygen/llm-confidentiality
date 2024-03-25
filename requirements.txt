@@ -18,3 +18,4 @@ sentence-transformers
 matplotlib
 tenacity
 langchain
+langchain-community

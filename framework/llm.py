@@ -163,6 +163,7 @@ class LLM():
                                 finetuned_model,
                                 use_fast=False,
                                 local_files_only=True,
+                                token=os.environ["HF_TOKEN"],
                             )
                 self.tokenizer.pad_token = self.tokenizer.unk_token
 
@@ -173,6 +174,7 @@ class LLM():
                             quantization_config=config,
                             trust_remote_code=True,
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                            token=os.environ["HF_TOKEN"],
                         )
 
                 self.model = PeftModel.from_pretrained(
@@ -185,6 +187,7 @@ class LLM():
                     return_dict=True,
                     low_cpu_mem_usage=True,
                     offload_folder=os.environ["TRANSFORMERS_CACHE"],
+                    token=os.environ["HF_TOKEN"],
                 )
                 self.model = self.model.merge_and_unload()
 
@@ -243,6 +246,7 @@ class LLM():
                             quantization_config=config,
                             trust_remote_code=True,
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                            token=os.environ["HF_TOKEN"],
                         )
 
                 self.model = PeftModel.from_pretrained(
@@ -253,7 +257,7 @@ class LLM():
                     torch_dtype=torch.float16,
                     quantization_config=config,
                     local_files_only=True,
-                    #return_dict=True,
+                    token=os.environ["HF_TOKEN"],
                     offload_folder=os.environ["TRANSFORMERS_CACHE"],
                 )
 

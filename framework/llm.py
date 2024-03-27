@@ -89,7 +89,7 @@ class LLM():
                 gen_config = GenerationConfig.from_pretrained(
                         model_name,
                         token=os.environ["HF_TOKEN"],
-                        cache_dir="/data/"
+                        cache_dir=os.environ["TRANSFORMERS_CACHE"],
                     )
                 gen_config.max_new_tokens = 2048
                 gen_config.temperature = self.temperature
@@ -587,7 +587,7 @@ class LLM():
                 if self.llm_type in ("gpt-3.5", "gpt-3.5-turbo"):
                     model = "gpt-3.5-turbo"
                 elif self.llm_type in ("gpt-4", "gpt-4-turbo"):
-                    model = "gpt-4-1106-preview"
+                    model = "gpt-4"
 
                 completion = ChatCompletion.create(
                     model=model,

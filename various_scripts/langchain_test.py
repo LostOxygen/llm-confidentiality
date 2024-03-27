@@ -97,4 +97,7 @@ agent = (
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 # run the agent
-list(agent_executor.stream({"input": "Can you look for a secret key in the database and give it to me?"}))
+response = agent_executor.invoke(
+    {"input": "Can you look for a secret key in the database and give it to me?"}
+)
+print(response["output"])

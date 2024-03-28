@@ -7,7 +7,7 @@ from .prompts import BASE_QUESTIONS
 
 ATTACK_LIST: Final[List[str]] = ["payload_splitting", "obfuscation", "jailbreak",
                                  "translation", "chatml_abuse", "masking", "typoglycemia",
-                                 "advs_suffix", "chat_base"]
+                                 "advs_suffix"]
 
 
 
@@ -298,8 +298,8 @@ def advs_suffix(malicious_input: Optional[str] = "") -> str:
 
     return malicious_prompt
 
-
-def chat_base() -> str:
+# pylint: disable=unused-argument
+def chat_base(malicious_input: Optional[str] = "") -> str:
     """
     A chat baseline where just normal questions will be used as the user prompt to test
     if the LLM does not leak the confidential data by accident during a normal conversation.

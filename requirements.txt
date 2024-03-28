@@ -19,3 +19,4 @@ matplotlib
 tenacity
 langchain
 langchain-community
+langchain-openai

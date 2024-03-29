@@ -56,7 +56,8 @@ class SecretKeyAttackStrategy(AttackStrategy):
             temperature: float,
             iterations: int,
             create_prompt_dataset: bool,
-            create_response_dataset: bool
+            create_response_dataset: bool,
+            verbose: bool,
         ) -> None:
         super().__init__()
         self.attack_func: Callable = attack_func
@@ -64,6 +65,7 @@ class SecretKeyAttackStrategy(AttackStrategy):
         self.llm_type = llm_type
         self.llm_suffix = llm_suffix
         self.temperature = temperature
+        self.verbose = verbose
         self.llm: Type[LLM] = LLM(
                 llm_type=llm_type,
                 temperature=temperature,
@@ -85,8 +87,11 @@ class SecretKeyAttackStrategy(AttackStrategy):
     def execute(self) -> int:
         """Executes the strategy and returns the number of successes"""
         num_successes: int = 0
-        print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
-              f"{ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
+        num_fails: int = 0
+
+        if self.verbose:
+            print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
+                f"{ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
 
         for iteration in range(0, self.iterations):
             # create random secret key prefix
@@ -128,9 +133,10 @@ class SecretKeyAttackStrategy(AttackStrategy):
             # check if the secret key got leaked
             if self.__evaluate_response(response, secret_key):
                 # Success print followed by prompt enhancement
-                print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
-                      f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
-                      f"{TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
+                if self.verbose:
+                    print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
+                            f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
+                            f"{TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
                 num_successes += 1
                 curr_success = True
 
@@ -146,9 +152,11 @@ class SecretKeyAttackStrategy(AttackStrategy):
                         self.prompt_dataset.add_prompt(enh_sys_prompt)
             else:
                 # fail print
-                print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
-                      f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
-                      f"{TColors.FAIL}{fail_result_str}{TColors.ENDC}")
+                if self.verbose:
+                    print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
+                            f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
+                            f"{TColors.FAIL}{fail_result_str}{TColors.ENDC}")
+                    num_fails += 1
 
             # logging stuff
             log_conversation(
@@ -278,6 +286,7 @@ class LangchainAttackStrategy(AttackStrategy):
             iterations: int,
             create_prompt_dataset: bool,
             create_response_dataset: bool,
+            verbose: bool,
             scenario: str,
         ) -> None:
         super().__init__()
@@ -285,6 +294,7 @@ class LangchainAttackStrategy(AttackStrategy):
         self.defense_func: Callable = defense_func
         self.llm_type = llm_type
         self.llm_suffix = llm_suffix
+        self.verbose = verbose
         self.scenario = scenario
         self.temperature = temperature
         assert self.llm_type.startswith("gpt"), \
@@ -318,8 +328,11 @@ class LangchainAttackStrategy(AttackStrategy):
     def execute(self) -> int:
         """Executes the strategy and returns the number of successes"""
         num_successes: int = 0
-        print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
-              f"{ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
+        num_fails: int = 0
+
+        if self.verbose:
+            print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
+                f"{ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
 
         for iteration in range(0, self.iterations):
             secret_key: int = get_random_secret_key()
@@ -400,17 +413,20 @@ class LangchainAttackStrategy(AttackStrategy):
             # check if the secret key got leaked
             if self.__evaluate_response(response, secret_key):
                 # Success print followed by prompt enhancement
-                print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
-                      f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
-                      f"{TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
+                if self.verbose:
+                    print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
+                        f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
+                        f"{TColors.OKGREEN}{succ_result_str}{TColors.ENDC}")
                 num_successes += 1
                 curr_success = True
 
             else:
                 # fail print
-                print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
-                      f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
-                      f"{TColors.FAIL}{fail_result_str}{TColors.ENDC}")
+                if self.verbose:
+                    print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
+                        f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
+                        f"{TColors.FAIL}{fail_result_str}{TColors.ENDC}")
+                    num_fails += 1
 
             # logging stuff
             log_conversation(

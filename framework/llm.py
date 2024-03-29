@@ -2,7 +2,7 @@
 import os
 from typing import Tuple, Final, Type
 import torch
-from openai import ChatCompletion
+from openai import OpenAI
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
@@ -589,7 +589,11 @@ class LLM():
                 elif self.llm_type in ("gpt-4", "gpt-4-turbo"):
                     model = "gpt-4"
 
-                completion = ChatCompletion.create(
+                client = OpenAI(
+                    api_key=os.environ.get("OPENAI_API_KEY"),
+                )
+
+                completion = client.chat.completions.create(
                     model=model,
                     messages=messages,
                     temperature=self.temperature,

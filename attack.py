@@ -58,6 +58,7 @@ def main(
         name_suffix: str,
         strategy: str,
         scenario: str,
+        verbose: bool,
     ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
@@ -74,6 +75,7 @@ def main(
         name_suffix: str - adds a name suffix for loading custom models
         strategy: str - specifies the attack strategy to use (secretkey or langchain)
         scenario: str - specifies the scenario to use for langchain attacks
+        verbose: bool - enables a more verbose logging output
 
     Returns:
         None
@@ -145,9 +147,13 @@ def main(
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Iterations{TColors.ENDC}: {iterations}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM Guessing{TColors.ENDC}: {llm_guessing}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Strategy{TColors.ENDC}: {strategy}")
     if strategy in ["langchain", "LangChain", "lang_chain", "lang-chain"]:
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}Strategy{TColors.ENDC}: {strategy}")
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Scenario{TColors.ENDC}: {scenario}")
+    else:
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}Strategy{TColors.ENDC}: secrey-key game")
+    if verbose:
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}Verbose Logging{TColors.ENDC}: {verbose}")
     if create_prompt_dataset:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Creating System Prompt Dataset{TColors.ENDC}: " \
             f"{create_prompt_dataset}")
@@ -170,7 +176,8 @@ def main(
                     iterations=iterations,
                     create_prompt_dataset=create_prompt_dataset,
                     create_response_dataset=create_response_dataset,
-                    scenario=scenario
+                    scenario=scenario,
+                    verbose=verbose,
                 )
     else:
         attack_strategy = SecretKeyAttackStrategy(
@@ -182,7 +189,8 @@ def main(
                     temperature=temperature,
                     iterations=iterations,
                     create_prompt_dataset=create_prompt_dataset,
-                    create_response_dataset=create_response_dataset
+                    create_response_dataset=create_response_dataset,
+                    verbose=verbose,
                 )
 
     for defense in defenses:
@@ -264,5 +272,7 @@ if __name__ == "__main__":
                         default="", type=str)
     parser.add_argument("--scenario", "-sc", help="which scenario to use for langchain attacks",
                         default="database", type=str)
+    parser.add_argument("--verbose", "-v", help="enables a more verbose logging output",
+                        action="store_true", default=False)
     args = parser.parse_args()
     main(**vars(args))

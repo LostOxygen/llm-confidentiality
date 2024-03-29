@@ -20,3 +20,4 @@ tenacity
 langchain
 langchain-community
 langchain-openai
+progressbar2

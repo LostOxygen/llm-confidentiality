@@ -447,7 +447,7 @@ class LangchainAttackStrategy(AttackStrategy):
                         print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
                             f"[{TColors.OKCYAN}{iteration}{TColors.ENDC}]: " \
                             f"{TColors.FAIL}{fail_result_str}{TColors.ENDC}")
-                        num_fails += 1
+                    num_fails += 1
 
                 # logging stuff
                 log_conversation(
@@ -464,7 +464,7 @@ class LangchainAttackStrategy(AttackStrategy):
                 pbar.update(iteration)
         if not self.verbose:
             # print total successes and fails
-            print(f"Successes: {TColors.OKGREEN}{num_successes} " \
+            print(f"Successes: {TColors.OKGREEN}{num_successes}{TColors.ENDC} " \
                     f"Fails: {TColors.FAIL}{num_fails}{TColors.ENDC}")
         return num_successes
 

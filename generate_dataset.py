@@ -3,6 +3,7 @@
 # !/usr/bin/env python3
 
 import os
+from pathlib import Path
 import sys
 import time
 from random import randint
@@ -23,9 +24,9 @@ from framework.colors import TColors
 from framework.prompts import get_random_secret_key, SYSTEM_PROMPTS
 
 
-if not os.path.isdir("/data/"):
-    os.mkdir("/data/")
-os.environ["TRANSFORMERS_CACHE"] = "/data/"
+if not os.path.isdir(Path.home() / "data"):
+    os.mkdir(Path.home() / "data")
+os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
 
 
 def main(

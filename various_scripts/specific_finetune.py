@@ -3,6 +3,7 @@
 # !/usr/bin/env python3
 
 import os
+from pathlib import Path
 import datetime
 import socket
 
@@ -20,7 +21,7 @@ from datasets import load_dataset
 
 from colors import TColors
 
-os.environ["TRANSFORMERS_CACHE"] = "/data/"
+os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
 LLM_TYPE = "meta-llama/Llama-2-7b-hf"
 OUTPUT_NAME= "llama2-7b-robust-specific"
 

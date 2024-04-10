@@ -3,6 +3,7 @@
 # !/usr/bin/env python3
 
 import os
+from pathlib import Path
 import datetime
 import socket
 import argparse
@@ -18,7 +19,7 @@ from peft import PeftModel
 
 from colors import TColors
 
-os.environ["TRANSFORMERS_CACHE"] = "/data/"
+os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
 OUTPUT_DIR: Final[str] = "./merged_models/"
 
 def main(base_llm: str, finetuned_model: str, quantization: bool) -> None:

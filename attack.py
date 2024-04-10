@@ -3,6 +3,7 @@
 # !/usr/bin/env python3
 
 import os
+from pathlib import Path
 import sys
 import time
 import datetime
@@ -41,9 +42,9 @@ from framework.colors import TColors
 from framework.utils import log_results
 
 
-if not os.path.isdir("/data/"):
-    os.mkdir("/data/")
-os.environ["TRANSFORMERS_CACHE"] = "/data/"
+if not os.path.isdir(Path.home() / "data"):
+    os.mkdir(Path.home() / "data")
+os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
 
 
 def main(

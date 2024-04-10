@@ -3,6 +3,7 @@
 # !/usr/bin/env python3
 
 import os
+from pathlib import Path
 import sys
 import random
 import time
@@ -47,7 +48,7 @@ from framework.dataset import (
 )
 from framework.prompts import get_random_secret_key
 
-os.environ["TRANSFORMERS_CACHE"] = "/data/"
+os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
 os.environ["WANDB_WATCH"] = "false"
 os.environ["WANDB_PROJECT"]="llm-finetuning"
 

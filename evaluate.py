@@ -3,6 +3,7 @@
 # !/usr/bin/env python3
 
 import os
+from pathlib import Path
 import sys
 import time
 import datetime
@@ -15,15 +16,13 @@ import torch
 from huggingface_hub import login
 
 from framework.strategy import BenchmarkStrategy
-from framework.benchmarks import BENCHMARK_LIST
 from framework.colors import TColors
 from framework.utils import log_benchmark
 
 
-if not os.path.isdir("/data/"):
-    os.mkdir("/data/")
-os.environ["TRANSFORMERS_CACHE"] = "/data/"
-
+if not os.path.isdir(Path.home() / "data"):
+    os.mkdir(Path.home() / "data")
+os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
 
 def main(
         benchmarks: List[str],
@@ -85,9 +84,6 @@ def main(
         device = "cpu"
     else:
         device = "cuda:0"
-
-    if "all" in benchmarks:
-        benchmarks = BENCHMARK_LIST
 
     # add '-' in front of the name suffix
     if name_suffix != "" and not name_suffix.startswith("-"):

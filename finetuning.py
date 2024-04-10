@@ -48,7 +48,7 @@ from framework.dataset import (
 )
 from framework.prompts import get_random_secret_key
 
-os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
+os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 os.environ["WANDB_WATCH"] = "false"
 os.environ["WANDB_PROJECT"]="llm-finetuning"
 

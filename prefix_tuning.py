@@ -57,9 +57,9 @@ DATA_PATH: Final[str] = "./datasets/system_prompts_train.json"
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 if not os.path.isdir(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-if not os.path.isdir(Path.home() / "data"):
-    os.mkdir(Path.home() / "data")
-os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
+if not os.path.isdir(str(Path.home() / "data")):
+    os.mkdir(str(Path.home() / "data"))
+os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 
 # hacky global variables for the tokenizer
 glob_tokenizer: AutoTokenizer = None

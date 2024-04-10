@@ -106,7 +106,7 @@ class LLM():
                     do_sample=True,
                     trust_remote_code=True,
                     eos_token_id=self.tokenizer.eos_token_id,
-                    # cache_dir=Path.home() / "data",
+                    # cache_dir=str(Path.home() / "data"),
                     token=os.environ["HF_TOKEN"],
                     # quantization_config=config,
                     # low_cpu_mem_usage=True,

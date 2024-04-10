@@ -18,7 +18,7 @@ from transformers import (
 
 from colors import TColors
 
-os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
+os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 OUTPUT_DIR: Final[str] = "./merged_models/"
 LLM_TYPE = "meta-llama/Llama-2-7b-hf"
 

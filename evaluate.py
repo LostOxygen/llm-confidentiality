@@ -20,9 +20,9 @@ from framework.colors import TColors
 from framework.utils import log_benchmark
 
 
-if not os.path.isdir(Path.home() / "data"):
-    os.mkdir(Path.home() / "data")
-os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
+if not os.path.isdir(str(Path.home() / "data")):
+    os.mkdir(str(Path.home() / "data"))
+os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 
 def main(
         benchmarks: List[str],

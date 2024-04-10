@@ -21,7 +21,7 @@ from datasets import load_dataset
 
 from colors import TColors
 
-os.environ["TRANSFORMERS_CACHE"] = Path.home() / "data"
+os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 LLM_TYPE = "meta-llama/Llama-2-7b-hf"
 OUTPUT_NAME= "llama2-7b-robust-specific"
 

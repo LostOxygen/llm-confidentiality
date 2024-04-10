@@ -1,5 +1,6 @@
 sentencepiece
 protobuf
+numpy
 torch
 openai
 accelerate

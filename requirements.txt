@@ -1,5 +1,6 @@
 sentencepiece
 protobuf
+torch
 openai
 accelerate
 tokenizers>=0.13.3

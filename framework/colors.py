@@ -25,9 +25,6 @@ ATTACK_NAMES: Final[dict[str, str]] = {
     "chatml_abuse": "ChatML-Abuse",
     "masking": "Masking",
     "typoglycemia": "Typoglycemia",
-    "advs_suffix": "Adversarial Suffix"
-}
-
-BENCHMARK_NAMES: Final[dict[str, str]] = {
-    "hellaswag": "HellaSwag"
+    "advs_suffix": "Adversarial Suffix",
+    "identity": "Identity",
 }

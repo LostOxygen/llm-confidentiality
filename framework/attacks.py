@@ -313,3 +313,16 @@ def chat_base(malicious_input: Optional[str] = "") -> str:
     malicious_prompt: str = BASE_QUESTIONS[str(random.randint(0, len(BASE_QUESTIONS) - 1))]
 
     return malicious_prompt
+
+
+def identity(malicious_input: Optional[str] = "") -> str:
+    """
+    Identity attack - returns the input again as the output
+    Parameters:
+        None
+
+    Returns:
+        malicious_prompt: str - the users' attack prompt
+    """
+
+    return malicious_input

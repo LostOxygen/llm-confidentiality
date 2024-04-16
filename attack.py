@@ -3,6 +3,7 @@
 # !/usr/bin/env python3
 
 import os
+import getpass
 from pathlib import Path
 import sys
 import time
@@ -26,7 +27,8 @@ from framework.attacks import (
         masking,
         typoglycemia,
         advs_suffix,
-        chat_base
+        chat_base,
+        identity
     )
 from framework.defenses import (
         DEFENSES_LIST,
@@ -136,7 +138,7 @@ def main(
           str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: " \
           f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
-          f"{torch.cuda.device_count()} GPUs on {socket.gethostname()}")
+          f"{torch.cuda.device_count()} GPUs on user: {getpass.getuser()}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Device{TColors.ENDC}: {device}")
     if torch.cuda.is_available():
         print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
@@ -209,6 +211,7 @@ def main(
         for attack in attacks:
             # set the attack function
             match attack:
+                case "identity": attack_func = identity
                 case "chat_base": attack_func = chat_base
                 case "payload_splitting": attack_func = payload_splitting
                 case "obfuscation": attack_func = obfuscation

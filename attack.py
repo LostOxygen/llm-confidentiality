@@ -8,7 +8,6 @@ from pathlib import Path
 import sys
 import time
 import datetime
-import socket
 import argparse
 from typing import List
 

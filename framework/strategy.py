@@ -415,20 +415,20 @@ class LangchainAttackStrategy(AttackStrategy):
 
                 match iteration:
                     case _ as lid if lid in range(0, 10):
-                        succ_result_str = f"{"SUCCESS":>10}"
-                        fail_result_str = f"{"FAIL":>10}"
+                        succ_result_str = f"{'SUCCESS':>10}"
+                        fail_result_str = f"{'FAIL':>10}"
                     case _ as lid if lid in range(10, 100):
-                        succ_result_str = f"{"SUCCESS":>9}"
-                        fail_result_str = f"{"FAIL":>9}"
+                        succ_result_str = f"{'SUCCESS':>9}"
+                        fail_result_str = f"{'FAIL':>9}"
                     case _ as lid if lid in range(100, 1000):
-                        succ_result_str = f"{"SUCCESS":>8}"
-                        fail_result_str = f"{"FAIL":>8}"
+                        succ_result_str = f"{'SUCCESS':>8}"
+                        fail_result_str = f"{'FAIL':>8}"
                     case _ as lid if lid in range(1000, 10000):
-                        succ_result_str = f"{"SUCCESS":>7}"
-                        fail_result_str = f"{"FAIL":>7}"
+                        succ_result_str = f"{'SUCCESS':>7}"
+                        fail_result_str = f"{'FAIL':>7}"
                     case _:
-                        succ_result_str = f"{"SUCCESS":>10}"
-                        fail_result_str = f"{"FAIL":>10}"
+                        succ_result_str = f"{'SUCCESS':>10}"
+                        fail_result_str = f"{'FAIL':>10}"
 
                 curr_success = False
                 # check if the secret key got leaked

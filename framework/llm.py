@@ -379,6 +379,51 @@ class LLM():
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
 
+            case (
+                    "llama3-7b" | "llama3-70b" | "llama3-400b"
+                ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                # create quantization config
+                config = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_quant_type="nf4",
+                    bnb_4bit_use_double_quant=True,
+                    bnb_4bit_compute_dtype=torch.float16
+                )
+
+                # complete the model name for chat or normal models
+                model_name = "meta-llama/"
+                if "-" not in self.llm_type:
+                    raise NotImplementedError(
+                        f"LLM specifier {self.llm_type} not complete." +\
+                        f"Did you mean {self.llm_type}-7b?"
+                    )
+                if self.llm_type.split("-")[1] == "7b":
+                    model_name += "Meta-Llama-3-7B-Instruct"
+                elif self.llm_type.split("-")[1] == "70b":
+                    model_name += "Meta-Llama-3-70B-Instruct"
+                elif self.llm_type.split("-")[1] == "400b":
+                    # model_name += "Meta-Llama-3-70B-Instruct"
+                    raise NotImplementedError(f"{self.llm_type} not yet available")
+                else:
+                    model_name += "Meta-Llama-3-7B-Instruct"
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                                model_name,
+                                use_fast=False,
+                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                            )
+                self.tokenizer.pad_token = self.tokenizer.unk_token
+
+                self.model = AutoModelForCausalLM.from_pretrained(
+                            model_name,
+                            device_map="auto",
+                            quantization_config=config,
+                            low_cpu_mem_usage=True,
+                            trust_remote_code=True,
+                            cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                        )
+
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 self.temperature = max(0.01, min(self.temperature, 2.0))
                 model_name = "stabilityai/"
@@ -505,6 +550,14 @@ class LLM():
                 {system_prompt}
 
                 USER: {user_prompt}
+                """
+
+            case ("llama3" | "llama3-7b" | "llama3-70b" | "llama3-400b"):
+                #https://llama.meta.com/docs/model-cards-and-prompt-formats/meta-llama-3/
+                formatted_messages = f"""
+                <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+                {{ {system_prompt} }}<|eot_id|><|start_header_id|>user<|end_header_id|>
+                {{ {user_prompt} }}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
                 """
 
             case (
@@ -649,6 +702,42 @@ class LLM():
                 # so only the models' actual response remains
                 history = "<s>"+response[0]+" </s>"
                 response = response[0].replace(formatted_messages.replace("<s>", ""), "", 1)
+
+            case (
+                    "llama3" | "llama3-7b" | "llama3-70b" | "llama3-400b"
+                ):
+                formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
+
+                with torch.no_grad():
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
+                    stopping_criteria = StoppingCriteriaList([
+                        AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
+                    ])
+                    logits_processor = LogitsProcessorList([
+                        EosTokenRewardLogitsProcessor(
+                            eos_token_id=self.tokenizer.eos_token_id,
+                            max_length=4096
+                        )
+                    ])
+
+                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
+                                                        enable_math=False,
+                                                        enable_mem_efficient=False):
+                        outputs = self.model.generate(
+                                                inputs=inputs.input_ids,
+                                                do_sample=True,
+                                                temperature=self.temperature,
+                                                max_length=4096,
+                                                stopping_criteria=stopping_criteria,
+                                                logits_processor=logits_processor,
+                                        )
+                    response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+                    del inputs
+                    del outputs
+
+                # remove the previous chat history from the response
+                # so only the models' actual response remains
+                response = response[0].replace(formatted_messages, "", 1)
 
             case (
                     "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 

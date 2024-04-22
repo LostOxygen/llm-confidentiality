@@ -81,10 +81,11 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 |-------|------|-----|-----|
 | GPT-3.5-Turbo | ```gpt-3.5``` / ```gpt-3.5-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-3-5)| OpenAI API |
 | GPT-4-Turbo | ```gpt-4``` / ```gpt-4-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
-| LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
-| LLaMA2 (base) | ```llama2-7b-base``` / ```llama2-13b-base``` / ```llama2-70b-base``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
-| LLaMA2 (chat) Finetuned | ```llama2-7b-finetuned``` / ```llama2-13b-finetuned``` / ```llama2-70b-finetuned``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
-| LLaMA2 (chat) hardened | ```llama2-7b-robust``` / ```llama2-13b-robust``` / ```llama2-70b-robust```|  [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA 2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA 2 (base) | ```llama2-7b-base``` / ```llama2-13b-base``` / ```llama2-70b-base``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA 2 (chat) Finetuned | ```llama2-7b-finetuned``` / ```llama2-13b-finetuned``` / ```llama2-70b-finetuned``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA 2 (chat) hardened | ```llama2-7b-robust``` / ```llama2-13b-robust``` / ```llama2-70b-robust```|  [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA 3 (chat) | ```llama3-8b``` / ```llama3-70b``` / ```llama3-400b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 | Vicuna | ```vicuna-7b``` / ```vicuna-13b``` / ```vicuna-33b``` | [Link](https://huggingface.co/lmsys/vicuna-33b-v1.3) | Local Inference |
 | StableBeluga (2) | ```beluga-7b``` / ```beluga-13b``` / ```beluga2-70b```| [Link](https://huggingface.co/stabilityai/StableBeluga2) | Local Inference |
 | Orca 2 | ```orca2-7b``` / ```orca2-13b``` / ```orca2-70b``` | [Link](https://huggingface.co/microsoft/Orca-2-7b) | Local Inference |

@@ -380,7 +380,7 @@ class LLM():
                         )
 
             case (
-                    "llama3-7b" | "llama3-70b" | "llama3-400b"
+                    "llama3-8b" | "llama3-70b" | "llama3-400b"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
@@ -398,8 +398,8 @@ class LLM():
                         f"LLM specifier {self.llm_type} not complete." +\
                         f"Did you mean {self.llm_type}-7b?"
                     )
-                if self.llm_type.split("-")[1] == "7b":
-                    model_name += "Meta-Llama-3-7B-Instruct"
+                if self.llm_type.split("-")[1] == "8b":
+                    model_name += "Meta-Llama-3-8B-Instruct"
                 elif self.llm_type.split("-")[1] == "70b":
                     model_name += "Meta-Llama-3-70B-Instruct"
                 elif self.llm_type.split("-")[1] == "400b":
@@ -552,7 +552,7 @@ class LLM():
                 USER: {user_prompt}
                 """
 
-            case ("llama3" | "llama3-7b" | "llama3-70b" | "llama3-400b"):
+            case ("llama3" | "llama3-8b" | "llama3-70b" | "llama3-400b"):
                 #https://llama.meta.com/docs/model-cards-and-prompt-formats/meta-llama-3/
                 formatted_messages = f"""
                 <|begin_of_text|><|start_header_id|>system<|end_header_id|>
@@ -704,7 +704,7 @@ class LLM():
                 response = response[0].replace(formatted_messages.replace("<s>", ""), "", 1)
 
             case (
-                    "llama3" | "llama3-7b" | "llama3-70b" | "llama3-400b"
+                    "llama3" | "llama3-8b" | "llama3-70b" | "llama3-400b"
                 ):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 

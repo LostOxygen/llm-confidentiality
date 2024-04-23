@@ -396,7 +396,7 @@ class LLM():
                 if "-" not in self.llm_type:
                     raise NotImplementedError(
                         f"LLM specifier {self.llm_type} not complete." +\
-                        f"Did you mean {self.llm_type}-7b?"
+                        f"Did you mean {self.llm_type}-8b?"
                     )
                 if self.llm_type.split("-")[1] == "8b":
                     model_name += "Meta-Llama-3-8B-Instruct"
@@ -406,7 +406,7 @@ class LLM():
                     # model_name += "Meta-Llama-3-70B-Instruct"
                     raise NotImplementedError(f"{self.llm_type} not yet available")
                 else:
-                    model_name += "Meta-Llama-3-7B-Instruct"
+                    model_name += "Meta-Llama-3-8B-Instruct"
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,

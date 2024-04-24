@@ -1,0 +1,66 @@
+cff-version: 1.2.0
+title: >-
+  Whispers in the Machine: Confidentiality in LLM-integrated
+  Systems
+message: >-
+  If you want to cite our work or use this framework, please
+  cite using the provided data.
+type: software
+authors:
+  - given-names: Jonathan
+    family-names: Evertz
+    email: jonathan.evertz@cispa.de
+    affiliation: CISPA Helmholtz Center for Information Security
+  - given-names: Merlin
+    family-names: Chlosta
+    email: merlin.chlosta@cispa.de
+    affiliation: CISPA Helmholtz Center for Information Security
+  - given-names: Lea
+    family-names: Schönherr
+    email: schoenherr@cispa.de
+    affiliation: CISPA Helmholtz Center for Information Security
+  - given-names: 'Thorsten '
+    family-names: Eisenhofer
+    email: thorsten.eisenhofer@tu-berlin.de
+    affiliation: TU Berlin
+identifiers:
+  - type: url
+    value: 'https://arxiv.org/abs/2402.06922'
+repository-code: 'https://github.com/LostOxygen/llm-confidentiality'
+abstract: >-
+  Large Language Models (LLMs) are increasingly integrated
+  with external tools. While these integrations can
+  significantly improve the functionality of LLMs, they also
+  create a new attack surface where confidential data may be
+  disclosed between different components. Specifically,
+  malicious tools can exploit vulnerabilities in the LLM
+  itself to manipulate the model and compromise the data of
+  other services, raising the question of how private data
+  can be protected in the context of LLM integrations.
+
+
+  In this work, we provide a systematic way of evaluating
+  confidentiality in LLM-integrated systems. For this, we
+  formalize a "secret key" game that can capture the ability
+  of a model to conceal private information. This enables us
+  to compare the vulnerability of a model against
+  confidentiality attacks and also the effectiveness of
+  different defense strategies. In this framework, we
+  evaluate eight previously published attacks and four
+  defenses. We find that current defenses lack
+  generalization across attack strategies. Building on this
+  analysis, we propose a method for robustness fine-tuning,
+  inspired by adversarial training.
+
+  This approach is effective in lowering the success rate of
+  attackers and in improving the system's resilience against
+  unknown attacks.
+keywords:
+  - large language models
+  - llm
+  - adversarial attacks
+  - machine learning
+  - confidentiality
+  - prompt injections
+  - llm security
+license: Apache-2.0

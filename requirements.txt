@@ -15,7 +15,6 @@ peft @ git+https://github.com/huggingface/peft.git
 trl
 datasets
 pkbar
-auto_gptq
 sentence-transformers
 matplotlib
 tenacity
@@ -23,3 +22,4 @@ langchain
 langchain-community
 langchain-openai
 progressbar2
+langsmith>=0.0.72

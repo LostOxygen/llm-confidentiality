@@ -3,6 +3,7 @@
 # !/usr/bin/env python3
 
 import os
+import psutil
 import getpass
 from pathlib import Path
 import sys
@@ -139,16 +140,25 @@ def main(
     if name_suffix != "" and not name_suffix.startswith("-"):
         name_suffix = "-" + name_suffix
 
-    print("\n"+"#"*os.get_terminal_size().columns)
+    print("\n"+f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information" + \
+          f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-23))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
           str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: " \
           f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
           f"{torch.cuda.device_count()} GPUs on user: {getpass.getuser()}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Device{TColors.ENDC}: {device}")
-    if torch.cuda.is_available():
+    if device == "cuda" and torch.cuda.is_available():
         print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
+    elif device == "mps" and torch.backends.mps.is_available():
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}Shared Memory{TColors.ENDC}: " \
+              f"{psutil.virtual_memory()[0] // 1024**2} MB")
+    else:
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}CPU Memory{TColors.ENDC}: " \
+              f"{psutil.virtual_memory()[0] // 1024**2} MB")
+    print(f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}Parameters" + \
+          f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-14))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Type{TColors.ENDC}: {attacks}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Defense Type{TColors.ENDC}: {defenses}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Opponent LLM{TColors.ENDC}: " \

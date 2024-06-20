@@ -18,9 +18,11 @@ pkbar
 sentence-transformers
 matplotlib
 tenacity
-langchain
+langchain<0.2.0,>=0.1.15
+langchain-core<0.2.0,>=0.1.52
 langchain-community
 langchain-openai
 progressbar2
 langsmith>=0.0.72
+langchain_benchmarks
 mlx_lm

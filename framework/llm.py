@@ -634,17 +634,14 @@ class LLM():
             case ("gemma-2b" | "gemma-7b"):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to(self.device)
 
-                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
-                                                        enable_math=False,
-                                                        enable_mem_efficient=False):
-                        outputs = self.model.generate(
-                                                inputs=inputs.input_ids,
-                                                do_sample=True,
-                                                temperature=self.temperature,
-                                                max_length=4096,
-                                        )
+                    outputs = self.model.generate(
+                                            inputs=inputs.input_ids,
+                                            do_sample=True,
+                                            temperature=self.temperature,
+                                            max_length=4096,
+                                    )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs
@@ -697,7 +694,7 @@ class LLM():
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to(self.device)
                     stopping_criteria = StoppingCriteriaList([
                         AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                     ])
@@ -708,17 +705,14 @@ class LLM():
                         )
                     ])
 
-                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
-                                                        enable_math=False,
-                                                        enable_mem_efficient=False):
-                        outputs = self.model.generate(
-                                                inputs=inputs.input_ids,
-                                                do_sample=True,
-                                                temperature=self.temperature,
-                                                max_length=2048,
-                                                stopping_criteria=stopping_criteria,
-                                                logits_processor=logits_processor,
-                                        )
+                    outputs = self.model.generate(
+                        inputs=inputs.input_ids,
+                        do_sample=True,
+                        temperature=self.temperature,
+                        max_length=2048,
+                        stopping_criteria=stopping_criteria,
+                        logits_processor=logits_processor,
+                    )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs
@@ -734,29 +728,27 @@ class LLM():
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
-                    stopping_criteria = StoppingCriteriaList([
-                        AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
-                    ])
-                    logits_processor = LogitsProcessorList([
-                        EosTokenRewardLogitsProcessor(
-                            eos_token_id=self.tokenizer.eos_token_id,
-                            max_length=4096
-                        )
-                    ])
+                    inputs = self.tokenizer(
+                        formatted_messages,
+                        add_generation_prompt=True,
+                        return_tensors="pt",
+                    ).to(self.device)
 
-                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
-                                                        enable_math=False,
-                                                        enable_mem_efficient=False):
-                        outputs = self.model.generate(
-                                                inputs=inputs.input_ids,
-                                                do_sample=True,
-                                                temperature=self.temperature,
-                                                max_length=4096,
-                                                stopping_criteria=stopping_criteria,
-                                                logits_processor=logits_processor,
-                                        )
-                    response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
+                    outputs = self.model.generate(
+                        inputs=inputs.input_ids,
+                        do_sample=True,
+                        temperature=self.temperature,
+                        top_p=0.6,
+                        max_length=4096,
+                        eos_token_id=[
+                            self.tokenizer.eos_token_id,
+                            self.tokenizer.convert_tokens_to_ids("<|eot_id|>")
+                        ]
+                    )
+                    response = self.tokenizer.batch_decode(
+                        outputs.cpu(),
+                        skip_special_tokens=True
+                    )
                     del inputs
                     del outputs
 
@@ -770,7 +762,7 @@ class LLM():
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to(self.device)
                     stopping_criteria = StoppingCriteriaList([
                         AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                     ])
@@ -781,20 +773,17 @@ class LLM():
                         )
                     ])
 
-                    model_inputs = {key: val.to("cuda") for key, val in inputs.items()}
+                    model_inputs = {key: val.to(self.device) for key, val in inputs.items()}
                     del inputs
 
-                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
-                                                        enable_math=False,
-                                                        enable_mem_efficient=False):
-                        outputs = self.model.generate(
-                                                inputs=model_inputs["input_ids"],
-                                                do_sample=True,
-                                                temperature=self.temperature,
-                                                max_length=4096,
-                                                stopping_criteria=stopping_criteria,
-                                                logits_processor=logits_processor,
-                                            )
+                    outputs = self.model.generate(
+                        inputs=model_inputs["input_ids"],
+                        do_sample=True,
+                        temperature=self.temperature,
+                        max_length=4096,
+                        stopping_criteria=stopping_criteria,
+                        logits_processor=logits_processor,
+                    )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del model_inputs
                     del outputs
@@ -808,7 +797,7 @@ class LLM():
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to(self.device)
                     stopping_criteria = StoppingCriteriaList([
                         AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                     ])
@@ -819,17 +808,14 @@ class LLM():
                         )
                     ])
 
-                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
-                                                        enable_math=False,
-                                                        enable_mem_efficient=False):
-                        outputs = self.model.generate(
-                                                inputs=inputs.input_ids,
-                                                do_sample=True,
-                                                temperature=self.temperature,
-                                                max_length=4096,
-                                                stopping_criteria=stopping_criteria,
-                                                logits_processor=logits_processor,
-                                            )
+                    outputs = self.model.generate(
+                        inputs=inputs.input_ids,
+                        do_sample=True,
+                        temperature=self.temperature,
+                        max_length=4096,
+                        stopping_criteria=stopping_criteria,
+                        logits_processor=logits_processor,
+                    )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs
@@ -843,7 +829,7 @@ class LLM():
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
                 with torch.no_grad():
-                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to("cuda")
+                    inputs = self.tokenizer(formatted_messages, return_tensors="pt").to(self.device)
                     stopping_criteria = StoppingCriteriaList([
                         AttackStopping(stops=self.stop_list, tokenizer=self.tokenizer)
                     ])
@@ -854,17 +840,14 @@ class LLM():
                         )
                     ])
 
-                    with torch.backends.cuda.sdp_kernel(enable_flash=True,
-                                                        enable_math=False,
-                                                        enable_mem_efficient=False):
-                        outputs = self.model.generate(
-                                                inputs=inputs.input_ids,
-                                                do_sample=True,
-                                                temperature=self.temperature,
-                                                max_length=4096,
-                                                stopping_criteria=stopping_criteria,
-                                                logits_processor=logits_processor,
-                                            )
+                    outputs = self.model.generate(
+                        inputs=inputs.input_ids,
+                        do_sample=True,
+                        temperature=self.temperature,
+                        max_length=4096,
+                        stopping_criteria=stopping_criteria,
+                        logits_processor=logits_processor,
+                    )
                     response = self.tokenizer.batch_decode(outputs.cpu(), skip_special_tokens=True)
                     del inputs
                     del outputs

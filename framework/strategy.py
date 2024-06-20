@@ -60,6 +60,7 @@ class SecretKeyAttackStrategy(AttackStrategy):
             create_prompt_dataset: bool,
             create_response_dataset: bool,
             verbose: bool,
+            device: str,
         ) -> None:
         super().__init__()
         self.attack_func: Callable = attack_func
@@ -68,10 +69,12 @@ class SecretKeyAttackStrategy(AttackStrategy):
         self.llm_suffix = llm_suffix
         self.temperature = temperature
         self.verbose = verbose
+        self.device = device
         self.llm: Type[LLM] = LLM(
                 llm_type=llm_type,
                 temperature=temperature,
-                llm_suffix=llm_suffix
+                llm_suffix=llm_suffix,
+                device=self.device
             )
         # whether to use the llm to guess the secret key or not
         self.llm_guessing: bool = llm_guessing
@@ -301,6 +304,7 @@ class LangchainAttackStrategy(AttackStrategy):
             create_response_dataset: bool,
             verbose: bool,
             scenario: str,
+            device: str,
         ) -> None:
         super().__init__()
         self.attack_func: Callable = attack_func
@@ -310,6 +314,7 @@ class LangchainAttackStrategy(AttackStrategy):
         self.verbose = verbose
         self.scenario = scenario
         self.temperature = temperature
+        self.device = device
         assert self.llm_type.startswith("gpt"), \
             f"{TColors.WARNING}Only OpenAI's ChatGPT models are supported currently!{TColors.ENDC}"
         if self.llm_type in ("gpt-3.5", "gpt-3.5-turbo"):

@@ -62,6 +62,7 @@ python attack.py --attacks "payload_splitting" "obfuscation" --defense "xml_tagg
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a name suffix to load custom models. Since argument parameter strings aren't allowed to start with '-' symbols, the first '-' will be added by the parser automatically |
 | ```-s, --strategy``` | <b>str</b> | ```None``` | Specifies the strategy for the attack (whether to use normal attacks or ```langchain``` attacks) |
 | ```-sc, --scenario``` | <b>str</b> | ```database``` | Specifies the scenario for the attack (whether to use ```database``` or ```database+calendar``` scenario) |
+| ```-dx, --device``` | <b>str</b> | ```cpu```| Specifies the device which is used for running the script (cpu, cuda, or mps)
 The naming conventions for the models are as follows:
 ```python
 <model_name>-<param_count>-<robustness>-<attack_suffix>-<custom_suffix>

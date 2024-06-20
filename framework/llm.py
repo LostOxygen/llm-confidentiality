@@ -34,10 +34,12 @@ class LLM():
             llm_type: str,
             temperature: float = 1.0,
             is_finetuning: bool = False,
-            llm_suffix: str = ""
+            llm_suffix: str = "",
+            device: str = "cpu",
         ) -> None:
         self.llm_suffix: str = llm_suffix
         self.llm_type: str = llm_type
+        self.device: str = device
 
         if self.llm_type not in ("gpt-3.5-turbo", "gpt-4"):
             # yes i know this is really dirty, but it does it's job
@@ -56,12 +58,15 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
-                config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type="nf4",
-                    bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.float16
-                )
+                if str(self.device) in ["mps", "cpu"]:
+                    config=None
+                else:
+                    config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.float16
+                    )
 
                 # complete the model name for chat or normal models
                 model_name = "meta-llama/"
@@ -116,12 +121,16 @@ class LLM():
             case ("gemma-2b" | "gemma-7b"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
-                config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type="nf4",
-                    bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.float16
-                )
+                if str(self.device) in ["mps", "cpu"]:
+                    config=None
+                else:
+                    config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.float16
+                    )
+
                 model_name = "google/"
                 if self.llm_type.split("-")[1] == "2b":
                     model_name += "gemma-2b-it"
@@ -147,12 +156,15 @@ class LLM():
             case ("orca" | "orca-7b" | "orca-13b" | "orca-70b"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
-                config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type="nf4",
-                    bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.float16
-                )
+                if str(self.device) in ["mps", "cpu"]:
+                    config=None
+                else:
+                    config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.float16
+                    )
 
                 # complete the model name for chat or normal models
                 model_name = "microsoft/"
@@ -331,12 +343,15 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
-                config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type="nf4",
-                    bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.float16
-                )
+                if str(self.device) in ["mps", "cpu"]:
+                    config=None
+                else:
+                    config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.float16
+                    )
 
                 # complete the model name for chat or normal models
                 model_name = "meta-llama/"
@@ -384,12 +399,15 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
-                config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type="nf4",
-                    bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.float16
-                )
+                if str(self.device) in ["mps", "cpu"]:
+                    config=None
+                else:
+                    config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.float16
+                    )
 
                 # complete the model name for chat or normal models
                 model_name = "meta-llama/"
@@ -428,12 +446,16 @@ class LLM():
                 self.temperature = max(0.01, min(self.temperature, 2.0))
                 model_name = "stabilityai/"
                 # create quantization config
-                config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type="nf4",
-                    bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.float16
-                )
+                if str(self.device) in ["mps", "cpu"]:
+                    config=None
+                else:
+                    config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.float16
+                    )
+
                 if "-" not in self.llm_type:
                     raise NotImplementedError(
                         f"LLM specifier {self.llm_type} not complete." +\
@@ -483,12 +505,15 @@ class LLM():
                     model_name += "lmsys/vicuna-33b-v1.3"
 
                 # create quantization config
-                config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type="nf4",
-                    bnb_4bit_use_double_quant=True,
-                    bnb_4bit_compute_dtype=torch.float16
-                )
+                if str(self.device) in ["mps", "cpu"]:
+                    config=None
+                else:
+                    config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.float16
+                    )
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                                 model_name,

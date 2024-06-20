@@ -61,6 +61,7 @@ def main(
         strategy: str,
         scenario: str,
         verbose: bool,
+        device: str
     ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
@@ -117,11 +118,17 @@ def main(
         if llm_type in ["llama2", "llama2-7b", "llama2-13b", "llama2-70b"]:
             sys.exit(1)
 
-    # setting devies and variables correctly
-    if not torch.cuda.is_available():
-        device = "cpu"
+    # set the devices correctly
+    if device == "cpu":
+        device = torch.device("cpu")
+    elif device != "cpu" and device == "cuda" and torch.cuda.is_available():
+        device = torch.device(device)
+    elif device != "cpu" and device == "mps" and torch.backends.mps.is_available():
+        device = torch.device(device)
     else:
-        device = "cuda:0"
+        print(f"{TColors.WARNING}Warning{TColors.ENDC}: Device {TColors.OKCYAN}{device} " \
+              f"{TColors.ENDC}is not available. Setting device to CPU instead.")
+        device = torch.device("cpu")
 
     if "all" in attacks:
         attacks = ATTACK_LIST
@@ -180,6 +187,7 @@ def main(
                     create_response_dataset=create_response_dataset,
                     scenario=scenario,
                     verbose=verbose,
+                    device=device
                 )
     else:
         attack_strategy = SecretKeyAttackStrategy(
@@ -193,6 +201,7 @@ def main(
                     create_prompt_dataset=create_prompt_dataset,
                     create_response_dataset=create_response_dataset,
                     verbose=verbose,
+                    device=device
                 )
 
     for defense in defenses:
@@ -277,5 +286,7 @@ if __name__ == "__main__":
                         default="database", type=str)
     parser.add_argument("--verbose", "-v", help="enables a more verbose logging output",
                         action="store_true", default=False)
+    parser.add_argument("--device", "-dx", type=str, default="cpu",
+                        help="specifies the device to run the computations on (cpu, cuda, mps)")
     args = parser.parse_args()
     main(**vars(args))

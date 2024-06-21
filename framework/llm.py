@@ -453,7 +453,6 @@ class LLM():
                                     use_fast=False,
                                     cache_dir=os.environ["TRANSFORMERS_CACHE"],
                                 )
-                    self.tokenizer.pad_token = self.tokenizer.unk_token
 
                     self.model = AutoModelForCausalLM.from_pretrained(
                                 model_name,
@@ -463,6 +462,11 @@ class LLM():
                                 trust_remote_code=True,
                                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
                             )
+
+                    # set padding tokens correctly for tokenizer and model
+                    self.tokenizer.add_special_tokens({"pad_token": "<pad>"})
+                    self.model.config.pad_token_id = self.tokenizer.pad_token_id
+                    self.model.generation_config.pad_token_id = self.tokenizer.pad_token_id
 
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 self.temperature = max(0.01, min(self.temperature, 2.0))

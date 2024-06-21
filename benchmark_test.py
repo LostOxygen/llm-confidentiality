@@ -2,8 +2,12 @@
 import os
 import uuid
 import datetime
+import psutil
+from typing import Type
 from getpass import getpass
+import argparse
 
+import torch
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from langsmith.client import Client
@@ -16,49 +20,102 @@ from langchain_benchmarks import (
 from langchain_benchmarks.rate_limiting import RateLimiter
 
 from framework.colors import TColors
+from framework.llm import LLM
 
-# paste the OpenAI key into the key.txt file and put into the root directory
-try:
-    with open(file="key.txt", mode="r", encoding="utf-8") as f:
-        key = f.read().replace("\n", "")
-        assert key != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
+def main(
+        llm_type: str,
+        temperature: float,
+        device: str,
+) -> None:
+    """
+    Main hook for benchmarking llms via langchain
 
-        os.environ["OPENAI_API_KEY"] = key
-        print(f"{TColors.OKGREEN}OpenAI API key loaded.{TColors.ENDC}")
+    Parameters:
+        llm_type: str - specifies which llm to benchmark
+        temperature: float - specifices the used temperature for llm generation
+        device: str - specifies the used computation device (cpu, cuda, mps)
 
-except FileNotFoundError:
-    print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
-            f"file and put it into the root directory.{TColors.ENDC}")
+    Returns:
+        None
+    
+    """
 
-# now same for langsmith api key
-try:
-    with open(file="langsmith_key.txt", mode="r", encoding="utf-8") as f:
-        key = f.read().replace("\n", "")
-        assert key != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
+    # paste the OpenAI key into the key.txt file and put into the root directory
+    try:
+        with open(file="key.txt", mode="r", encoding="utf-8") as f:
+            key = f.read().replace("\n", "")
+            assert key != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
 
-        os.environ["LANGCHAIN_API_KEY"] = key
-        print(f"{TColors.OKGREEN}Langsmith API key loaded.{TColors.ENDC}")
+            os.environ["OPENAI_API_KEY"] = key
+            print(f"{TColors.OKGREEN}OpenAI API key loaded.{TColors.ENDC}")
 
-except FileNotFoundError:
-    print(f"{TColors.FAIL}Please paste your Langsmith API key into the langsmith_key.txt "
-            f"file and put it into the root directory.{TColors.ENDC}")
+    except FileNotFoundError:
+        print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
+                f"file and put it into the root directory.{TColors.ENDC}")
+
+    # now same for langsmith api key
+    try:
+        with open(file="langsmith_key.txt", mode="r", encoding="utf-8") as f:
+            key = f.read().replace("\n", "")
+            assert key != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
+
+            os.environ["LANGCHAIN_API_KEY"] = key
+            print(f"{TColors.OKGREEN}Langsmith API key loaded.{TColors.ENDC}")
+
+    except FileNotFoundError:
+        print(f"{TColors.FAIL}Please paste your Langsmith API key into the langsmith_key.txt "
+                f"file and put it into the root directory.{TColors.ENDC}")
+
+    print("\n"+f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information" + \
+            f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-23))
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
+          str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: " \
+          f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
+          f"{torch.cuda.device_count()} GPUs on user: {getpass.getuser()}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Device{TColors.ENDC}: {device}")
+    if device == "cuda" and torch.cuda.is_available():
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
+              f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
+    elif device == "mps" and torch.backends.mps.is_available():
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}Shared Memory{TColors.ENDC}: " \
+              f"{psutil.virtual_memory()[0] // 1024**2} MB")
+    else:
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}CPU Memory{TColors.ENDC}: " \
+              f"{psutil.virtual_memory()[0] // 1024**2} MB")
+    print(f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}Parameters" + \
+          f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-14))
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: " \
+          f"{TColors.HEADER}{llm_type}{TColors.ENDC}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
+    print("#"*os.get_terminal_size().columns+"\n")
 
 
-# This is just the default list below
-required_env_vars = [
-    "OPENAI_API_KEY",
-    "LANGCHAIN_API_KEY",
-]
-for var in required_env_vars:
-    if var not in os.environ:
-        os.environ[var] = getpass(f"Provide the required {var}")
 
-tests = [
-    (
-        "gpt-4-turbo-2024-04-09",
-        ChatOpenAI(model="gpt-4-turbo-2024-04-09", temperature=0),
-    ),
-]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Create prompts for the agents
 # Using two prompts because some chat models do not support SystemMessage.
@@ -131,3 +188,14 @@ for task in registry.tasks:
                 "langchain_benchmarks_version": __version__,
             },
         )
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="llm-confidentiality")
+    parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
+                        help="specifies the opponent LLM type")
+    parser.add_argument("--temperature", "-t", type=float, default=0.0,
+                        help="specifies the opponent LLM temperature")
+    parser.add_argument("--device", "-dx", type=str, default="cpu",
+                        help="specifies the device to run the computations on (cpu, cuda, mps)")
+    args = parser.parse_args()
+    main(**vars(args))

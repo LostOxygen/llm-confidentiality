@@ -25,10 +25,6 @@ from framework.prompts import (
     STOPPING_LIST,
 )
 
-# only if apple silicon is used
-if torch.backends.mps.is_available():
-    import mlx_lm
-
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 MAX_RETRIES: int = 10 # number of retries for GPT based chat requests
 
@@ -434,7 +430,12 @@ class LLM():
                     else:
                         model_name += "Meta-Llama-3-8B-Instruct"
 
-                    self.model, self.tokenizer = mlx_lm.load(model_name)
+                    # check if apple silicon is used
+                    if torch.backends.mps.is_available():
+                        import mlx_lm
+                        self.model, self.tokenizer = mlx_lm.load(model_name)
+                    else:
+                        raise RuntimeError("You chose mps as device on non-apple hardware")
                 else:
                     model_name = "meta-llama/"
                     if self.llm_type.split("-")[1] == "8b":
@@ -756,12 +757,17 @@ class LLM():
                         add_generation_prompt=True
                     )
                     prompt = self.tokenizer.decode(input_ids)
-                    response = mlx_lm.generate(
-                        self.model,
-                        self.tokenizer,
-                        max_tokens=4096,
-                        prompt=prompt,
-                    )
+                    # check if apple silicon is used
+                    if torch.backends.mps.is_available():
+                        import mlx_lm
+                        response = mlx_lm.generate(
+                            self.model,
+                            self.tokenizer,
+                            max_tokens=4096,
+                            prompt=prompt,
+                        )
+                    else:
+                        raise RuntimeError("You chose mps as device on non-apple hardware")
                     history = self.format_prompt(system_prompt, user_prompt, self.llm_type)+response
                 else:
                     with torch.no_grad():

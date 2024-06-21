@@ -3,7 +3,7 @@ import os
 from typing import Tuple, Final, Type
 import torch
 from openai import OpenAI
-import mlx_lm
+
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
@@ -24,6 +24,10 @@ from framework.prompts import (
     EosTokenRewardLogitsProcessor,
     STOPPING_LIST,
 )
+
+# only if apple silicon is used
+if torch.backends.mps.is_available():
+    import mlx_lm
 
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 MAX_RETRIES: int = 10 # number of retries for GPT based chat requests

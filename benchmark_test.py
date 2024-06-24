@@ -9,9 +9,7 @@ import argparse
 
 import torch
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_openai import ChatOpenAI
 from langsmith.client import Client
-from langchain_benchmarks.tool_usage.agents import StandardAgentFactory
 from langchain_benchmarks import (
     __version__,
     clone_public_dataset,
@@ -21,6 +19,7 @@ from langchain_benchmarks.rate_limiting import RateLimiter
 
 from framework.colors import TColors
 from framework.llm import LLM
+from framework.benchmark_agents import AgentFactory
 
 def main(
         llm_type: str,
@@ -90,87 +89,50 @@ def main(
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
     print("#"*os.get_terminal_size().columns+"\n")
 
+    # create the LLM
+    model: Type[LLM] = LLM(
+        llm_type=llm_type,
+        temperature=temperature,
+        llm_suffix="",
+        device=device
+    )
+
+    # Create prompts for the agents
+    # with_system_message_prompt = ChatPromptTemplate.from_messages(
+    #     [
+    #         ("system", "{instructions}"),
+    #         ("human", "{question}"),  # Populated from task.instructions automatically
+    #         MessagesPlaceholder("agent_scratchpad"),  # Workspace for the agent
+    #     ]
+    # )
+
+    # experiment_uuid = "gewürzgurke1337"  # Or generate random using uuid.uuid4().hex[:4]
+    experiment_uuid = uuid.uuid4().hex[:4]
+
+    client = Client()  # Launch langsmith client for cloning datasets
+    today = datetime.date.today().isoformat()
 
 
+    for task in registry.tasks:
+        if task.type != "ToolUsageTask":
+            continue
 
+        # This is a small test dataset that can be used to verify
+        # that everything is set up correctly prior to running over
+        # all results. We may remove it in the future.
+        if task.name == "Multiverse Math (Tiny)":
+            continue
 
+        dataset_name = task.name + f" ({today})"
+        clone_public_dataset(task.dataset_id, dataset_name=dataset_name)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Create prompts for the agents
-# Using two prompts because some chat models do not support SystemMessage.
-without_system_message_prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "human",
-            "{instructions}\n{question}",
-        ),  # Populated from task.instructions automatically
-        MessagesPlaceholder("agent_scratchpad"),  # Workspace for the agent
-    ]
-)
-
-with_system_message_prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", "{instructions}"),
-        ("human", "{question}"),  # Populated from task.instructions automatically
-        MessagesPlaceholder("agent_scratchpad"),  # Workspace for the agent
-    ]
-)
-
-# experiment_uuid = "gewürzgurke1337"  # Or generate random using uuid.uuid4().hex[:4]
-experiment_uuid = uuid.uuid4().hex[:4]
-
-client = Client()  # Launch langsmith client for cloning datasets
-today = datetime.date.today().isoformat()
-
-
-for task in registry.tasks:
-    if task.type != "ToolUsageTask":
-        continue
-
-    # This is a small test dataset that can be used to verify
-    # that everything is set up correctly prior to running over
-    # all results. We may remove it in the future.
-    if task.name == "Multiverse Math (Tiny)":
-        continue
-
-    dataset_name = task.name + f" ({today})"
-    clone_public_dataset(task.dataset_id, dataset_name=dataset_name)
-
-    for model_name, model in tests:
-        if model_name.startswith("gemini"):
-            # google models don't use system prompt
-            prompt = without_system_message_prompt
-            rate_limiter = RateLimiter(requests_per_second=0.1)
-        else:
-            prompt = with_system_message_prompt
-            rate_limiter = RateLimiter(requests_per_second=1)
         print()
-        print(f"Benchmarking {task.name} with model: {model_name}")
+        print(f"Benchmarking {task.name} with model: {llm_type}")
         eval_config = task.get_eval_config()
 
-        agent_factory = StandardAgentFactory(
-            task, model, prompt, rate_limiter=rate_limiter
+        agent_factory = AgentFactory(
+            task,
+            model,
         )
 
         client.run_on_dataset(
@@ -178,10 +140,10 @@ for task in registry.tasks:
             llm_or_chain_factory=agent_factory,
             evaluation=eval_config,
             verbose=False,
-            project_name=f"{model_name}-{task.name}-{today}-{experiment_uuid}",
+            project_name=f"{llm_type}-{task.name}-{today}-{experiment_uuid}",
             concurrency_level=5,
             project_metadata={
-                "model": model_name,
+                "model": llm_type,
                 "id": experiment_uuid,
                 "task": task.name,
                 "date": today,

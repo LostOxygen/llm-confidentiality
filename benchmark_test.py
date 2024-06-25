@@ -1,25 +1,32 @@
 """Langchain benchmark test script"""
 import os
+import sys
+from pathlib import Path
 import uuid
 import datetime
 import psutil
 from typing import Type
-from getpass import getpass
+import getpass
 import argparse
 
+from huggingface_hub import login
 import torch
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langsmith.client import Client
+from langchain_community.chat_models import ChatOllama
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_benchmarks import (
     __version__,
     clone_public_dataset,
     registry,
 )
-from langchain_benchmarks.rate_limiting import RateLimiter
 
 from framework.colors import TColors
 from framework.llm import LLM
 from framework.benchmark_agents import AgentFactory
+
+if not os.path.isdir(str(Path.home() / "data")):
+    os.mkdir(str(Path.home() / "data"))
+os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 
 def main(
         llm_type: str,
@@ -64,6 +71,22 @@ def main(
     except FileNotFoundError:
         print(f"{TColors.FAIL}Please paste your Langsmith API key into the langsmith_key.txt "
                 f"file and put it into the root directory.{TColors.ENDC}")
+    # and again for huggingfce
+    try:
+        with open(file="hf_token.txt", mode="r", encoding="utf-8") as f:
+            key = f.read().replace("\n", "")
+            assert key != "", f"{TColors.FAIL}HF Token is empty.{TColors.ENDC}"
+
+            os.environ["HF_TOKEN"] = key
+            print(f"{TColors.OKGREEN}Huggingface token loaded.")
+            login(token=key, add_to_git_credential=True)
+            print(f"{TColors.ENDC}")
+
+    except FileNotFoundError:
+        print(f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
+              f"file and put it into the root directory.{TColors.ENDC}")
+        if llm_type.startswith("llama"):
+            sys.exit(1)
 
     print("\n"+f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information" + \
             f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-23))
@@ -90,21 +113,61 @@ def main(
     print("#"*os.get_terminal_size().columns+"\n")
 
     # create the LLM
-    model: Type[LLM] = LLM(
-        llm_type=llm_type,
-        temperature=temperature,
-        llm_suffix="",
-        device=device
-    )
+    # model: Type[LLM] = LLM(
+    #     llm_type=llm_type,
+    #     temperature=temperature,
+    #     llm_suffix="",
+    #     device=device
+    # )
+    model = ChatOllama(model="llama3", format="json", temperature=0)
+
+    system = """
+        Respond to the human as helpfully and accurately as possible. You have access to the following tools:
+
+        {tools}
+
+        Use a json blob to specify a tool by providing an action key (tool name) and an action_input key (tool input).
+
+        Valid "action" values: "Final Answer" or {tool_names}
+
+        Provide only ONE action per $JSON_BLOB, as shown:
+
+        ```
+        {{
+        "action": $TOOL_NAME,
+        "action_input": $INPUT
+        }}
+        ```
+
+        Follow this format:
+
+        Question: input question to answer
+        Thought: consider previous and subsequent steps
+        Action:
+        ```
+        $JSON_BLOB
+        ```
+        Observation: action result
+        ... (repeat Thought/Action/Observation N times)
+        Thought: I know what to respond
+        Action:
+        ```
+        {{
+        "action": "Final Answer",
+        "action_input": "Final response to human"
+        }}
+
+        Begin! Reminder to ALWAYS respond with a valid json blob of a single action. Use tools if necessary. Respond directly if appropriate. Format is Action:```$JSON_BLOB```then Observation
+    """
 
     # Create prompts for the agents
-    # with_system_message_prompt = ChatPromptTemplate.from_messages(
-    #     [
-    #         ("system", "{instructions}"),
-    #         ("human", "{question}"),  # Populated from task.instructions automatically
-    #         MessagesPlaceholder("agent_scratchpad"),  # Workspace for the agent
-    #     ]
-    # )
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", system),
+            ("human", "{question}"),  # Populated from task.instructions automatically
+            MessagesPlaceholder("agent_scratchpad"),  # Workspace for the agent
+        ]
+    )
 
     # experiment_uuid = "gewürzgurke1337"  # Or generate random using uuid.uuid4().hex[:4]
     experiment_uuid = uuid.uuid4().hex[:4]
@@ -133,6 +196,7 @@ def main(
         agent_factory = AgentFactory(
             task,
             model,
+            prompt,
         )
 
         client.run_on_dataset(
@@ -153,7 +217,7 @@ def main(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
-    parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
+    parser.add_argument("--llm_type", "-llm", type=str, default="llama3-8b",
                         help="specifies the opponent LLM type")
     parser.add_argument("--temperature", "-t", type=float, default=0.0,
                         help="specifies the opponent LLM temperature")

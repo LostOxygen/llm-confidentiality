@@ -31,7 +31,6 @@ class AgentFactory:
         self.task = task
         self.llm = llm
         self.prompt = prompt
-        print("AgentFactory hat geklappt und so")
 
     def __call__(self):
         env = self.task.create_environment()
@@ -42,13 +41,11 @@ class AgentFactory:
             prompt=self.prompt,
         )
 
-        print("Agent erstellt")
         executor = AgentExecutor(
             agent=agent,
             tools=env.tools,
             handle_parsing_errors=True,
             return_intermediate_steps=True,
         )
-        print("Executor erstellt")
-        print("Test Invoke: ", executor.invoke({"input": "hey how are you?"}))
+
         return apply_agent_executor_adapter(executor, state_reader=env.read_state)

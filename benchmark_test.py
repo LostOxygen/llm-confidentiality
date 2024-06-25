@@ -5,15 +5,14 @@ from pathlib import Path
 import uuid
 import datetime
 import psutil
-from typing import Type
 import getpass
 import argparse
 
 from huggingface_hub import login
 import torch
 from langsmith.client import Client
-from langchain_community.chat_models import ChatOllama
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.chat_models import ChatOllama
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_benchmarks import (
     __version__,
     clone_public_dataset,
@@ -21,7 +20,6 @@ from langchain_benchmarks import (
 )
 
 from framework.colors import TColors
-from framework.llm import LLM
 from framework.benchmark_agents import AgentFactory
 
 if not os.path.isdir(str(Path.home() / "data")):
@@ -158,6 +156,8 @@ def main(
         }}
 
         Begin! Reminder to ALWAYS respond with a valid json blob of a single action. Use tools if necessary. Respond directly if appropriate. Format is Action:```$JSON_BLOB```then Observation
+    
+        {agent_scratchpad}
     """
 
     # Create prompts for the agents
@@ -165,11 +165,11 @@ def main(
         [
             ("system", system),
             ("human", "{question}"),  # Populated from task.instructions automatically
-            MessagesPlaceholder("agent_scratchpad"),  # Workspace for the agent
+            #MessagesPlaceholder(variable_name="agent_scratchpad"),  # Workspace for the agent
         ]
     )
 
-    # experiment_uuid = "gewürzgurke1337"  # Or generate random using uuid.uuid4().hex[:4]
+    # experiment_uuid = "gewürzgurke1337"
     experiment_uuid = uuid.uuid4().hex[:4]
 
     client = Client()  # Launch langsmith client for cloning datasets

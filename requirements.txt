@@ -26,4 +26,3 @@ progressbar2
 langsmith>=0.0.72
 langchain-benchmarks
 langchain-experimental
-mlx_lm

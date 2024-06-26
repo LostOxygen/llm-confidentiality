@@ -4,6 +4,8 @@ from typing import Tuple, Final, Type
 import torch
 from openai import OpenAI
 
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.chat_models import ChatOllama
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
@@ -399,74 +401,85 @@ class LLM():
                     "llama3-8b" | "llama3-70b" | "llama3-400b"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
-                # create quantization config
-                if str(self.device) in ["mps", "cpu"]:
-                    config=None
+                if self.llm_type.split("-")[1] == "8b":
+                    self.model = ChatOllama(model="llama3", temperature=self.temperature)
+                elif self.llm_type.split("-")[1] == "70b":
+                    self.model = ChatOllama(model="llama3:70b", temperature=self.temperature)
+                elif self.llm_type.split("-")[1] == "400b":
+                    # model_name += "Meta-Llama-3-70B-Instruct"
+                    raise NotImplementedError(f"{self.llm_type} not yet available")
                 else:
-                    config = BitsAndBytesConfig(
-                        load_in_4bit=True,
-                        bnb_4bit_quant_type="nf4",
-                        bnb_4bit_use_double_quant=True,
-                        bnb_4bit_compute_dtype=torch.float16
-                    )
+                    self.model = ChatOllama(model="llama3", temperature=self.temperature)
 
-                # complete the model name for chat or normal models
-                if "-" not in self.llm_type:
-                    raise NotImplementedError(
-                        f"LLM specifier {self.llm_type} not complete." +\
-                        f"Did you mean {self.llm_type}-8b?"
-                    )
+                self.tokenizer = None
+                # # create quantization config
+                # if str(self.device) in ["mps", "cpu"]:
+                #     config=None
+                # else:
+                #     config = BitsAndBytesConfig(
+                #         load_in_4bit=True,
+                #         bnb_4bit_quant_type="nf4",
+                #         bnb_4bit_use_double_quant=True,
+                #         bnb_4bit_compute_dtype=torch.float16
+                #     )
 
-                # differ between apple silicon and non-apple silicon devices
-                if str(self.device) == "mps":
-                    model_name = "mlx-community/"
-                    if self.llm_type.split("-")[1] == "8b":
-                        model_name += "Meta-Llama-3-8B-Instruct-4bit"
-                    elif self.llm_type.split("-")[1] == "70b":
-                        model_name += "Meta-Llama-3-70B-Instruct-4bit"
-                    elif self.llm_type.split("-")[1] == "400b":
-                        # model_name += "Meta-Llama-3-70B-Instruct"
-                        raise NotImplementedError(f"{self.llm_type} not yet available")
-                    else:
-                        model_name += "Meta-Llama-3-8B-Instruct"
+                # # complete the model name for chat or normal models
+                # if "-" not in self.llm_type:
+                #     raise NotImplementedError(
+                #         f"LLM specifier {self.llm_type} not complete." +\
+                #         f"Did you mean {self.llm_type}-8b?"
+                #     )
 
-                    # check if apple silicon is used
-                    if torch.backends.mps.is_available():
-                        import mlx_lm
-                        self.model, self.tokenizer = mlx_lm.load(model_name)
-                    else:
-                        raise RuntimeError("You chose mps as device on non-apple hardware")
-                else:
-                    model_name = "meta-llama/"
-                    if self.llm_type.split("-")[1] == "8b":
-                        model_name += "Meta-Llama-3-8B-Instruct"
-                    elif self.llm_type.split("-")[1] == "70b":
-                        model_name += "Meta-Llama-3-70B-Instruct"
-                    elif self.llm_type.split("-")[1] == "400b":
-                        # model_name += "Meta-Llama-3-70B-Instruct"
-                        raise NotImplementedError(f"{self.llm_type} not yet available")
-                    else:
-                        model_name += "Meta-Llama-3-8B-Instruct"
+                # # differ between apple silicon and non-apple silicon devices
+                # if str(self.device) == "mps":
+                #     model_name = "mlx-community/"
+                #     if self.llm_type.split("-")[1] == "8b":
+                #         model_name += "Meta-Llama-3-8B-Instruct-4bit"
+                #     elif self.llm_type.split("-")[1] == "70b":
+                #         model_name += "Meta-Llama-3-70B-Instruct-4bit"
+                #     elif self.llm_type.split("-")[1] == "400b":
+                #         # model_name += "Meta-Llama-3-70B-Instruct"
+                #         raise NotImplementedError(f"{self.llm_type} not yet available")
+                #     else:
+                #         model_name += "Meta-Llama-3-8B-Instruct"
 
-                    self.tokenizer = AutoTokenizer.from_pretrained(
-                                    model_name,
-                                    use_fast=False,
-                                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
-                                )
+                #     # check if apple silicon is used
+                #     if torch.backends.mps.is_available():
+                #         import mlx_lm
+                #         self.model, self.tokenizer = mlx_lm.load(model_name)
+                #     else:
+                #         raise RuntimeError("You chose mps as device on non-apple hardware")
+                # else:
+                #     model_name = "meta-llama/"
+                #     if self.llm_type.split("-")[1] == "8b":
+                #         model_name += "Meta-Llama-3-8B-Instruct"
+                #     elif self.llm_type.split("-")[1] == "70b":
+                #         model_name += "Meta-Llama-3-70B-Instruct"
+                #     elif self.llm_type.split("-")[1] == "400b":
+                #         # model_name += "Meta-Llama-3-70B-Instruct"
+                #         raise NotImplementedError(f"{self.llm_type} not yet available")
+                #     else:
+                #         model_name += "Meta-Llama-3-8B-Instruct"
 
-                    self.model = AutoModelForCausalLM.from_pretrained(
-                                model_name,
-                                device_map="auto",
-                                quantization_config=config,
-                                low_cpu_mem_usage=True,
-                                trust_remote_code=True,
-                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
-                            )
+                #     self.tokenizer = AutoTokenizer.from_pretrained(
+                #                     model_name,
+                #                     use_fast=False,
+                #                     cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                #                 )
 
-                    # set padding tokens correctly for tokenizer and model
-                    self.tokenizer.add_special_tokens({"pad_token": "<pad>"})
-                    self.model.config.pad_token_id = self.tokenizer.pad_token_id
-                    self.model.generation_config.pad_token_id = self.tokenizer.pad_token_id
+                #     self.model = AutoModelForCausalLM.from_pretrained(
+                #                 model_name,
+                #                 device_map="auto",
+                #                 quantization_config=config,
+                #                 low_cpu_mem_usage=True,
+                #                 trust_remote_code=True,
+                #                 cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                #             )
+
+                #     # set padding tokens correctly for tokenizer and model
+                #     self.tokenizer.add_special_tokens({"pad_token": "<pad>"})
+                #     self.model.config.pad_token_id = self.tokenizer.pad_token_id
+                #     self.model.generation_config.pad_token_id = self.tokenizer.pad_token_id
 
             case ("beluga2-70b" | "beluga-13b" | "beluga-7b"):
                 self.temperature = max(0.01, min(self.temperature, 2.0))
@@ -751,58 +764,68 @@ class LLM():
             case (
                     "llama3" | "llama3-8b" | "llama3-70b" | "llama3-400b"
                 ):
-                messages = [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ]
-                if str(self.device) == "mps":
-                    input_ids = self.tokenizer.apply_chat_template(
-                        messages,
-                        add_generation_prompt=True
-                    )
-                    prompt = self.tokenizer.decode(input_ids)
-                    # check if apple silicon is used
-                    if torch.backends.mps.is_available():
-                        import mlx_lm
-                        response = mlx_lm.generate(
-                            self.model,
-                            self.tokenizer,
-                            max_tokens=4096,
-                            prompt=prompt,
-                        )
-                    else:
-                        raise RuntimeError("You chose mps as device on non-apple hardware")
-                    history = self.format_prompt(system_prompt, user_prompt, self.llm_type)+response
-                else:
-                    with torch.no_grad():
-                        input_ids = self.tokenizer.apply_chat_template(
-                            messages,
-                            add_generation_prompt=True,
-                            return_tensors="pt"
-                        )
+                prompt = ChatPromptTemplate.from_messages(
+                    [
+                        ("system", system_prompt),
+                        ("human", "{user_prompt}"),  # Populated from task.instructions automatically
+                        #MessagesPlaceholder(variable_name="agent_scratchpad"),  # Workspace for the agent
+                    ]
+                )
+                model_chain = prompt | self.model
+                response = model_chain.invoke({"user_prompt", user_prompt}).content
+                history = system_prompt + user_prompt + response
+                # messages = [
+                #     {"role": "system", "content": system_prompt},
+                #     {"role": "user", "content": user_prompt}
+                # ]
+                # if str(self.device) == "mps":
+                #     input_ids = self.tokenizer.apply_chat_template(
+                #         messages,
+                #         add_generation_prompt=True
+                #     )
+                #     prompt = self.tokenizer.decode(input_ids)
+                #     # check if apple silicon is used
+                #     if torch.backends.mps.is_available():
+                #         import mlx_lm
+                #         response = mlx_lm.generate(
+                #             self.model,
+                #             self.tokenizer,
+                #             max_tokens=4096,
+                #             prompt=prompt,
+                #         )
+                #     else:
+                #         raise RuntimeError("You chose mps as device on non-apple hardware")
+                #     history = self.format_prompt(system_prompt, user_prompt, self.llm_type)+response
+                # else:
+                #     with torch.no_grad():
+                #         input_ids = self.tokenizer.apply_chat_template(
+                #             messages,
+                #             add_generation_prompt=True,
+                #             return_tensors="pt"
+                #         )
 
-                        outputs = self.model.generate(
-                            inputs=input_ids,
-                            do_sample=True,
-                            temperature=self.temperature,
-                            top_p=0.9,
-                            max_length=4096,
-                            eos_token_id=[
-                                self.tokenizer.eos_token_id,
-                                self.tokenizer.convert_tokens_to_ids("<|eot_id|>")
-                            ]
-                        )
-                        response = self.tokenizer.batch_decode(
-                            outputs.cpu(),
-                            skip_special_tokens=True
-                        )
-                        del inputs
-                        del outputs
+                #         outputs = self.model.generate(
+                #             inputs=input_ids,
+                #             do_sample=True,
+                #             temperature=self.temperature,
+                #             top_p=0.9,
+                #             max_length=4096,
+                #             eos_token_id=[
+                #                 self.tokenizer.eos_token_id,
+                #                 self.tokenizer.convert_tokens_to_ids("<|eot_id|>")
+                #             ]
+                #         )
+                #         response = self.tokenizer.batch_decode(
+                #             outputs.cpu(),
+                #             skip_special_tokens=True
+                #         )
+                #         del inputs
+                #         del outputs
 
-                        # remove the previous chat history from the response
-                        # so only the models' actual response remains
-                        history = "<s>"+response[0]+" </s>"
-                        response = response[0].replace(formatted_messages, "", 1)
+                #         # remove the previous chat history from the response
+                #         # so only the models' actual response remains
+                #         history = "<s>"+response[0]+" </s>"
+                #         response = response[0].replace(formatted_messages, "", 1)
 
             case (
                     "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 

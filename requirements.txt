@@ -24,5 +24,6 @@ langchain-community
 langchain-openai
 progressbar2
 langsmith>=0.0.72
-langchain_benchmarks
+langchain-benchmarks
+langchain-experimental
 mlx_lm

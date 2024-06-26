@@ -12,6 +12,7 @@ from huggingface_hub import login
 import torch
 from langsmith.client import Client
 from langchain.chat_models import ChatOllama
+from langchain_experimental.llms.ollama_functions import OllamaFunctions
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_benchmarks import (
     __version__,
@@ -110,6 +111,7 @@ def main(
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
     print("#"*os.get_terminal_size().columns+"\n")
 
+    assert llm_type.startswith("llama3"), "Only LLaMA3 models are currently supported."
     # create the LLM
     # model: Type[LLM] = LLM(
     #     llm_type=llm_type,
@@ -117,7 +119,7 @@ def main(
     #     llm_suffix="",
     #     device=device
     # )
-    model = ChatOllama(model="llama3", format="json", temperature=0)
+    model = OllamaFunctions(model="llama3", temperature=0, format="json")
 
     system = """
         Respond to the human as helpfully and accurately as possible. You have access to the following tools:
@@ -156,15 +158,13 @@ def main(
         }}
 
         Begin! Reminder to ALWAYS respond with a valid json blob of a single action. Use tools if necessary. Respond directly if appropriate. Format is Action:```$JSON_BLOB```then Observation
-    
-        {agent_scratchpad}
     """
 
     # Create prompts for the agents
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", system),
-            ("human", "{question}"),  # Populated from task.instructions automatically
+            ("human", "{question} \n {agent_scratchpad}"),
             #MessagesPlaceholder(variable_name="agent_scratchpad"),  # Workspace for the agent
         ]
     )

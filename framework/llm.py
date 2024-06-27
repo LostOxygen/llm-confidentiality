@@ -1,11 +1,13 @@
 """library for LLM models, functions and helper stuff"""
 import os
-from typing import Tuple, Final, Type
+from typing import Tuple, Final, Type, Optional
 import torch
 from openai import OpenAI
 
 from langchain_core.prompts import ChatPromptTemplate
+from langchain.tools import BaseTool
 from langchain.chat_models import ChatOllama
+from langchain_experimental.llms.ollama_functions import OllamaFunctions
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
@@ -39,10 +41,12 @@ class LLM():
             is_finetuning: bool = False,
             llm_suffix: str = "",
             device: str = "cpu",
+            tools: Optional[BaseTool] = None,
         ) -> None:
         self.llm_suffix: str = llm_suffix
         self.llm_type: str = llm_type
         self.device: str = device
+        self.tools: BaseTool = tools
 
         if self.llm_type not in ("gpt-3.5-turbo", "gpt-4"):
             # yes i know this is really dirty, but it does it's job
@@ -511,6 +515,17 @@ class LLM():
         if self.tokenizer is not None:
             del self.tokenizer
 
+    def bind_tools_to_model(self, tools: list[callable]) -> None:
+        """
+        Helper method to bind tools to the LLM
+
+        Parameters:
+            tools: List[Callable] - a List of tool functions which should be binded
+
+        Returns:
+            None
+        """
+        self.model.bind_tools(tools)
 
     @staticmethod
     def format_prompt(system_prompt: str, user_prompt: str, llm_type: str) -> str:
@@ -703,6 +718,7 @@ class LLM():
                     ]
                 )
                 model_chain = prompt | self.model
+
                 response = model_chain.invoke({"user_prompt", user_prompt}).content
                 history = system_prompt + user_prompt + response
 

@@ -11,7 +11,6 @@ import argparse
 from huggingface_hub import login
 import torch
 from langsmith.client import Client
-from langchain.chat_models import ChatOllama
 from langchain_experimental.llms.ollama_functions import OllamaFunctions
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_benchmarks import (

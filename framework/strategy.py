@@ -434,7 +434,7 @@ class LangchainAttackStrategy(AttackStrategy):
                 #     | llm_with_tools
                 #     | OpenAIToolsAgentOutputParser()
                 # )
-                agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
+                # agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
 
                 # # run the agent
                 # response = agent_executor.invoke({"input": user_prompt})["output"]

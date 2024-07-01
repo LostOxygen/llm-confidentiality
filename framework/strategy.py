@@ -315,19 +315,12 @@ class LangchainAttackStrategy(AttackStrategy):
         self.scenario = scenario
         self.temperature = temperature
         self.device = device
-        assert self.llm_type.startswith("gpt"), \
-            f"{TColors.WARNING}Only OpenAI's ChatGPT models are supported currently!{TColors.ENDC}"
-        if self.llm_type in ("gpt-3.5", "gpt-3.5-turbo"):
-            # langchain model
-            self.llm: Type[ChatOpenAI] = ChatOpenAI(
-                model="gpt-3.5-turbo",
-                temperature=self.temperature
-            )
-        elif self.llm_type in ("gpt-4", "gpt-4-turbo"):
-            # langchain model
-            self.llm: Type[ChatOpenAI] = ChatOpenAI(
-                model="gpt-4",
-                temperature=self.temperature
+
+        self.llm: Type[LLM] = LLM(
+                llm_type=llm_type,
+                temperature=temperature,
+                llm_suffix=llm_suffix,
+                device=self.device,
             )
 
         # whether to use the llm to guess the secret key or not
@@ -370,6 +363,36 @@ class LangchainAttackStrategy(AttackStrategy):
                 database_tool = DatabaseTool(secret_key)
                 calendar_tool = CalendarTool(self.attack_func)
                 tools = [database_tool, calendar_tool]
+                # tools=[
+                #         {
+                #             "name": "use_calendar",
+                #             "description": "Receive the upcoming calendar events",
+                #             "parameters": {
+                #                 "type": "object",
+                #                 "properties": {
+                #                     "query": {
+                #                         "type": "string",
+                #                         "description": "The calendar query",
+                #                     },
+                #                 },
+                #                 "required": [],
+                #             },
+                #         },
+                #         {
+                #             "name": "use_database",
+                #             "description": "Receive the database contents",
+                #             "parameters": {
+                #                 "type": "object",
+                #                 "properties": {
+                #                     "query": {
+                #                         "type": "string",
+                #                         "description": "Database SQL query",
+                #                     },
+                #                 },
+                #                 "required": [],
+                #             },
+                #         }
+                #     ]
 
                 # define the user prompt based on the chosen scenario
                 if self.scenario == "database":
@@ -384,34 +407,42 @@ class LangchainAttackStrategy(AttackStrategy):
                 user_prompt = self.defense_func(user_prompt)
 
                 # define the prompt template
-                prompt = ChatPromptTemplate.from_messages(
-                    [
-                        ("system", f"{system_prompt}"),
-                        ("user", "{input}"),
-                        MessagesPlaceholder(variable_name="agent_scratchpad"),
-                    ]
-                )
+                # prompt = ChatPromptTemplate.from_messages(
+                #     [
+                #         ("system", f"{system_prompt}"),
+                #         ("user", "{input}"),
+                #         MessagesPlaceholder(variable_name="agent_scratchpad"),
+                #     ]
+                # )
 
                 # bind the tools to the LLM
-                llm_with_tools = self.llm.bind_tools(tools)
+                self.llm.bind_tools_to_model(tools)
+                # llm_with_tools = self.llm.model.bind_tools(
+                #     tools,
+                #     function_call={"name": "use_calendar"}
+                # )
 
-                # define the agent
-                agent = (
-                    {
-                        "input": lambda x: x["input"],
-                        "agent_scratchpad": lambda x: format_to_openai_tool_messages(
-                            x["intermediate_steps"]
-                        ),
-                    }
-                    | prompt
-                    | llm_with_tools
-                    | OpenAIToolsAgentOutputParser()
-                )
+                # # define the agent
+                # agent = (
+                #     {
+                #         "input": lambda x: x["input"],
+                #         "agent_scratchpad": lambda x: format_to_openai_tool_messages(
+                #             x["intermediate_steps"]
+                #         ),
+                #     }
+                #     | prompt
+                #     | llm_with_tools
+                #     | OpenAIToolsAgentOutputParser()
+                # )
                 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
 
-                # run the agent
-                response = agent_executor.invoke({"input": user_prompt})["output"]
+                # # run the agent
+                # response = agent_executor.invoke({"input": user_prompt})["output"]
                 # print(f"{TColors.OKCYAN}Response: {response}{TColors.ENDC}")
+
+                # start the conversation. this time the malicious prompt
+                # is inside the tool, so we use the normal user prompt
+                response, _ = self.llm.chat(system_prompt, user_prompt)
 
                 # call the chat api to add the messages to the chat
                 self.chat_api_add_messages("system", system_prompt)

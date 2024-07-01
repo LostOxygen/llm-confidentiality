@@ -6,6 +6,7 @@ key.txt
 hf_token.txt
 wandb_key.txt
 langsmith_key.txt
+gmail_credentials.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

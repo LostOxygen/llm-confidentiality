@@ -35,7 +35,7 @@ def main():
             )
             creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open("gmail_credentials.json", "w", encoding="utf-8") as token:
+            with open("gmail_user_credentials.json", "w", encoding="utf-8") as token:
                 token.write(creds.to_json())
 
     try:

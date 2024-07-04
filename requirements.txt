@@ -26,6 +26,8 @@ progressbar2
 langsmith>=0.0.72
 langchain-benchmarks
 langchain-experimental
+langchain-googledrive
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
+unstructured

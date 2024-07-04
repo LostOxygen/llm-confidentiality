@@ -1,19 +1,24 @@
 """langchain llm email test script"""
 import os
 
-from langchain import hub
-from langchain.agents import AgentExecutor, create_structured_chat_agent, create_openai_functions_agent
+#from langchain import hub
+from langchain.agents import AgentExecutor, create_structured_chat_agent#, create_openai_functions_agent
 from langchain_experimental.llms.ollama_functions import OllamaFunctions
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_community.agent_toolkits import GmailToolkit
 from langchain_community.tools.gmail.utils import (
     build_resource_service,
     get_gmail_credentials,
 )
-from langchain_openai import ChatOpenAI
-from langchain_core.utils.function_calling import convert_to_openai_function
+from langchain_googledrive.tools.google_drive.tool import GoogleDriveSearchTool
+from langchain_googledrive.utilities.google_drive import GoogleDriveAPIWrapper
+
+#from langchain_openai import ChatOpenAI
 
 from colors import TColors
+
+os.environ["GOOGLE_ACCOUNT_FILE"] = "google_credentials.json"
 
 def main() -> None:
     """
@@ -49,22 +54,49 @@ def main() -> None:
     api_resource = build_resource_service(credentials=credentials)
     toolkit = GmailToolkit(api_resource=api_resource)
 
-    model = OllamaFunctions(model="llama3", temperature=0)
-    # model = ChatOpenAI(temperature=0)
+    gdrive_tool = GoogleDriveSearchTool(
+        api_wrapper=GoogleDriveAPIWrapper(
+            folder_id="12QFKRqhM_R6-MMryXuOMIMGzIqaYGupt",
+            num_results=2,
+            template="gdrive-query-in-folder",  # Search in the body of documents
+            mode="documents",
+        )
+    )
+
+    # complete tools list
+    tools_list = toolkit.get_tools() + [gdrive_tool]
+
+    allowed_tools = ["search_gmail", "send_gmail_message", "Google Drive Search"]
+    tools = [t for t in tools_list if t.name in allowed_tools]
+
+    model = OllamaFunctions(model="llama3", temperature=0, format="json")
+    #model = ChatOpenAI(temperature=0)
     # Create prompts for the agents
     system_prompt = """
         Respond to the human as helpfully and accurately as possible. You have access to the following tools:
 
-        {tools}
+        {tools} with their names {tool_names}
 
         Use a json blob to specify a tool by providing an action key (tool name) and an action_input key (tool input).
-        Make sure to use the tool input correctly with its specified formats and types. For example:
+        Make sure to use the tool input correctly with its specified formats and types. For example, when sending mails
+        use the send_gmail_message tool like this:
         $INPUT: {{
             "message": "text",
             "subject": "subject text"
             "to": ["person1", "person2", ...]
         }}
         Only append a single string to the message key. Not a dictionary or anything else.
+        
+        Or when searching fo the latest mail use the search_gmail tool:
+        $INPUT: {{
+            "query": "is:inbox",
+            "max_results": 1
+        }}
+
+        Or when searching for a document in Google Drive use the Google Drive Search tool:
+        $INPUT: {{
+            "query": "search query",
+        }}
 
         Valid "action" values: "Final Answer" or {tool_names}
 
@@ -88,6 +120,7 @@ def main() -> None:
         Observation: action result
         ... (repeat Thought/Action/Observation N times)
         Thought: I know what to respond
+        After the final action, respond with the final answer:
         Action:
         ```
         {{
@@ -104,33 +137,32 @@ def main() -> None:
         ]
     )
     model.bind_tools(
-        [convert_to_openai_function(t) for t in toolkit.get_tools()], 
+        [convert_to_openai_function(t) for t in tools],
         tool_choice="any",
     )
 
+
     agent = create_structured_chat_agent(
-        tools=toolkit.get_tools(),
+        tools=tools,
         llm=model,
         prompt=prompt,
     )
     # instructions = """You are an assistant."""
     # base_prompt = hub.pull("langchain-ai/openai-functions-template")
     # prompt = base_prompt.partial(instructions=instructions)
-    # agent = create_openai_functions_agent(model, toolkit.get_tools(), prompt)
+    #agent = create_openai_functions_agent(model, tools, prompt)
 
     agent_executor = AgentExecutor(
         agent=agent,
-        tools=toolkit.get_tools(),
+        tools=tools,
         handle_parsing_errors=True,
-        # This is set to False to prevent information about my email showing up on the screen
-        # Normally, it is helpful to have it set to True however.
         verbose=True,
     )
 
     agent_executor.invoke(
         {
-            "input": "Create a gmail draft for me with the subject 'Hello'" \
-            " and the message 'World'. It should be sent to ''.",
+            "input": "Search on google drive for 'soup' and use the received information "\
+            " to write an email with the subject 'bohnensuppe' to 'jonathan.evertz@gmail.com'",
         }
     )
 

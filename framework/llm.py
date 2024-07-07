@@ -504,6 +504,20 @@ class LLM():
                             trust_remote_code=True,
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
+            
+            case (
+                    "gemma2-9b" | "gemma2-27b"
+                ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                if self.llm_type.split("-")[1] == "9b":
+                    self.model = ChatOllama(model="gemma2", temperature=self.temperature)
+                elif self.llm_type.split("-")[1] == "27b":
+                    self.model = ChatOllama(model="llama2:27b", temperature=self.temperature)
+                else:
+                    self.model = ChatOllama(model="gemma2", temperature=self.temperature)
+
+                self.tokenizer = None
+
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
@@ -709,7 +723,8 @@ class LLM():
                 response = response[0].replace(formatted_messages.replace("<s>", ""), "", 1)
 
             case (
-                    "llama3" | "llama3-8b" | "llama3-70b" | "llama3-400b"
+                    "llama3" | "llama3-8b" | "llama3-70b" | "llama3-400b" |
+                    "gemma2-9b" | "gemma2-27b"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [

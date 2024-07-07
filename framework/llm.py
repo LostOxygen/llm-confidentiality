@@ -504,7 +504,7 @@ class LLM():
                             trust_remote_code=True,
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
-            
+
             case (
                     "gemma2-9b" | "gemma2-27b"
                 ):

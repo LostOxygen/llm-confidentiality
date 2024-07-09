@@ -512,7 +512,7 @@ class LLM():
                 if self.llm_type.split("-")[1] == "9b":
                     self.model = ChatOllama(model="gemma2", temperature=self.temperature)
                 elif self.llm_type.split("-")[1] == "27b":
-                    self.model = ChatOllama(model="llama2:27b", temperature=self.temperature)
+                    self.model = ChatOllama(model="gemma2s:27b", temperature=self.temperature)
                 else:
                     self.model = ChatOllama(model="gemma2", temperature=self.temperature)
 

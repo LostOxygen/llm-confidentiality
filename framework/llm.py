@@ -6,7 +6,6 @@ from openai import OpenAI
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.tools import BaseTool
-from langchain.chat_models import ChatOllama
 from langchain_experimental.llms.ollama_functions import OllamaFunctions
 from transformers import (
     AutoTokenizer,
@@ -406,14 +405,14 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "8b":
-                    self.model = ChatOllama(model="llama3", temperature=self.temperature)
+                    self.model = OllamaFunctions(model="llama3", temperature=self.temperature)
                 elif self.llm_type.split("-")[1] == "70b":
-                    self.model = ChatOllama(model="llama3:70b", temperature=self.temperature)
+                    self.model = OllamaFunctions(model="llama3:70b", temperature=self.temperature)
                 elif self.llm_type.split("-")[1] == "400b":
                     # model_name += "Meta-Llama-3-70B-Instruct"
                     raise NotImplementedError(f"{self.llm_type} not yet available")
                 else:
-                    self.model = ChatOllama(model="llama3", temperature=self.temperature)
+                    self.model = OllamaFunctions(model="llama3", temperature=self.temperature)
 
                 self.tokenizer = None
 
@@ -510,11 +509,11 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "9b":
-                    self.model = ChatOllama(model="gemma2", temperature=self.temperature)
+                    self.model = OllamaFunctions(model="gemma2", temperature=self.temperature)
                 elif self.llm_type.split("-")[1] == "27b":
-                    self.model = ChatOllama(model="gemma2:27b", temperature=self.temperature)
+                    self.model = OllamaFunctions(model="gemma2:27b", temperature=self.temperature)
                 else:
-                    self.model = ChatOllama(model="gemma2", temperature=self.temperature)
+                    self.model = OllamaFunctions(model="gemma2", temperature=self.temperature)
 
                 self.tokenizer = None
 

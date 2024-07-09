@@ -47,9 +47,9 @@ def main() -> None:
     # Can review scopes here https://developers.google.com/gmail/api/auth/scopes
     # For instance, readonly scope is 'https://www.googleapis.com/auth/gmail.readonly'
     credentials = get_gmail_credentials(
-        token_file="gmail_token.json",
+        token_file="google_token.json",
         scopes=["https://mail.google.com/"],
-        client_secrets_file="gmail_credentials.json",
+        client_secrets_file="google_credentials.json",
     )
     api_resource = build_resource_service(credentials=credentials)
     toolkit = GmailToolkit(api_resource=api_resource)
@@ -57,7 +57,7 @@ def main() -> None:
     gdrive_tool = GoogleDriveSearchTool(
         api_wrapper=GoogleDriveAPIWrapper(
             folder_id="12QFKRqhM_R6-MMryXuOMIMGzIqaYGupt",
-            num_results=2,
+            num_results=1,
             template="gdrive-query-in-folder",  # Search in the body of documents
             mode="documents",
         )
@@ -161,8 +161,9 @@ def main() -> None:
 
     agent_executor.invoke(
         {
-            "input": "Search on google drive for 'soup' and use the received information "\
-            " to write an email with the subject 'bohnensuppe' to 'jonathan.evertz@gmail.com'",
+            "input": "Look into my last email and tell me whats inside",
+            # "input": "Search on google drive for 'soup' and use the received information "\
+            # " to write an email with the subject 'bohnensuppe' to 'jonathan.evertz@gmail.com'",
         }
     )
 

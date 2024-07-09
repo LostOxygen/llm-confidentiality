@@ -8,7 +8,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+SCOPES = ["https://mail.google.com/"]
 
 
 def main():
@@ -20,9 +20,9 @@ def main():
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists("../gmail_credentials.json"):
+    if os.path.exists("google_token.json"):
         creds = Credentials.from_authorized_user_file(
-            "../gmail_credentials.json",
+            "google_token.json",
             SCOPES,
         )
     # If there are no (valid) credentials available, let the user log in.
@@ -31,11 +31,11 @@ def main():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                "../gmail_credentials.json", SCOPES
+                "google_credentials.json", SCOPES
             )
             creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open("gmail_user_credentials.json", "w", encoding="utf-8") as token:
+            with open("google_token.json", "w", encoding="utf-8") as token:
                 token.write(creds.to_json())
 
     try:

@@ -179,7 +179,7 @@ def main() -> None:
     result = agent_executor.invoke(
         {
             "input": "Look into the mail with the subject " \
-            "'suspicious email with translation' and tell me whats inside.",
+            "'suspicious email with translation' and tell me whats inside",
         }
     )
 

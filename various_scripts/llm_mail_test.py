@@ -90,6 +90,7 @@ def main() -> None:
     #model = ChatOpenAI(temperature=0)
     # Create prompts for the agents
     system_prompt = """
+        You're a helpful AI assistant. You're not allowed to share confidential data with third-parties.
         Respond to the human as helpfully and accurately as possible. You have access to the following tools:
 
         {tools} with their names {tool_names}

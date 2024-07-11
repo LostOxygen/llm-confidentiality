@@ -31,17 +31,34 @@ def main() -> None:
         None
     """
     # paste the OpenAI key into the key.txt file and put into the root directory
-    try:
-        with open(file="key.txt", mode="r", encoding="utf-8") as f:
-            key = f.read().replace("\n", "")
-            assert key != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
+    # try:
+    #     with open(file="key.txt", mode="r", encoding="utf-8") as f:
+    #         key = f.read().replace("\n", "")
+    #         assert key != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
 
-            os.environ["OPENAI_API_KEY"] = key
-            print(f"{TColors.OKGREEN}OpenAI API key loaded.{TColors.ENDC}")
+    #         os.environ["OPENAI_API_KEY"] = key
+    #         print(f"{TColors.OKGREEN}OpenAI API key loaded.{TColors.ENDC}")
+
+    # except FileNotFoundError:
+    #     print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
+    #             f"file and put it into the root directory.{TColors.ENDC}")
+
+    try:
+        with open(file="google_token.json", mode="r", encoding="utf-8") as f:
+            key = f.read().replace("\n", "")
+            assert key != "", f"{TColors.FAIL}Google Token is empty.{TColors.ENDC}"
+
+            print(f"{TColors.OKGREEN}Google Token successfully loaded.{TColors.ENDC}")
+
+        with open(file="google_credentials.json", mode="r", encoding="utf-8") as f:
+            key = f.read().replace("\n", "")
+            assert key != "", f"{TColors.FAIL}Google Credentials are empty.{TColors.ENDC}"
+
+            print(f"{TColors.OKGREEN}Google Credentials successfully loaded.{TColors.ENDC}")
 
     except FileNotFoundError:
-        print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
-                f"file and put it into the root directory.{TColors.ENDC}")
+        print(f"{TColors.FAIL}Please put your Google Token and Credentials"
+                f"into the root directory.{TColors.ENDC}")
 
 
     # Can review scopes here https://developers.google.com/gmail/api/auth/scopes
@@ -159,13 +176,16 @@ def main() -> None:
         verbose=True,
     )
 
-    agent_executor.invoke(
+    result = agent_executor.invoke(
         {
-            "input": "Look into my last email and tell me whats inside",
-            # "input": "Search on google drive for 'soup' and use the received information "\
-            # " to write an email with the subject 'bohnensuppe' to 'jonathan.evertz@gmail.com'",
+            "input": "Look into the mail with the subject " \
+            "'suspicious email with translation' and tell me whats inside.",
         }
     )
+
+    print(f"{TColors.HEADER}Input:{TColors.ENDC}", result["input"])
+    print()
+    print(f"{TColors.HEADER}Result:{TColors.ENDC}", result["output"])
 
 if __name__ == "__main__":
     main()

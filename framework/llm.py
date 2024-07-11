@@ -4,8 +4,11 @@ from typing import Tuple, Final, Type, Optional
 import torch
 from openai import OpenAI
 
-from langchain_core.prompts import ChatPromptTemplate
 from langchain.tools import BaseTool
+from langchain.agents import AgentExecutor, create_structured_chat_agent
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.utils.function_calling import convert_to_openai_function
+from langchain_community.chat_models import ChatOllama
 from langchain_experimental.llms.ollama_functions import OllamaFunctions
 from transformers import (
     AutoTokenizer,
@@ -405,11 +408,25 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "8b":
+                    self.model = ChatOllama(model="llama3", temperature=self.temperature)
+                elif self.llm_type.split("-")[1] == "70b":
+                    self.model = ChatOllama(model="llama3:70b", temperature=self.temperature)
+                elif self.llm_type.split("-")[1] == "400b":
+                    raise NotImplementedError(f"{self.llm_type} not yet available")
+                else:
+                    self.model = ChatOllama(model="llama3", temperature=self.temperature)
+
+                self.tokenizer = None
+
+            case (
+                    "llama3-8b-tools" | "llama3-70b-tools" | "llama3-400b-tools"
+                ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                if self.llm_type.split("-")[1] == "8b":
                     self.model = OllamaFunctions(model="llama3", temperature=self.temperature)
                 elif self.llm_type.split("-")[1] == "70b":
                     self.model = OllamaFunctions(model="llama3:70b", temperature=self.temperature)
                 elif self.llm_type.split("-")[1] == "400b":
-                    # model_name += "Meta-Llama-3-70B-Instruct"
                     raise NotImplementedError(f"{self.llm_type} not yet available")
                 else:
                     self.model = OllamaFunctions(model="llama3", temperature=self.temperature)
@@ -509,6 +526,19 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "9b":
+                    self.model = ChatOllama(model="gemma2", temperature=self.temperature)
+                elif self.llm_type.split("-")[1] == "27b":
+                    self.model = ChatOllama(model="gemma2:27b", temperature=self.temperature)
+                else:
+                    self.model = ChatOllama(model="gemma2", temperature=self.temperature)
+
+                self.tokenizer = None
+
+            case (
+                    "gemma2-9b-tool" | "gemma2-27b-tool"
+                ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                if self.llm_type.split("-")[1] == "9b":
                     self.model = OllamaFunctions(model="gemma2", temperature=self.temperature)
                 elif self.llm_type.split("-")[1] == "27b":
                     self.model = OllamaFunctions(model="gemma2:27b", temperature=self.temperature)
@@ -538,7 +568,10 @@ class LLM():
         Returns:
             None
         """
-        self.model.bind_tools(tools)
+        self.model.bind_tools(
+            [convert_to_openai_function(t) for t in tools],
+            tool_choice="any",
+        )
 
     @staticmethod
     def format_prompt(system_prompt: str, user_prompt: str, llm_type: str) -> str:
@@ -734,6 +767,35 @@ class LLM():
                 model_chain = prompt | self.model
 
                 response = model_chain.invoke({"user_prompt", user_prompt}).content
+                history = system_prompt + user_prompt + response
+
+            case (
+                    "llama3-tools" | "llama3-8b-tools" | "llama3-70b-tools" | 
+                    "llama3-400b-tools" | "gemma2-9b-tools" | "gemma2-27b-tools"
+                ):
+                prompt = ChatPromptTemplate.from_messages(
+                    [
+                        ("system", system_prompt),
+                        ("human", "{user_prompt}\n {agent_scratchpad}"),
+                    ]
+                )
+                agent = create_structured_chat_agent(
+                    tools=self.tools,
+                    llm=self.model,
+                    prompt=prompt,
+                )
+                agent_executor = AgentExecutor(
+                    agent=agent,
+                    tools=self.tools,
+                    handle_parsing_errors=True,
+                    verbose=False,
+                )
+
+                agent_executor.invoke(
+                    {
+                        "user_prompt": user_prompt,
+                    }
+                )
                 history = system_prompt + user_prompt + response
 
             case (

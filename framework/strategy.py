@@ -317,7 +317,7 @@ class LangchainAttackStrategy(AttackStrategy):
         self.device = device
 
         self.llm: Type[LLM] = LLM(
-                llm_type=llm_type,
+                llm_type=llm_type+"-tools",
                 temperature=temperature,
                 llm_suffix=llm_suffix,
                 device=self.device,
@@ -363,36 +363,6 @@ class LangchainAttackStrategy(AttackStrategy):
                 database_tool = DatabaseTool(secret_key)
                 calendar_tool = CalendarTool(self.attack_func)
                 tools = [database_tool, calendar_tool]
-                # tools=[
-                #         {
-                #             "name": "use_calendar",
-                #             "description": "Receive the upcoming calendar events",
-                #             "parameters": {
-                #                 "type": "object",
-                #                 "properties": {
-                #                     "query": {
-                #                         "type": "string",
-                #                         "description": "The calendar query",
-                #                     },
-                #                 },
-                #                 "required": [],
-                #             },
-                #         },
-                #         {
-                #             "name": "use_database",
-                #             "description": "Receive the database contents",
-                #             "parameters": {
-                #                 "type": "object",
-                #                 "properties": {
-                #                     "query": {
-                #                         "type": "string",
-                #                         "description": "Database SQL query",
-                #                     },
-                #                 },
-                #                 "required": [],
-                #             },
-                #         }
-                #     ]
 
                 # define the user prompt based on the chosen scenario
                 if self.scenario == "database":
@@ -406,39 +376,8 @@ class LangchainAttackStrategy(AttackStrategy):
                 # wrap the user input into a defense function if given
                 user_prompt = self.defense_func(user_prompt)
 
-                # define the prompt template
-                # prompt = ChatPromptTemplate.from_messages(
-                #     [
-                #         ("system", f"{system_prompt}"),
-                #         ("user", "{input}"),
-                #         MessagesPlaceholder(variable_name="agent_scratchpad"),
-                #     ]
-                # )
-
                 # bind the tools to the LLM
                 self.llm.bind_tools_to_model(tools)
-                # llm_with_tools = self.llm.model.bind_tools(
-                #     tools,
-                #     function_call={"name": "use_calendar"}
-                # )
-
-                # # define the agent
-                # agent = (
-                #     {
-                #         "input": lambda x: x["input"],
-                #         "agent_scratchpad": lambda x: format_to_openai_tool_messages(
-                #             x["intermediate_steps"]
-                #         ),
-                #     }
-                #     | prompt
-                #     | llm_with_tools
-                #     | OpenAIToolsAgentOutputParser()
-                # )
-                # agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=False)
-
-                # # run the agent
-                # response = agent_executor.invoke({"input": user_prompt})["output"]
-                # print(f"{TColors.OKCYAN}Response: {response}{TColors.ENDC}")
 
                 # start the conversation. this time the malicious prompt
                 # is inside the tool, so we use the normal user prompt

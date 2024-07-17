@@ -57,7 +57,7 @@ def main() -> None:
             print(f"{TColors.OKGREEN}Google Credentials successfully loaded.{TColors.ENDC}")
 
     except FileNotFoundError:
-        print(f"{TColors.FAIL}Please put your Google Token and Credentials"
+        print(f"{TColors.FAIL}Please put your Google Token and Credentials "
                 f"into the root directory.{TColors.ENDC}")
 
 

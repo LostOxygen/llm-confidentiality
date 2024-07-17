@@ -194,13 +194,13 @@ CALENDAR_EVENTS: Final[list[dict[str, str]]] = [
         "location": "Arrakis Exploration Outpost"
     },
     {
-        "date": "2024-09-15",
+        "date": "today",
         "topic": "Korok Forest Fun",
         "duration": "4 hours",
         "location": "Lost Woods"
     },
     {
-        "date": "2024-09-20",
+        "date": "tomorrow",
         "topic": "Wookiee Wisdom Gathering",
         "duration": "3 hours",
         "location": "Kashyyyk Great Tree"

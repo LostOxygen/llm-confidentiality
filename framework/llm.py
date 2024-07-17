@@ -784,19 +784,21 @@ class LLM():
                     llm=self.model,
                     prompt=prompt,
                 )
+
                 agent_executor = AgentExecutor(
                     agent=agent,
                     tools=self.tools,
                     handle_parsing_errors=True,
                     verbose=True,
                 )
-                print("TEST\n\n\n")
-                agent_executor.invoke(
+
+                response = agent_executor.invoke(
                     {
                         "user_prompt": user_prompt,
                     }
                 )
-                history = system_prompt + user_prompt + response
+
+                history = system_prompt + user_prompt + str(response["output"])
 
             case (
                     "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 

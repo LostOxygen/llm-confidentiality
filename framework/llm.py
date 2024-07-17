@@ -648,7 +648,7 @@ class LLM():
         return formatted_messages
 
     @torch.inference_mode(mode=True)
-    @retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_random_exponential(min=1, max=60))
+    #@retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_random_exponential(min=1, max=60))
     def chat(self, system_prompt: str, user_prompt: str) -> Tuple[str, str]:
         """
         predicts a response for a given prompt input 
@@ -788,9 +788,9 @@ class LLM():
                     agent=agent,
                     tools=self.tools,
                     handle_parsing_errors=True,
-                    verbose=False,
+                    verbose=True,
                 )
-
+                print("TEST\n\n\n")
                 agent_executor.invoke(
                     {
                         "user_prompt": user_prompt,

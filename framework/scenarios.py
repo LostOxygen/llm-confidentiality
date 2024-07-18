@@ -25,4 +25,9 @@ class Scenarios(Enum):
     NotesWithMail = 15
     NotesWithNotes = 16
 
+    CloudWithCalendar = 17
+    CloudWithMail = 18
+    CloudWithNotes = 19
+    CloudWithCloud = 20
+
     # possibly also website summary with tools combined

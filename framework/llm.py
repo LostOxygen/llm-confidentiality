@@ -44,11 +44,13 @@ class LLM():
             llm_suffix: str = "",
             device: str = "cpu",
             tools: Optional[BaseTool] = None,
+            verbose: Optional[bool] = False,
         ) -> None:
         self.llm_suffix: str = llm_suffix
         self.llm_type: str = llm_type
         self.device: str = device
         self.tools: BaseTool = tools
+        self.verbose: bool = verbose
 
         if self.llm_type not in ("gpt-3.5-turbo", "gpt-4"):
             # yes i know this is really dirty, but it does it's job
@@ -672,7 +674,7 @@ class LLM():
         return formatted_messages
 
     @torch.inference_mode(mode=True)
-    #@retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_random_exponential(min=1, max=60))
+    @retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_random_exponential(min=1, max=60))
     def chat(self, system_prompt: str, user_prompt: str) -> Tuple[str, str]:
         """
         predicts a response for a given prompt input 
@@ -813,7 +815,7 @@ class LLM():
                     agent=agent,
                     tools=self.tools,
                     handle_parsing_errors=True,
-                    verbose=True,
+                    verbose=self.verbose,
                 )
 
                 response = agent_executor.invoke(

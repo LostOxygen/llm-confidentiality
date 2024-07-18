@@ -329,6 +329,7 @@ class LangchainAttackStrategy(AttackStrategy):
                 llm_suffix=llm_suffix,
                 device=self.device,
                 tools=self.tools,
+                verbose=self.verbose,
             )
 
         # whether to use the llm to guess the secret key or not

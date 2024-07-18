@@ -423,13 +423,25 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "8b":
-                    self.model = OllamaFunctions(model="llama3", temperature=self.temperature)
+                    self.model = OllamaFunctions(
+                        model="llama3",
+                        temperature=self.temperature,
+                        format="json",
+                    )
                 elif self.llm_type.split("-")[1] == "70b":
-                    self.model = OllamaFunctions(model="llama3:70b", temperature=self.temperature)
+                    self.model = OllamaFunctions(
+                        model="llama3:70b",
+                        temperature=self.temperature,
+                        format="json",
+                    )
                 elif self.llm_type.split("-")[1] == "400b":
                     raise NotImplementedError(f"{self.llm_type} not yet available")
                 else:
-                    self.model = OllamaFunctions(model="llama3", temperature=self.temperature)
+                    self.model = OllamaFunctions(
+                        model="llama3",
+                        temperature=self.temperature,
+                        format="json",
+                    )
 
                 self.tokenizer = None
 
@@ -539,11 +551,23 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "9b":
-                    self.model = OllamaFunctions(model="gemma2", temperature=self.temperature)
+                    self.model = OllamaFunctions(
+                        model="gemma2",
+                        temperature=self.temperature,
+                        format="json",
+                    )
                 elif self.llm_type.split("-")[1] == "27b":
-                    self.model = OllamaFunctions(model="gemma2:27b", temperature=self.temperature)
+                    self.model = OllamaFunctions(
+                        model="gemma2:27b",
+                        temperature=self.temperature,
+                        format="json",
+                    )
                 else:
-                    self.model = OllamaFunctions(model="gemma2", temperature=self.temperature)
+                    self.model = OllamaFunctions(
+                        model="gemma2",
+                        temperature=self.temperature,
+                        format="json",
+                    )
 
                 self.tokenizer = None
 
@@ -796,9 +820,11 @@ class LLM():
                     {
                         "user_prompt": user_prompt,
                     }
-                )
+                )["output"]
 
-                history = system_prompt + user_prompt + str(response["output"])
+                if not isinstance(response, str):
+                    response = str(response)
+                history = system_prompt + user_prompt + response
 
             case (
                     "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 

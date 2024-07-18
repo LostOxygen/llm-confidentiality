@@ -1,7 +1,8 @@
 """library of utility functions"""
-# pylint: disable=incosistent-quotes
+# pylint: disable=inconsistent-quotes
 import os
 import datetime
+import random
 from typing import Optional
 
 LOG_PATH: str = "./logs/"
@@ -203,3 +204,19 @@ def log_benchmark(
         total_score = round(total_successrate/total_iterations, 2)
         f.write(f">>Total Score: {total_score}%\n")
         f.write("\n"+"#"*100)
+
+
+def make_string_typoglycemiac(text: str) -> str:
+    """
+    Returns a string with the characters of each word randomly rearranged, 
+    except for the first and last characters.
+
+    Parameters:
+        text: str - the input text
+
+    Returns:
+        str - the text with the characters of each word randomly rearranged
+    """
+    result = " ".join([word[0] + "".join(random.sample(word[1:-1], \
+             len(word[1:-1]))) + word[-1] for word in text.split()])
+    return result

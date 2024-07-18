@@ -1,26 +1,28 @@
 """library implementing the different attack scenarios as enums"""
+# pylint: disable=invalid-name
 from enum import Enum
 
 
 class Scenarios(Enum):
     """Scenario class providing the different scenarios as strings using Enums"""
-    # Scenario 1:
-    # Scenario 2:
-    # Scenario 3:
-    # Scenario 4:
-    # Scenario 5:
-    # Scenario 6:
-    # Scenario 7:
-    # Scenario 8:
-    # Scenario 9:
-    # Scenario 10:
-    # Scenario 11:
-    # Scenario 12:
-    # Scenario 13:
-    # Scenario 14:
-    # Scenario 15:
-    # Scenario 16:
-    # Scenario 17:
-    # Scenario 18:
-    # Scenario 19:
-    # Scenario 20:
+    CloudPlain = 1
+    CalendarPlain = 2
+    MailPlain = 3
+    NotesPlain = 4
+
+    CalendarWithClound = 5
+    CalendarWithMail = 6
+    CalendarWithNotes = 7
+    CalendarWithCalendar = 8
+
+    MailWithCloud = 9
+    MailWithCalendar = 10
+    MailWithNotes = 11
+    MailWithMail = 12
+
+    NotesWithCloud = 13
+    NotesWithCalendar = 14
+    NotesWithMail = 15
+    NotesWithNotes = 16
+
+    # possibly also website summary with tools combined

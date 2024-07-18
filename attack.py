@@ -42,6 +42,7 @@ from framework.defenses import (
     )
 from framework.colors import TColors
 from framework.utils import log_results
+from framework.scenarios import Scenarios
 
 
 if not os.path.isdir(str(Path.home() / "data")):
@@ -136,6 +137,19 @@ def main(
     if "all" in defenses:
         defenses = ["none"] + DEFENSES_LIST
 
+    # set the scenario string properly
+    scenario = [s.lower() for s in scenario]
+    scenario_print = []
+    scenario_list = []
+    if scenario == "all":
+        scenario_print = list(Scenarios.__members__.keys())
+        scenario_list = [scenario for scenario in Scenarios]
+
+    for scenario_iter in Scenarios:
+        if scenario_iter.name.lower() in scenario:
+            scenario_print.append(scenario_iter.name)
+            scenario_list.append(scenario_iter)
+
     # add '-' in front of the name suffix
     if name_suffix != "" and not name_suffix.startswith("-"):
         name_suffix = "-" + name_suffix
@@ -166,11 +180,11 @@ def main(
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Iterations{TColors.ENDC}: {iterations}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM Guessing{TColors.ENDC}: {llm_guessing}")
-    if strategy in ["langchain", "LangChain", "lang_chain", "lang-chain"]:
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Strategy{TColors.ENDC}: {strategy}")
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Scenario{TColors.ENDC}: {scenario}")
+    if strategy in ["tools", "langchain", "LangChain", "lang_chain", "lang-chain"]:
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Strategy{TColors.ENDC}: {strategy}")
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}Scenario(s){TColors.ENDC}: {scenario_print}")
     else:
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Strategy{TColors.ENDC}: secrey-key game")
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}Strategy{TColors.ENDC}: normal secrey-key game")
     if verbose:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Verbose Logging{TColors.ENDC}: {verbose}")
     if create_prompt_dataset:
@@ -184,21 +198,78 @@ def main(
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
     # initialize the strategy
-    if strategy in ["langchain", "LangChain", "lang_chain", "lang-chain"]:
-        attack_strategy = LangchainAttackStrategy(
-                    attack_func=None,
-                    defense_func=None,
-                    llm_type=llm_type,
-                    llm_suffix=name_suffix,
-                    llm_guessing=llm_guessing,
-                    temperature=temperature,
-                    iterations=iterations,
-                    create_prompt_dataset=create_prompt_dataset,
-                    create_response_dataset=create_response_dataset,
-                    scenario=scenario,
-                    verbose=verbose,
-                    device=device
-                )
+    if strategy in ["tools", "langchain", "LangChain", "lang_chain", "lang-chain"]:
+        for exec_scenario in scenario_list:
+            print(f"{TColors.HEADER}{TColors.BOLD}>> Executing Scenario: " \
+                  f"{exec_scenario.name}{TColors.ENDC}")
+
+            attack_strategy = LangchainAttackStrategy(
+                        attack_func=None,
+                        defense_func=None,
+                        llm_type=llm_type,
+                        llm_suffix=name_suffix,
+                        llm_guessing=llm_guessing,
+                        temperature=temperature,
+                        iterations=iterations,
+                        create_prompt_dataset=create_prompt_dataset,
+                        create_response_dataset=create_response_dataset,
+                        scenario=exec_scenario,
+                        verbose=verbose,
+                        device=device
+                    )
+
+            for defense in defenses:
+                # set the defense function
+                match defense:
+                    case "seq_enclosure": defense_func = seq_enclosure
+                    case "xml_tagging": defense_func = xml_tagging
+                    case "heuristic_defense": defense_func = heuristic_defense
+                    case "sandwiching": defense_func = sandwiching
+                    case "llm_eval": defense_func = llm_eval
+                    case "ppl_detection": defense_func = ppl_detection
+                    case ("None" | "none"): defense_func = identity_prompt
+                    case _: defense_func = identity_prompt
+
+                for attack in attacks:
+                    # set the attack function
+                    match attack:
+                        case "identity": attack_func = identity
+                        case "chat_base": attack_func = chat_base
+                        case "payload_splitting": attack_func = payload_splitting
+                        case "obfuscation": attack_func = obfuscation
+                        case "jailbreak": attack_func = jailbreak
+                        case "translation": attack_func = translation
+                        case "chatml_abuse": attack_func = chatml_abuse
+                        case "masking": attack_func = masking
+                        case "typoglycemia": attack_func = typoglycemia
+                        case "advs_suffix": attack_func = advs_suffix
+                        case _:
+                            print(f"{TColors.FAIL}Attack type {attack} " \
+                                  "is not supported.{TColors.ENDC}")
+                            print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
+                            sys.exit(1)
+
+                    # set the attack and defense functions
+                    attack_strategy.set_attack_func(attack_func)
+                    attack_strategy.set_defense_func(defense_func)
+                    # run the attack
+                    total_successes[attack] = attack_strategy.execute()
+                    torch.cuda.empty_cache()
+
+                # print and log the results
+                print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
+                for attack, successes in total_successes.items():
+                    print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}"
+                        f"/{iterations}")
+                log_results(
+                        llm_name=llm_type+name_suffix,
+                        defense_name=defense,
+                        success_dict=total_successes,
+                        iters=iterations,
+                        overwrite=True,
+                        scenario=exec_scenario.name,
+                    )
+
     else:
         attack_strategy = SecretKeyAttackStrategy(
                     attack_func=None,
@@ -214,54 +285,54 @@ def main(
                     device=device
                 )
 
-    for defense in defenses:
-        # set the defense function
-        match defense:
-            case "seq_enclosure": defense_func = seq_enclosure
-            case "xml_tagging": defense_func = xml_tagging
-            case "heuristic_defense": defense_func = heuristic_defense
-            case "sandwiching": defense_func = sandwiching
-            case "llm_eval": defense_func = llm_eval
-            case "ppl_detection": defense_func = ppl_detection
-            case ("None" | "none"): defense_func = identity_prompt
-            case _: defense_func = identity_prompt
+        for defense in defenses:
+            # set the defense function
+            match defense:
+                case "seq_enclosure": defense_func = seq_enclosure
+                case "xml_tagging": defense_func = xml_tagging
+                case "heuristic_defense": defense_func = heuristic_defense
+                case "sandwiching": defense_func = sandwiching
+                case "llm_eval": defense_func = llm_eval
+                case "ppl_detection": defense_func = ppl_detection
+                case ("None" | "none"): defense_func = identity_prompt
+                case _: defense_func = identity_prompt
 
-        for attack in attacks:
-            # set the attack function
-            match attack:
-                case "identity": attack_func = identity
-                case "chat_base": attack_func = chat_base
-                case "payload_splitting": attack_func = payload_splitting
-                case "obfuscation": attack_func = obfuscation
-                case "jailbreak": attack_func = jailbreak
-                case "translation": attack_func = translation
-                case "chatml_abuse": attack_func = chatml_abuse
-                case "masking": attack_func = masking
-                case "typoglycemia": attack_func = typoglycemia
-                case "advs_suffix": attack_func = advs_suffix
-                case _:
-                    print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
-                    print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
-                    sys.exit(1)
+            for attack in attacks:
+                # set the attack function
+                match attack:
+                    case "identity": attack_func = identity
+                    case "chat_base": attack_func = chat_base
+                    case "payload_splitting": attack_func = payload_splitting
+                    case "obfuscation": attack_func = obfuscation
+                    case "jailbreak": attack_func = jailbreak
+                    case "translation": attack_func = translation
+                    case "chatml_abuse": attack_func = chatml_abuse
+                    case "masking": attack_func = masking
+                    case "typoglycemia": attack_func = typoglycemia
+                    case "advs_suffix": attack_func = advs_suffix
+                    case _:
+                        print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
+                        print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
+                        sys.exit(1)
 
-            # set the attack and defense functions
-            attack_strategy.set_attack_func(attack_func)
-            attack_strategy.set_defense_func(defense_func)
-            # run the attack
-            total_successes[attack] = attack_strategy.execute()
-            torch.cuda.empty_cache()
+                # set the attack and defense functions
+                attack_strategy.set_attack_func(attack_func)
+                attack_strategy.set_defense_func(defense_func)
+                # run the attack
+                total_successes[attack] = attack_strategy.execute()
+                torch.cuda.empty_cache()
 
-        # print and log the results
-        print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
-        for attack, successes in total_successes.items():
-            print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
-                f"{iterations}")
-        log_results(
-                llm_name=llm_type+name_suffix,
-                defense_name=defense,
-                success_dict=total_successes,
-                iters=iterations
-            )
+            # print and log the results
+            print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
+            for attack, successes in total_successes.items():
+                print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
+                    f"{iterations}")
+            log_results(
+                    llm_name=llm_type+name_suffix,
+                    defense_name=defense,
+                    success_dict=total_successes,
+                    iters=iterations
+                )
 
     end = time.perf_counter()
     duration = (round(end - start) / 60.) / 60.
@@ -292,8 +363,8 @@ if __name__ == "__main__":
                         default="", type=str)
     parser.add_argument("--strategy", "-s", help="which strategy to use (secretkey or langchain)",
                         default="", type=str)
-    parser.add_argument("--scenario", "-sc", help="which scenario to use for langchain attacks",
-                        default="database", type=str)
+    parser.add_argument("--scenario", "-sc", help="which scenario to use for tool based attacks",
+                        default=["all"], type=str, nargs="+")
     parser.add_argument("--verbose", "-v", help="enables a more verbose logging output",
                         action="store_true", default=False)
     parser.add_argument("--device", "-dx", type=str, default="cpu",

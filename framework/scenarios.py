@@ -10,7 +10,7 @@ class Scenarios(Enum):
     MailPlain = 3
     NotesPlain = 4
 
-    CalendarWithClound = 5
+    CalendarWithCloud = 5
     CalendarWithMail = 6
     CalendarWithNotes = 7
     CalendarWithCalendar = 8

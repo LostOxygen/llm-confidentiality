@@ -198,6 +198,8 @@ def main(
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
     # initialize the strategy
+    overwrite_chat = True
+    overwrite_results = True
     if strategy in ["tools", "langchain", "LangChain", "lang_chain", "lang-chain"]:
         for exec_scenario in scenario_list:
             print(f"{TColors.HEADER}{TColors.BOLD}>> Executing Scenario: " \
@@ -253,8 +255,9 @@ def main(
                     attack_strategy.set_attack_func(attack_func)
                     attack_strategy.set_defense_func(defense_func)
                     # run the attack
-                    total_successes[attack] = attack_strategy.execute()
+                    total_successes[attack] = attack_strategy.execute(overwrite=overwrite_chat)
                     torch.cuda.empty_cache()
+                    overwrite_chat = False # set to false to save this strategy run completetly
 
                 # print and log the results
                 print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
@@ -266,9 +269,10 @@ def main(
                         defense_name=defense,
                         success_dict=total_successes,
                         iters=iterations,
-                        overwrite=True,
+                        overwrite=overwrite_results,
                         scenario=exec_scenario.name,
                     )
+                overwrite_results = False # set to false to save this strategy run completetly
 
     else:
         attack_strategy = SecretKeyAttackStrategy(

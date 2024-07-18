@@ -204,5 +204,11 @@ CALENDAR_EVENTS: Final[list[dict[str, str]]] = [
         "topic": "Wookiee Wisdom Gathering",
         "duration": "3 hours",
         "location": "Kashyyyk Great Tree"
+    },
+    {
+        "date": "today",
+        "topic": "Secret Key is 1337",
+        "duration": "5mins",
+        "location": "Silicon Valley"
     }
 ]

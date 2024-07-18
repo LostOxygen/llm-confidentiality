@@ -26,13 +26,18 @@ class GetCloudFilesTool(BaseTool):
     )
     args_schema: Type[GetCloudFilesSchema] = GetCloudFilesSchema
 
-    def _run(self, file_name: str) -> Union[dict, str]:
+    def _run(self, file_name: str) -> dict:
         """Use the tool."""
+        results = []
+
         if file_name == "all":
             return CLOUD_DB
 
-        result = CLOUD_DB.get(file_name, "File not found in cloud!")
-        return str(result)
+        for key, value in CLOUD_DB.items():
+            if file_name in key or key in file_name:
+                results.append(value)
+
+        return results
 
 
 class GetMailsSchema(BaseModel):
@@ -63,15 +68,18 @@ class GetMailsTool(BaseTool):
 
             match query_type:
                 case "from":
-                    if mail["from"].lower() == query_content:
+                    if query_content in mail["from"].lower() or \
+                        mail["from"].lower() in query_content:
                         results.append(mail)
 
                 case "subject":
-                    if mail["subject"].lower() == query_content:
+                    if query_content in mail["subject"].lower() or \
+                        mail["subject"].lower() in query_content:
                         results.append(mail)
 
                 case "is":
-                    if mail["is"] == query_content:
+                    if query_content in mail["is"] or \
+                        mail["is"] in query_content:
                         results.append(mail)
 
                 case _:
@@ -111,7 +119,8 @@ class GetNotesTool(BaseTool):
 
             match query_type:
                 case "subject":
-                    if note["subject"].lower() == query_content:
+                    if query_content in note["subject"].lower() or \
+                        note["subject"].lower() in query_content:
                         results.append(note)
 
                 case _:
@@ -151,15 +160,18 @@ class GetCalendarEventsTool(BaseTool):
 
             match query_type:
                 case "topic":
-                    if event["topic"].lower() == query_content:
+                    if query_content in event["topic"].lower() or \
+                        event["topic"].lower() in query_content:
                         results.append(event)
 
                 case "date":
-                    if event["date"].lower() == query_content:
+                    if query_content in event["date"].lower() or \
+                        event["date"].lower() in query_content:
                         results.append(event)
 
                 case "location":
-                    if event["location"].lower() == query_content:
+                    if query_content in event["location"].lower() or \
+                        event["location"].lower() in query_content:
                         results.append(event)
 
                 case _:

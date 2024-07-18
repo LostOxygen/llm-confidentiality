@@ -1,6 +1,7 @@
 """library of utility functions"""
 import os
 import datetime
+from typing import Optional
 
 LOG_PATH: str = "./logs/"
 
@@ -101,7 +102,9 @@ def log_results(
         llm_name: str,
         defense_name: str,
         success_dict: dict,
-        iters: int
+        iters: int,
+        overwrite: Optional[bool] = False,
+        scenario: Optional[str] = None,
     ) -> None:
     """
     Logs the final attack/defense results into the {llm_name}_result_logs.txt file.
@@ -111,6 +114,8 @@ def log_results(
         defense_name: str - the name of the defense
         success_dict: dict - the dictionary containing the attack/defense results
         iters: int - the number of iterations for the attacks
+        overwrite: bool - whether to overwrite the file or not
+        scenario: str - the scenario of the attack (if the tool attack strategy is used)
 
     Returns:
         None
@@ -121,11 +126,18 @@ def log_results(
 
     file_name = LOG_PATH + f"{llm_name}_result_logs.txt"
 
-    with open(file=file_name, mode="a", encoding="utf-8") as f:
+    if overwrite:
+        mode = "w"
+    else:
+        mode = "a"
+
+    with open(file=file_name, mode=mode, encoding="utf-8") as f:
         f.write("\n"+"#"*100)
         f.write(f"\n>>Time: {str(datetime.datetime.now().strftime('%A, %d. %B %Y %I:%M%p'))}\n")
         f.write(f">>LLM Type: {llm_name}\n")
         f.write(f">>Defense: {defense_name}\n")
+        if scenario:
+            f.write(f">>Scenario: {scenario}\n")
         f.write(">>Attack Results: \n\n")
 
         total_successes: int = 0

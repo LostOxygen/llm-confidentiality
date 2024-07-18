@@ -19,11 +19,11 @@ from transformers import (
     GenerationConfig,
     pipeline
 )
-from tenacity import (
-    retry,
-    stop_after_attempt,
-    wait_random_exponential,
-)
+# from tenacity import (
+#     retry,
+#     stop_after_attempt,
+#     wait_random_exponential,
+# )
 
 from framework.prompts import (
     AttackStopping,
@@ -674,7 +674,7 @@ class LLM():
         return formatted_messages
 
     @torch.inference_mode(mode=True)
-    @retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_random_exponential(min=1, max=60))
+    #@retry(stop=stop_after_attempt(MAX_RETRIES), wait=wait_random_exponential(min=1, max=60))
     def chat(self, system_prompt: str, user_prompt: str) -> Tuple[str, str]:
         """
         predicts a response for a given prompt input 

@@ -1,4 +1,5 @@
 """library of utility functions"""
+# pylint: disable=incosistent-quotes
 import os
 import datetime
 from typing import Optional
@@ -15,7 +16,9 @@ def log_conversation(
         sys_prompt: str,
         response: str,
         success: bool,
-        secret_key: str
+        secret_key: str,
+        scenario: Optional[str] = None,
+        overwrite: Optional[bool] = False,
     ) -> None:
     """
     Logs the conversation between the user and the opponent LLM into 
@@ -31,6 +34,8 @@ def log_conversation(
         response: str - the response of the opponent LLM
         success: bool - whether the response contains the secret key or not
         secret_key: str - the secret key
+        scenario: str - the scenario of the attack (if the tool attack strategy is used)
+        overwrite: bool - whether to overwrite the file or not
 
     Returns:
         None
@@ -40,10 +45,17 @@ def log_conversation(
 
     file_name = LOG_PATH + f"{llm_name}_chat_logs.txt"
 
-    with open(file=file_name, mode="a", encoding="utf-8") as f:
+    if overwrite:
+        mode = "w"
+    else:
+        mode = "a"
+
+    with open(file=file_name, mode=mode, encoding="utf-8") as f:
         f.write("\n"+"#"*100)
         f.write(f"\n>>Time: {str(datetime.datetime.now().strftime('%A, %d. %B %Y %I:%M%p'))}\n")
         f.write(f">>LLM Type: {llm_name}\n")
+        if scenario:
+            f.write(f">>Scenario: {scenario}\n")
         f.write(f">>Attack: {attack_name}\n")
         f.write(f">>Defense: {defense_name}\n")
         f.write(f">>iteration: {iteration}\n")

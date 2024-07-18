@@ -60,8 +60,8 @@ python attack.py --attacks "payload_splitting" "obfuscation" --defense "xml_tagg
 | ```-cr, --create_response_dataset``` | <b>bool</b> | ```False``` | specifies whether a new dataset of secret leaking responses should be created |
 | ```-i, --iterations``` | <b>int</b> | ```10``` | specifies the number of iterations for the attack |
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a name suffix to load custom models. Since argument parameter strings aren't allowed to start with '-' symbols, the first '-' will be added by the parser automatically |
-| ```-s, --strategy``` | <b>str</b> | ```None``` | Specifies the strategy for the attack (whether to use normal attacks or ```langchain``` attacks) |
-| ```-sc, --scenario``` | <b>str</b> | ```database``` | Specifies the scenario for the attack (whether to use ```database``` or ```database+calendar``` scenario) |
+| ```-s, --strategy``` | <b>str</b> | ```None``` | Specifies the strategy for the attack (whether to use normal attacks or ```tools``` attacks) |
+| ```-sc, --scenario``` | <b>str</b> | ```all``` | Specifies the scenario for the tool based attacks |
 | ```-dx, --device``` | <b>str</b> | ```cpu```| Specifies the device which is used for running the script (cpu, cuda, or mps)
 
 The naming conventions for the models are as follows:
@@ -85,12 +85,12 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 | GPT-4-Turbo | ```gpt-4``` / ```gpt-4-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
 | LLaMA 2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 | LLaMA 2 hardened | ```llama2-7b-robust``` / ```llama2-13b-robust``` / ```llama2-70b-robust```|  [Link](https://huggingface.co/meta-llama) | Local Inference |
-| LLaMA 3 | ```llama3-8b``` / ```llama3-70b``` / ```llama3-400b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+| LLaMA 3 | ```llama3-8b``` / ```llama3-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference (first: ```ollama pull llama3/llama3:70b```) |
 | Vicuna | ```vicuna-7b``` / ```vicuna-13b``` / ```vicuna-33b``` | [Link](https://huggingface.co/lmsys/vicuna-33b-v1.3) | Local Inference |
 | StableBeluga (2) | ```beluga-7b``` / ```beluga-13b``` / ```beluga2-70b```| [Link](https://huggingface.co/stabilityai/StableBeluga2) | Local Inference |
 | Orca 2 | ```orca2-7b``` / ```orca2-13b``` / ```orca2-70b``` | [Link](https://huggingface.co/microsoft/Orca-2-7b) | Local Inference |
 | Gemma | ```gemma-2b``` / ```gemma-7b```| [Link](https://huggingface.co/google/gemma-7b-it) | Local Inference |
-| Gemma 2 | ```gemma2-9b``` / ```gemma2-27b```| [Link](https://huggingface.co/blog/gemma2) | Local Inference |
+| Gemma 2 | ```gemma2-9b``` / ```gemma2-27b```| [Link](https://huggingface.co/blog/gemma2) | Local Inference (first: ```ollama pull gemma2/gemma2:27b```) |
 
 (Finetuned or robust/hardened LLaMA models first have to be generated using the ```finetuning.py``` script, see below)
 

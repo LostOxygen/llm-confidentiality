@@ -432,7 +432,7 @@ class LangchainAttackStrategy(AttackStrategy):
                 """
 
                 # get a scenario based user prompt
-                user_prompt = self.__get_user_prompt()
+                user_prompt = self._get_user_prompt()
 
                 # obfuscate it using the attack strategies
                 mal_prompt = self.attack_func(user_prompt)
@@ -510,7 +510,7 @@ class LangchainAttackStrategy(AttackStrategy):
         return num_successes
 
 
-    def __get_user_prompt(self) -> str:
+    def _get_user_prompt(self) -> str:
         """returns a user prompt based on the used scenario"""
         user_prompt = ""
 

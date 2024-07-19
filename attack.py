@@ -142,7 +142,7 @@ def main(
     scenario_print = []
     scenario_list = []
 
-    if scenario == "all":
+    if "all" in scenario:
         scenario_print = list(Scenarios.__members__.keys())
         scenario_list = list(Scenarios)
 

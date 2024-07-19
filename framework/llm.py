@@ -35,7 +35,7 @@ OUTPUT_DIR: Final[str] = "./finetuned_models/"
 MAX_RETRIES: int = 10 # number of retries for GPT based chat requests
 
 class LLM():
-    """abstract implementation of a genereric LLM model"""
+    """Implementation of the LLM class to handle the different LLMs"""
     def __init__(
             self,
             llm_type: str,
@@ -429,12 +429,14 @@ class LLM():
                         model="llama3",
                         temperature=self.temperature,
                         format="json",
+                        include_raw=True,
                     )
                 elif self.llm_type.split("-")[1] == "70b":
                     self.model = OllamaFunctions(
                         model="llama3:70b",
                         temperature=self.temperature,
                         format="json",
+                        include_raw=True,
                     )
                 elif self.llm_type.split("-")[1] == "400b":
                     raise NotImplementedError(f"{self.llm_type} not yet available")
@@ -443,6 +445,7 @@ class LLM():
                         model="llama3",
                         temperature=self.temperature,
                         format="json",
+                        include_raw=True,
                     )
 
                 self.tokenizer = None
@@ -540,11 +543,20 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "9b":
-                    self.model = ChatOllama(model="gemma2", temperature=self.temperature)
+                    self.model = ChatOllama(
+                        model="gemma2",
+                        temperature=self.temperature,
+                    )
                 elif self.llm_type.split("-")[1] == "27b":
-                    self.model = ChatOllama(model="gemma2:27b", temperature=self.temperature)
+                    self.model = ChatOllama(
+                        model="gemma2:27b",
+                        temperature=self.temperature,
+                    )
                 else:
-                    self.model = ChatOllama(model="gemma2", temperature=self.temperature)
+                    self.model = ChatOllama(
+                        model="gemma2",
+                        temperature=self.temperature
+                    )
 
                 self.tokenizer = None
 
@@ -557,18 +569,21 @@ class LLM():
                         model="gemma2",
                         temperature=self.temperature,
                         format="json",
+                        include_raw=True,
                     )
                 elif self.llm_type.split("-")[1] == "27b":
                     self.model = OllamaFunctions(
                         model="gemma2:27b",
                         temperature=self.temperature,
                         format="json",
+                        include_raw=True,
                     )
                 else:
                     self.model = OllamaFunctions(
                         model="gemma2",
                         temperature=self.temperature,
                         format="json",
+                        include_raw=True,
                     )
 
                 self.tokenizer = None

@@ -141,14 +141,16 @@ def main(
     scenario = [s.lower() for s in scenario]
     scenario_print = []
     scenario_list = []
+
     if scenario == "all":
         scenario_print = list(Scenarios.__members__.keys())
         scenario_list = list(Scenarios)
 
-    for scenario_iter in Scenarios:
-        if scenario_iter.name.lower() in scenario:
-            scenario_print.append(scenario_iter.name)
-            scenario_list.append(scenario_iter)
+    else:
+        for scenario_iter in Scenarios:
+            if scenario_iter.name.lower() in scenario:
+                scenario_print.append(scenario_iter.name)
+                scenario_list.append(scenario_iter)
 
     # add '-' in front of the name suffix
     if name_suffix != "" and not name_suffix.startswith("-"):

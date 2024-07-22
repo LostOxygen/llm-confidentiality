@@ -316,10 +316,10 @@ class LangchainAttackStrategy(AttackStrategy):
 
         # create the tools
         self.tools = [
-            GetCloudFilesTool(),
-            GetMailsTool(),
-            GetNotesTool(),
-            GetCalendarEventsTool(),
+            GetCloudFilesTool(self.attack_func, self.defense_func),
+            GetMailsTool(self.attack_func, self.defense_func),
+            GetNotesTool(self.attack_func, self.defense_func),
+            GetCalendarEventsTool(self.attack_func, self.defense_func),
         ]
 
         # create the LLM in the tools variant
@@ -581,11 +581,23 @@ class LangchainAttackStrategy(AttackStrategy):
     def set_attack_func(self, new_attack_func: Callable) -> None:
         """helper method to set the attack function"""
         self.attack_func = new_attack_func
+        self._refresh_tools()
 
 
     def set_defense_func(self, new_defense_func: Callable) -> None:
         """helper method to set the defense function"""
         self.defense_func = new_defense_func
+        self._refresh_tools()
+
+
+    def _refresh_tools(self) -> None:
+        """helper method to refresh the tools with new attack/defense functions"""
+        self.tools = [
+            GetCloudFilesTool(self.attack_func, self.defense_func),
+            GetMailsTool(self.attack_func, self.defense_func),
+            GetNotesTool(self.attack_func, self.defense_func),
+            GetCalendarEventsTool(self.attack_func, self.defense_func),
+        ]
 
 
     def __evaluate_response(self,

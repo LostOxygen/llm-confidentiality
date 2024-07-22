@@ -50,6 +50,46 @@ if not os.path.isdir(str(Path.home() / "data")):
 os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 
 
+def match_attack_func(attack: str) -> callable:
+    """helper function to match the attack string with its corresponding function"""
+    match attack:
+        case "identity": attack_func = identity
+        case "chat_base": attack_func = chat_base
+        case "payload_splitting": attack_func = payload_splitting
+        case "obfuscation": attack_func = obfuscation
+        case "jailbreak": attack_func = jailbreak
+        case "translation": attack_func = translation
+        case "chatml_abuse": attack_func = chatml_abuse
+        case "masking": attack_func = masking
+        case "typoglycemia": attack_func = typoglycemia
+        case "advs_suffix": attack_func = advs_suffix
+        case _:
+            print(f"{TColors.FAIL}Attack type {attack} is not supported.")
+            print(f"Choose from: {ATTACK_LIST}{TColors.ENDC}")
+            sys.exit(1)
+
+    return attack_func
+
+
+def match_defense_func(defense: str) -> callable:
+    """helper function to match the defense string with its corresponding function"""
+    match defense:
+        case "seq_enclosure": defense_func = seq_enclosure
+        case "xml_tagging": defense_func = xml_tagging
+        case "heuristic_defense": defense_func = heuristic_defense
+        case "sandwiching": defense_func = sandwiching
+        case "llm_eval": defense_func = llm_eval
+        case "ppl_detection": defense_func = ppl_detection
+        case ("None" | "none"): defense_func = identity_prompt
+        case _:
+            print(f"{TColors.FAIL}Defense type {defense} " \
+                  f"is not supported.{TColors.ENDC}")
+            print(f"{TColors.CYAN}Used identity as default defense{TColors.ENDC}")
+            defense_func = identity_prompt
+
+    return defense_func
+
+
 def main(
         attacks: List[str],
         defenses: List[str],
@@ -207,51 +247,29 @@ def main(
             print(f"{TColors.HEADER}{TColors.BOLD}>> Executing Scenario: " \
                   f"{exec_scenario.name}{TColors.ENDC}")
 
+            # initialize the attack strategy
             attack_strategy = LangchainAttackStrategy(
-                        attack_func=None,
-                        defense_func=None,
-                        llm_type=llm_type,
-                        llm_suffix=name_suffix,
-                        llm_guessing=llm_guessing,
-                        temperature=temperature,
-                        iterations=iterations,
-                        create_prompt_dataset=create_prompt_dataset,
-                        create_response_dataset=create_response_dataset,
-                        scenario=exec_scenario,
-                        verbose=verbose,
-                        device=device
-                    )
+                attack_func=match_attack_func(attacks[0]),
+                defense_func=match_defense_func(defenses[0]),
+                llm_type=llm_type,
+                llm_suffix=name_suffix,
+                llm_guessing=llm_guessing,
+                temperature=temperature,
+                iterations=iterations,
+                create_prompt_dataset=create_prompt_dataset,
+                create_response_dataset=create_response_dataset,
+                scenario=exec_scenario,
+                verbose=verbose,
+                device=device
+            )
 
             for defense in defenses:
                 # set the defense function
-                match defense:
-                    case "seq_enclosure": defense_func = seq_enclosure
-                    case "xml_tagging": defense_func = xml_tagging
-                    case "heuristic_defense": defense_func = heuristic_defense
-                    case "sandwiching": defense_func = sandwiching
-                    case "llm_eval": defense_func = llm_eval
-                    case "ppl_detection": defense_func = ppl_detection
-                    case ("None" | "none"): defense_func = identity_prompt
-                    case _: defense_func = identity_prompt
+                defense_func = match_defense_func(defense)
 
                 for attack in attacks:
                     # set the attack function
-                    match attack:
-                        case "identity": attack_func = identity
-                        case "chat_base": attack_func = chat_base
-                        case "payload_splitting": attack_func = payload_splitting
-                        case "obfuscation": attack_func = obfuscation
-                        case "jailbreak": attack_func = jailbreak
-                        case "translation": attack_func = translation
-                        case "chatml_abuse": attack_func = chatml_abuse
-                        case "masking": attack_func = masking
-                        case "typoglycemia": attack_func = typoglycemia
-                        case "advs_suffix": attack_func = advs_suffix
-                        case _:
-                            print(f"{TColors.FAIL}Attack type {attack} " \
-                                  "is not supported.{TColors.ENDC}")
-                            print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
-                            sys.exit(1)
+                    attack_func = match_attack_func(attack)
 
                     # set the attack and defense functions
                     attack_strategy.set_attack_func(attack_func)
@@ -278,48 +296,26 @@ def main(
 
     else:
         attack_strategy = SecretKeyAttackStrategy(
-                    attack_func=None,
-                    defense_func=None,
-                    llm_type=llm_type,
-                    llm_suffix=name_suffix,
-                    llm_guessing=llm_guessing,
-                    temperature=temperature,
-                    iterations=iterations,
-                    create_prompt_dataset=create_prompt_dataset,
-                    create_response_dataset=create_response_dataset,
-                    verbose=verbose,
-                    device=device
-                )
+                attack_func=None,
+                defense_func=None,
+                llm_type=llm_type,
+                llm_suffix=name_suffix,
+                llm_guessing=llm_guessing,
+                temperature=temperature,
+                iterations=iterations,
+                create_prompt_dataset=create_prompt_dataset,
+                create_response_dataset=create_response_dataset,
+                verbose=verbose,
+                device=device
+            )
 
         for defense in defenses:
             # set the defense function
-            match defense:
-                case "seq_enclosure": defense_func = seq_enclosure
-                case "xml_tagging": defense_func = xml_tagging
-                case "heuristic_defense": defense_func = heuristic_defense
-                case "sandwiching": defense_func = sandwiching
-                case "llm_eval": defense_func = llm_eval
-                case "ppl_detection": defense_func = ppl_detection
-                case ("None" | "none"): defense_func = identity_prompt
-                case _: defense_func = identity_prompt
+            defense_func = match_defense_func(defense)
 
             for attack in attacks:
                 # set the attack function
-                match attack:
-                    case "identity": attack_func = identity
-                    case "chat_base": attack_func = chat_base
-                    case "payload_splitting": attack_func = payload_splitting
-                    case "obfuscation": attack_func = obfuscation
-                    case "jailbreak": attack_func = jailbreak
-                    case "translation": attack_func = translation
-                    case "chatml_abuse": attack_func = chatml_abuse
-                    case "masking": attack_func = masking
-                    case "typoglycemia": attack_func = typoglycemia
-                    case "advs_suffix": attack_func = advs_suffix
-                    case _:
-                        print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
-                        print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
-                        sys.exit(1)
+                attack_func = match_attack_func(attack)
 
                 # set the attack and defense functions
                 attack_strategy.set_attack_func(attack_func)

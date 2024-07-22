@@ -17,6 +17,10 @@ class GetCloudFilesSchema(BaseModel):
 
 class GetCloudFilesTool(BaseTool):
     """Tool that returns files from a cloud database"""
+    def __init__(self, attack_func: Callable, defense_func: Callable):
+        super().__init__()
+        self.attack_func: Callable = attack_func
+        self.defense_func: Callable = defense_func
 
     name: str = "get_cloud_files"
     description: str = (
@@ -35,6 +39,8 @@ class GetCloudFilesTool(BaseTool):
 
         for key, value in CLOUD_DB.items():
             if file_name in key or key in file_name:
+                value = self.attack_func(value)
+                value = self.defense_func(value)
                 results.append(value)
 
         return results
@@ -50,6 +56,10 @@ class GetMailsSchema(BaseModel):
 
 class GetMailsTool(BaseTool):
     """Tool that returns emails based on the used query"""
+    def __init__(self, attack_func: Callable, defense_func: Callable):
+        super().__init__()
+        self.attack_func: Callable = attack_func
+        self.defense_func: Callable = defense_func
 
     name: str = "get_mails"
     args_schema: Type[GetMailsSchema] = GetMailsSchema
@@ -70,16 +80,19 @@ class GetMailsTool(BaseTool):
                 case "from":
                     if query_content in mail["from"].lower() or \
                         mail["from"].lower() in query_content:
+                        mail["message"] = self.defense_func(self.attack_func(mail["message"]))
                         results.append(mail)
 
                 case "subject":
                     if query_content in mail["subject"].lower() or \
                         mail["subject"].lower() in query_content:
+                        mail["message"] = self.defense_func(self.attack_func(mail["message"]))
                         results.append(mail)
 
                 case "is":
                     if query_content in mail["is"] or \
                         mail["is"] in query_content:
+                        mail["message"] = self.defense_func(self.attack_func(mail["message"]))
                         results.append(mail)
 
                 case _:
@@ -100,6 +113,10 @@ class GetNotesSchema(BaseModel):
 
 class GetNotesTool(BaseTool):
     """Tool that returns notes based on the used query"""
+    def __init__(self, attack_func: Callable, defense_func: Callable):
+        super().__init__()
+        self.attack_func: Callable = attack_func
+        self.defense_func: Callable = defense_func
 
     name: str = "get_notes"
     args_schema: Type[GetNotesSchema] = GetNotesSchema
@@ -121,6 +138,8 @@ class GetNotesTool(BaseTool):
                 case "subject":
                     if query_content in note["subject"].lower() or \
                         note["subject"].lower() in query_content:
+                        note = self.attack_func(note)
+                        note = self.defense_func(note)
                         results.append(note)
 
                 case _:
@@ -141,6 +160,10 @@ class GetCalendarEventSchema(BaseModel):
 
 class GetCalendarEventsTool(BaseTool):
     """Tool that returns calendar events based on the used query"""
+    def __init__(self, attack_func: Callable, defense_func: Callable):
+        super().__init__()
+        self.attack_func: Callable = attack_func
+        self.defense_func: Callable = defense_func
 
     name: str = "get_calendar_events"
     args_schema: Type[GetCalendarEventSchema] = GetCalendarEventSchema
@@ -162,16 +185,19 @@ class GetCalendarEventsTool(BaseTool):
                 case "topic":
                     if query_content in event["topic"].lower() or \
                         event["topic"].lower() in query_content:
+                        event["topic"] = self.defense_func(self.attack_func(event["topic"]))
                         results.append(event)
 
                 case "date":
                     if query_content in event["date"].lower() or \
                         event["date"].lower() in query_content:
+                        event["topic"] = self.defense_func(self.attack_func(event["topic"]))
                         results.append(event)
 
                 case "location":
                     if query_content in event["location"].lower() or \
                         event["location"].lower() in query_content:
+                        event["topic"] = self.defense_func(self.attack_func(event["topic"]))
                         results.append(event)
 
                 case _:

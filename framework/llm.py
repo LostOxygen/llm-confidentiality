@@ -538,9 +538,7 @@ class LLM():
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
 
-            case (
-                    "gemma2-9b" | "gemma2-27b"
-                ):
+            case ("gemma2-9b" | "gemma2-27b"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "9b":
                     self.model = ChatOllama(
@@ -560,9 +558,7 @@ class LLM():
 
                 self.tokenizer = None
 
-            case (
-                    "gemma2-9b-tools" | "gemma2-27b-tools"
-                ):
+            case ("gemma2-9b-tools" | "gemma2-27b-tools"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "9b":
                     self.model = OllamaFunctions(
@@ -581,6 +577,52 @@ class LLM():
                 else:
                     self.model = OllamaFunctions(
                         model="gemma2",
+                        temperature=self.temperature,
+                        format="json",
+                        include_raw=True,
+                    )
+
+                self.tokenizer = None
+
+            case ("phi3-3b" | "phi3-14b"):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                if self.llm_type.split("-")[1] == "3b":
+                    self.model = ChatOllama(
+                        model="phi3:mini",
+                        temperature=self.temperature,
+                    )
+                elif self.llm_type.split("-")[1] == "14b":
+                    self.model = ChatOllama(
+                        model="phi3:medium",
+                        temperature=self.temperature,
+                    )
+                else:
+                    self.model = ChatOllama(
+                        model="phi3:mini",
+                        temperature=self.temperature
+                    )
+
+                self.tokenizer = None
+
+            case ("phi3-3b-tools" | "phi3-14b-tools"):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                if self.llm_type.split("-")[1] == "3b":
+                    self.model = OllamaFunctions(
+                        model="phi3:mini",
+                        temperature=self.temperature,
+                        format="json",
+                        include_raw=True,
+                    )
+                elif self.llm_type.split("-")[1] == "14b":
+                    self.model = OllamaFunctions(
+                        model="phi3:medium",
+                        temperature=self.temperature,
+                        format="json",
+                        include_raw=True,
+                    )
+                else:
+                    self.model = OllamaFunctions(
+                        model="phi3:mini",
                         temperature=self.temperature,
                         format="json",
                         include_raw=True,
@@ -797,7 +839,7 @@ class LLM():
 
             case (
                     "llama3" | "llama3-8b" | "llama3-70b" | "llama3-400b" |
-                    "gemma2-9b" | "gemma2-27b"
+                    "gemma2-9b" | "gemma2-27b" | "phi3-3b" | "phi3-14b" 
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [
@@ -812,7 +854,8 @@ class LLM():
 
             case (
                     "llama3-tools" | "llama3-8b-tools" | "llama3-70b-tools" | 
-                    "llama3-400b-tools" | "gemma2-9b-tools" | "gemma2-27b-tools"
+                    "llama3-400b-tools" | "gemma2-9b-tools" | "gemma2-27b-tools" |
+                     "phi3-3b-tools" | "phi3-14b-tools" 
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [
@@ -842,6 +885,7 @@ class LLM():
                 if not isinstance(response, str):
                     response = str(response)
                 history = system_prompt + user_prompt + response
+
 
             case (
                     "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" 

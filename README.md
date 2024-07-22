@@ -91,6 +91,7 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 | Orca 2 | ```orca2-7b``` / ```orca2-13b``` / ```orca2-70b``` | [Link](https://huggingface.co/microsoft/Orca-2-7b) | Local Inference |
 | Gemma | ```gemma-2b``` / ```gemma-7b```| [Link](https://huggingface.co/google/gemma-7b-it) | Local Inference |
 | Gemma 2 | ```gemma2-9b``` / ```gemma2-27b```| [Link](https://huggingface.co/blog/gemma2) | Local Inference (first: ```ollama pull gemma2/gemma2:27b```) |
+| Phi 3 | ```phi3-3b``` / ```phi3-14b``` | [Link](https://ollama.com/library/phi3) | Local Inference (first: ```ollama pull phi3:mini/phi3:medium```)|
 
 (Finetuned or robust/hardened LLaMA models first have to be generated using the ```finetuning.py``` script, see below)
 

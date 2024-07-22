@@ -441,7 +441,6 @@ class LangchainAttackStrategy(AttackStrategy):
                     Scenarios.MailPlain,
                     Scenarios.NotesPlain,
                 ]:
-                    print(self.scenario)
                     # obfuscate the user prompt using the attack strategies
                     user_prompt = self.attack_func(user_prompt)
 
@@ -725,6 +724,6 @@ class LangchainAttackStrategy(AttackStrategy):
                     )
 
             case _:
-                raise ValueError(f"{TColors.FAIL}Invalid scenario{TColors.ENDC}")
+                pass
 
         return [cloud_tool, mail_tool, notes_tool, calendar_tool]

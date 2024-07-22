@@ -123,9 +123,9 @@ def main(
     # set the devices correctly
     if device == "cpu":
         device = torch.device("cpu")
-    elif device != "cpu" and device == "cuda" and torch.cuda.is_available():
+    elif device == "cuda" and torch.cuda.is_available():
         device = torch.device(device)
-    elif device != "cpu" and device == "mps" and torch.backends.mps.is_available():
+    elif device == "mps" and torch.backends.mps.is_available():
         device = torch.device(device)
     else:
         print(f"{TColors.WARNING}Warning{TColors.ENDC}: Device {TColors.OKCYAN}{device} " \
@@ -164,10 +164,10 @@ def main(
           f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
           f"{torch.cuda.device_count()} GPUs on user: {getpass.getuser()}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Device{TColors.ENDC}: {device}")
-    if device == "cuda" and torch.cuda.is_available():
+    if (device == "cuda" or torch.device("cuda")) and torch.cuda.is_available():
         print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
               f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
-    elif device == "mps" and torch.backends.mps.is_available():
+    elif (device == "mps" or torch.device("mps")) and torch.backends.mps.is_available():
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Shared Memory{TColors.ENDC}: " \
               f"{psutil.virtual_memory()[0] // 1024**2} MB")
     else:

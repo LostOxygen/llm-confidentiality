@@ -640,7 +640,7 @@ class LangchainAttackStrategy(AttackStrategy):
         """
         Helper method to initialize the tools with the correct attack/defense functions
         depending on the scenario.
-        Only the second tool needs to use attack/defense functions. The first tool gets
+        Only the first tool needs to use attack/defense functions. The first tool gets
         called normally by the user.
 
         Parameters:
@@ -651,7 +651,7 @@ class LangchainAttackStrategy(AttackStrategy):
         """
 
         # initialize the tools with the identity functions first
-        # then overwrite the second tool with the attack/defense functions accordingly
+        # then overwrite the first tool with the attack/defense functions accordingly
         cloud_tool = GetCloudFilesTool(
                 metadata={
                     "attack_func": identity,
@@ -683,8 +683,8 @@ class LangchainAttackStrategy(AttackStrategy):
 
         match self.scenario:
             case (
-                Scenarios.CalendarWithCloud | Scenarios.MailWithCloud |
-                Scenarios.NotesWithCloud | Scenarios.CloudWithCloud
+                Scenarios.CloudWithCalendar | Scenarios.CloudWithMail |
+                Scenarios.CloudWithNotes | Scenarios.CloudWithCloud
                 ):
                 cloud_tool = GetCloudFilesTool(
                         metadata={
@@ -693,8 +693,8 @@ class LangchainAttackStrategy(AttackStrategy):
                         },
                     )
             case (
-                Scenarios.CalendarWithMail | Scenarios.MailWithMail |
-                Scenarios.NotesWithMail | Scenarios.CloudWithMail
+                Scenarios.MailWithNotes | Scenarios.MailWithMail |
+                Scenarios.MailWithCalendar | Scenarios.MailWithCloud
                 ):
                 mail_tool = GetMailsTool(
                         metadata={
@@ -703,8 +703,8 @@ class LangchainAttackStrategy(AttackStrategy):
                         },
                     )
             case (
-                Scenarios.CalendarWithNotes | Scenarios.MailWithNotes |
-                Scenarios.NotesWithNotes | Scenarios.CloudWithNotes
+                Scenarios.NotesWithCalendar | Scenarios.NotesWithCloud |
+                Scenarios.NotesWithNotes | Scenarios.NotesWithMail
                 ):
                 notes_tool = GetNotesTool(
                         metadata={
@@ -713,8 +713,8 @@ class LangchainAttackStrategy(AttackStrategy):
                         },
                     )
             case (
-                Scenarios.CalendarWithCalendar | Scenarios.MailWithCalendar |
-                Scenarios.NotesWithCalendar | Scenarios.CloudWithCalendar
+                Scenarios.CalendarWithCalendar | Scenarios.CalendarWithNotes |
+                Scenarios.CalendarWithCloud | Scenarios.CalendarWithMail
                 ):
                 calendar_tool = GetCalendarEventsTool(
                         metadata={

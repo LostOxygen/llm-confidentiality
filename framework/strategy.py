@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 import progressbar
 from progressbar import ProgressBar
 
+from langchain.tools import BaseTool
 from framework.utils import log_conversation
 from framework.colors import TColors, ATTACK_NAMES
 from framework.prompts import get_random_secret_key, ATTACK_KEYWORDS
@@ -21,8 +22,10 @@ from framework.tools import (
     GetNotesTool,
     GetCalendarEventsTool,
     GetMailsTool,
-    GetCloudFilesTool
+    GetCloudFilesTool,
 )
+from framework.attacks import identity
+from framework.defenses import identity_prompt
 
 class AttackStrategy(ABC):
     """Abstract interface for the attack strategies"""
@@ -139,7 +142,7 @@ class SecretKeyAttackStrategy(AttackStrategy):
 
                 curr_success = False
                 # check if the secret key got leaked
-                if self.__evaluate_response(response, secret_key):
+                if self._evaluate_response(response, secret_key):
                     # Success print followed by prompt enhancement
                     if self.verbose:
                         print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
@@ -247,7 +250,7 @@ class SecretKeyAttackStrategy(AttackStrategy):
         self.defense_func = new_defense_func
 
 
-    def __evaluate_response(self,
+    def _evaluate_response(self,
         response: str,
         secret_key: str,
     ) -> bool:
@@ -315,12 +318,7 @@ class LangchainAttackStrategy(AttackStrategy):
         self.device = device
 
         # create the tools
-        self.tools = [
-            GetCloudFilesTool(self.attack_func, self.defense_func),
-            GetMailsTool(self.attack_func, self.defense_func),
-            GetNotesTool(self.attack_func, self.defense_func),
-            GetCalendarEventsTool(self.attack_func, self.defense_func),
-        ]
+        self.tools = self._initialize_tools()
 
         # create the LLM in the tools variant
         self.llm: Type[LLM] = LLM(
@@ -434,11 +432,21 @@ class LangchainAttackStrategy(AttackStrategy):
                 # get a scenario based user prompt
                 user_prompt = self._get_user_prompt()
 
-                # obfuscate it using the attack strategies
-                mal_prompt = self.attack_func(user_prompt)
+                # if the base scenarios are used, we want to use the strategies directly
+                # otherwise, the attack/defense should only be applied on the tool data and
+                # hence gets deactivated here
+                if self.scenario in [
+                    Scenarios.CloudPlain,
+                    Scenarios.CalendarPlain,
+                    Scenarios.MailPlain,
+                    Scenarios.NotesPlain,
+                ]:
+                    print(self.scenario)
+                    # obfuscate the user prompt using the attack strategies
+                    user_prompt = self.attack_func(user_prompt)
 
-                # wrap the user input into a defense function if given
-                user_prompt = self.defense_func(mal_prompt)
+                    # wrap the user input into a defense function if given
+                    user_prompt = self.defense_func(user_prompt)
 
                 # bind the tools to the LLM
                 self.llm.bind_tools_to_model(self.tools)
@@ -471,7 +479,7 @@ class LangchainAttackStrategy(AttackStrategy):
 
                 curr_success = False
                 # check if the secret key got leaked
-                if self.__evaluate_response(response, str(secret_key)):
+                if self._evaluate_response(response, str(secret_key)):
                     # Success print followed by prompt enhancement
                     if self.verbose:
                         print(f"{TColors.BOLD}Iteration {TColors.ENDC}" \
@@ -581,26 +589,16 @@ class LangchainAttackStrategy(AttackStrategy):
     def set_attack_func(self, new_attack_func: Callable) -> None:
         """helper method to set the attack function"""
         self.attack_func = new_attack_func
-        self._refresh_tools()
+        self._initialize_tools()
 
 
     def set_defense_func(self, new_defense_func: Callable) -> None:
         """helper method to set the defense function"""
         self.defense_func = new_defense_func
-        self._refresh_tools()
+        self._initialize_tools()
 
 
-    def _refresh_tools(self) -> None:
-        """helper method to refresh the tools with new attack/defense functions"""
-        self.tools = [
-            GetCloudFilesTool(self.attack_func, self.defense_func),
-            GetMailsTool(self.attack_func, self.defense_func),
-            GetNotesTool(self.attack_func, self.defense_func),
-            GetCalendarEventsTool(self.attack_func, self.defense_func),
-        ]
-
-
-    def __evaluate_response(self,
+    def _evaluate_response(self,
         response: str,
         secret_key: str,
     ) -> bool:
@@ -637,3 +635,96 @@ class LangchainAttackStrategy(AttackStrategy):
                 return True
 
         return False
+
+
+    def _initialize_tools(self) -> list[BaseTool]:
+        """
+        Helper method to initialize the tools with the correct attack/defense functions
+        depending on the scenario.
+        Only the second tool needs to use attack/defense functions. The first tool gets
+        called normally by the user.
+
+        Parameters:
+            None
+
+        Returns:
+            tools: list[BaseTool] - the initialized tools
+        """
+
+        # initialize the tools with the identity functions first
+        # then overwrite the second tool with the attack/defense functions accordingly
+        cloud_tool = GetCloudFilesTool(
+                metadata={
+                    "attack_func": identity,
+                    "defense_func": identity_prompt,
+                },
+            )
+
+        mail_tool = GetMailsTool(
+                metadata={
+                    "attack_func": identity,
+                    "defense_func": identity_prompt,
+                },
+            )
+
+        notes_tool = GetNotesTool(
+                metadata={
+                    "attack_func": identity,
+                    "defense_func": identity_prompt,
+                },
+            )
+
+        calendar_tool = GetCalendarEventsTool(
+                metadata={
+                    "attack_func": identity,
+                    "defense_func": identity_prompt,
+                },
+            )
+
+
+        match self.scenario:
+            case (
+                Scenarios.CalendarWithCloud | Scenarios.MailWithCloud |
+                Scenarios.NotesWithCloud | Scenarios.CloudWithCloud
+                ):
+                cloud_tool = GetCloudFilesTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                        },
+                    )
+            case (
+                Scenarios.CalendarWithMail | Scenarios.MailWithMail |
+                Scenarios.NotesWithMail | Scenarios.CloudWithMail
+                ):
+                mail_tool = GetMailsTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                        },
+                    )
+            case (
+                Scenarios.CalendarWithNotes | Scenarios.MailWithNotes |
+                Scenarios.NotesWithNotes | Scenarios.CloudWithNotes
+                ):
+                notes_tool = GetNotesTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                        },
+                    )
+            case (
+                Scenarios.CalendarWithCalendar | Scenarios.MailWithCalendar |
+                Scenarios.NotesWithCalendar | Scenarios.CloudWithCalendar
+                ):
+                calendar_tool = GetCalendarEventsTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                        },
+                    )
+
+            case _:
+                raise ValueError(f"{TColors.FAIL}Invalid scenario{TColors.ENDC}")
+
+        return [cloud_tool, mail_tool, notes_tool, calendar_tool]

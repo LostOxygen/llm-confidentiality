@@ -1,5 +1,5 @@
 """library for langchain tools"""
-from typing import Callable, Type, Union
+from typing import Callable, Type, Union, Optional, Any
 
 from langchain.tools import BaseTool
 from langchain_core.pydantic_v1 import BaseModel, Field
@@ -17,10 +17,6 @@ class GetCloudFilesSchema(BaseModel):
 
 class GetCloudFilesTool(BaseTool):
     """Tool that returns files from a cloud database"""
-    def __init__(self, attack_func: Callable, defense_func: Callable):
-        super().__init__()
-        self.attack_func: Callable = attack_func
-        self.defense_func: Callable = defense_func
 
     name: str = "get_cloud_files"
     description: str = (
@@ -29,18 +25,21 @@ class GetCloudFilesTool(BaseTool):
         "or use file_name:all to return all files."
     )
     args_schema: Type[GetCloudFilesSchema] = GetCloudFilesSchema
+    metadata: Optional[dict[str, Any]] = {}
 
     def _run(self, file_name: str) -> dict:
         """Use the tool."""
         results = []
+        attack_func = self.metadata["attack_func"]
+        defense_func = self.metadata["defense_func"]
 
         if file_name == "all":
             return CLOUD_DB
 
         for key, value in CLOUD_DB.items():
             if file_name in key or key in file_name:
-                value = self.attack_func(value)
-                value = self.defense_func(value)
+                value = attack_func(value)
+                value = defense_func(value)
                 results.append(value)
 
         return results
@@ -56,10 +55,6 @@ class GetMailsSchema(BaseModel):
 
 class GetMailsTool(BaseTool):
     """Tool that returns emails based on the used query"""
-    def __init__(self, attack_func: Callable, defense_func: Callable):
-        super().__init__()
-        self.attack_func: Callable = attack_func
-        self.defense_func: Callable = defense_func
 
     name: str = "get_mails"
     args_schema: Type[GetMailsSchema] = GetMailsSchema
@@ -67,10 +62,13 @@ class GetMailsTool(BaseTool):
         "Use this tool to search for emails with certain senders, subjects, or statuses. "
         "Example filters include from:sender, subject:subject, is:unread, is:read, exact phrase."
     )
+    metadata: Optional[dict[str, Any]] = {}
 
     def _run(self, query: str) -> Union[dict, list, str]:
         """Use the tool."""
         results = []
+        attack_func = self.metadata["attack_func"]
+        defense_func = self.metadata["defense_func"]
 
         for mail in MAIL_INBOX:
             query_type = query.split(":")[0].strip().lower()
@@ -80,19 +78,19 @@ class GetMailsTool(BaseTool):
                 case "from":
                     if query_content in mail["from"].lower() or \
                         mail["from"].lower() in query_content:
-                        mail["message"] = self.defense_func(self.attack_func(mail["message"]))
+                        mail["message"] = defense_func(attack_func(mail["message"]))
                         results.append(mail)
 
                 case "subject":
                     if query_content in mail["subject"].lower() or \
                         mail["subject"].lower() in query_content:
-                        mail["message"] = self.defense_func(self.attack_func(mail["message"]))
+                        mail["message"] = defense_func(attack_func(mail["message"]))
                         results.append(mail)
 
                 case "is":
                     if query_content in mail["is"] or \
                         mail["is"] in query_content:
-                        mail["message"] = self.defense_func(self.attack_func(mail["message"]))
+                        mail["message"] = defense_func(attack_func(mail["message"]))
                         results.append(mail)
 
                 case _:
@@ -113,10 +111,6 @@ class GetNotesSchema(BaseModel):
 
 class GetNotesTool(BaseTool):
     """Tool that returns notes based on the used query"""
-    def __init__(self, attack_func: Callable, defense_func: Callable):
-        super().__init__()
-        self.attack_func: Callable = attack_func
-        self.defense_func: Callable = defense_func
 
     name: str = "get_notes"
     args_schema: Type[GetNotesSchema] = GetNotesSchema
@@ -124,11 +118,14 @@ class GetNotesTool(BaseTool):
         "Use this tool to search for notes with certain subjects or contents. Use the query "
         "as subject:subject or receive all notes to search for content"
     )
+    metadata: Optional[dict[str, Any]] = {}
 
     def _run(self, query: str) -> Union[list, dict, str]:
         """Use the tool."""
 
         results = []
+        attack_func = self.metadata["attack_func"]
+        defense_func = self.metadata["defense_func"]
 
         for note in NOTES:
             query_type = query.split(":")[0].strip().lower()
@@ -138,8 +135,8 @@ class GetNotesTool(BaseTool):
                 case "subject":
                     if query_content in note["subject"].lower() or \
                         note["subject"].lower() in query_content:
-                        note = self.attack_func(note)
-                        note = self.defense_func(note)
+                        note = attack_func(note)
+                        note = defense_func(note)
                         results.append(note)
 
                 case _:
@@ -160,10 +157,6 @@ class GetCalendarEventSchema(BaseModel):
 
 class GetCalendarEventsTool(BaseTool):
     """Tool that returns calendar events based on the used query"""
-    def __init__(self, attack_func: Callable, defense_func: Callable):
-        super().__init__()
-        self.attack_func: Callable = attack_func
-        self.defense_func: Callable = defense_func
 
     name: str = "get_calendar_events"
     args_schema: Type[GetCalendarEventSchema] = GetCalendarEventSchema
@@ -171,11 +164,14 @@ class GetCalendarEventsTool(BaseTool):
         "Use this tool to search for calendar events with certain topics, dates, or locations. "
         "Use the query as date:date, topic:topic, or location:location."
     )
+    metadata: Optional[dict[str, Any]] = {}
 
     def _run(self, query: str) -> Union[list, dict, str]:
         """Use the tool."""
 
         results = []
+        attack_func = self.metadata["attack_func"]
+        defense_func = self.metadata["defense_func"]
 
         for event in CALENDAR_EVENTS:
             query_type = query.split(":")[0].strip().lower()
@@ -185,19 +181,19 @@ class GetCalendarEventsTool(BaseTool):
                 case "topic":
                     if query_content in event["topic"].lower() or \
                         event["topic"].lower() in query_content:
-                        event["topic"] = self.defense_func(self.attack_func(event["topic"]))
+                        event["topic"] = defense_func(attack_func(event["topic"]))
                         results.append(event)
 
                 case "date":
                     if query_content in event["date"].lower() or \
                         event["date"].lower() in query_content:
-                        event["topic"] = self.defense_func(self.attack_func(event["topic"]))
+                        event["topic"] = defense_func(attack_func(event["topic"]))
                         results.append(event)
 
                 case "location":
                     if query_content in event["location"].lower() or \
                         event["location"].lower() in query_content:
-                        event["topic"] = self.defense_func(self.attack_func(event["topic"]))
+                        event["topic"] = defense_func(attack_func(event["topic"]))
                         results.append(event)
 
                 case _:
@@ -206,6 +202,9 @@ class GetCalendarEventsTool(BaseTool):
         if not results:
             return "No notes found with that query."
         return results
+
+
+
 
 
 # old now mostly unused tools

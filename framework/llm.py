@@ -561,7 +561,7 @@ class LLM():
                 self.tokenizer = None
 
             case (
-                    "gemma2-9b-tool" | "gemma2-27b-tool"
+                    "gemma2-9b-tools" | "gemma2-27b-tools"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "9b":

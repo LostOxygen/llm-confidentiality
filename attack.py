@@ -28,7 +28,8 @@ from framework.attacks import (
         typoglycemia,
         advs_suffix,
         chat_base,
-        identity
+        identity,
+        base_attack
     )
 from framework.defenses import (
         DEFENSES_LIST,
@@ -63,6 +64,7 @@ def match_attack_func(attack: str) -> callable:
         case "masking": attack_func = masking
         case "typoglycemia": attack_func = typoglycemia
         case "advs_suffix": attack_func = advs_suffix
+        case "base_attack": attack_func = base_attack
         case _:
             print(f"{TColors.FAIL}Attack type {attack} is not supported.")
             print(f"Choose from: {ATTACK_LIST}{TColors.ENDC}")

@@ -27,4 +27,5 @@ ATTACK_NAMES: Final[dict[str, str]] = {
     "typoglycemia": "Typoglycemia",
     "advs_suffix": "Adversarial Suffix",
     "identity": "Identity",
+    "base_attack": "Base Attack",
 }

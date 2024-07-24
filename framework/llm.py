@@ -410,39 +410,44 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "8b":
-                    self.model = ChatOllama(model="llama3", temperature=self.temperature)
+                    self.model = ChatOllama(model="llama3.1", temperature=self.temperature)
                 elif self.llm_type.split("-")[1] == "70b":
-                    self.model = ChatOllama(model="llama3:70b", temperature=self.temperature)
-                elif self.llm_type.split("-")[1] == "400b":
-                    raise NotImplementedError(f"{self.llm_type} not yet available")
+                    self.model = ChatOllama(model="llama3.1:70b", temperature=self.temperature)
+                elif self.llm_type.split("-")[1] == "405b":
+                    self.model = ChatOllama(model="llama3.1:405b", temperature=self.temperature)
                 else:
                     self.model = ChatOllama(model="llama3", temperature=self.temperature)
 
                 self.tokenizer = None
 
             case (
-                    "llama3-8b-tools" | "llama3-70b-tools" | "llama3-400b-tools"
+                    "llama3-8b-tools" | "llama3-70b-tools" | "llama3-405b-tools"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "8b":
                     self.model = OllamaFunctions(
-                        model="llama3",
+                        model="llama3.1",
                         temperature=self.temperature,
                         format="json",
                         include_raw=True,
                     )
                 elif self.llm_type.split("-")[1] == "70b":
                     self.model = OllamaFunctions(
-                        model="llama3:70b",
+                        model="llama3.1:70b",
                         temperature=self.temperature,
                         format="json",
                         include_raw=True,
                     )
-                elif self.llm_type.split("-")[1] == "400b":
-                    raise NotImplementedError(f"{self.llm_type} not yet available")
+                elif self.llm_type.split("-")[1] == "405b":
+                    self.model = OllamaFunctions(
+                        model="llama3.1:405b",
+                        temperature=self.temperature,
+                        format="json",
+                        include_raw=True,
+                    )
                 else:
                     self.model = OllamaFunctions(
-                        model="llama3",
+                        model="llama3.1",
                         temperature=self.temperature,
                         format="json",
                         include_raw=True,

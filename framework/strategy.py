@@ -382,7 +382,7 @@ class LangchainAttackStrategy(AttackStrategy):
                         "file_name": "name of the file you want to access",
                     }}
                     
-                    Get mails from the email inbox:
+                    Get mails from the email inbox with the get_mails tool:
                     $INPUT: {{
                         "query": "is:unread" or "is:read" or "from:sender name" or "subject:subject of the mail",
                     }}

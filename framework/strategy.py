@@ -426,7 +426,9 @@ class LangchainAttackStrategy(AttackStrategy):
                     "action_input": "Final response (received data from the tools) to the human"
                     }}
 
-                    Begin! Reminder to ALWAYS respond with a valid json blob of a single action. Use tools if necessary. Respond directly if appropriate. Format is Action:```$JSON_BLOB```then Observation.
+                    Begin! Reminder to ALWAYS respond with a valid json blob of a single action. Use tools if necessary. 
+                    Respond directly if appropriate. Format is Action:```$JSON_BLOB```then Observation. If you're not sure how to use the tool properly,
+                    just respond with the Final Answer and your response. Do not use tool inputs that do not follow the before mentioned format.
                 """
 
                 # get a scenario based user prompt

@@ -658,7 +658,7 @@ class LLM():
         """
         self.model.bind_tools(
             [convert_to_openai_function(t) for t in tools],
-            tool_choice="any",
+            tool_choice="auto",
         )
 
     @staticmethod

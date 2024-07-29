@@ -386,7 +386,7 @@ class LangchainAttackStrategy(AttackStrategy):
                         "query": "is:unread" or "is:read" or "from:sender name" or "subject:subject of the mail",
                     }}
                     
-                    Get saved notes using the get_notes tool:
+                    Get and search saved notes using the get_notes tool:
                     $INPUT: {{
                         "query": "subject:subject of the note",
                     }}

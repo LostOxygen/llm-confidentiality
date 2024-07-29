@@ -659,6 +659,7 @@ class LangchainAttackStrategy(AttackStrategy):
                 metadata={
                     "attack_func": identity,
                     "defense_func": identity_prompt,
+                    "device": self.device,
                 },
             )
 
@@ -666,6 +667,7 @@ class LangchainAttackStrategy(AttackStrategy):
                 metadata={
                     "attack_func": identity,
                     "defense_func": identity_prompt,
+                    "device": self.device,
                 },
             )
 
@@ -673,6 +675,7 @@ class LangchainAttackStrategy(AttackStrategy):
                 metadata={
                     "attack_func": identity,
                     "defense_func": identity_prompt,
+                    "device": self.device,
                 },
             )
 
@@ -680,6 +683,7 @@ class LangchainAttackStrategy(AttackStrategy):
                 metadata={
                     "attack_func": identity,
                     "defense_func": identity_prompt,
+                    "device": self.device,
                 },
             )
 
@@ -693,6 +697,7 @@ class LangchainAttackStrategy(AttackStrategy):
                         metadata={
                             "attack_func": self.attack_func,
                             "defense_func": self.defense_func,
+                            "device": self.device,
                         },
                     )
             case (
@@ -703,6 +708,7 @@ class LangchainAttackStrategy(AttackStrategy):
                         metadata={
                             "attack_func": self.attack_func,
                             "defense_func": self.defense_func,
+                            "device": self.device,
                         },
                     )
             case (
@@ -713,6 +719,7 @@ class LangchainAttackStrategy(AttackStrategy):
                         metadata={
                             "attack_func": self.attack_func,
                             "defense_func": self.defense_func,
+                            "device": self.device,
                         },
                     )
             case (
@@ -723,6 +730,7 @@ class LangchainAttackStrategy(AttackStrategy):
                         metadata={
                             "attack_func": self.attack_func,
                             "defense_func": self.defense_func,
+                            "device": self.device,
                         },
                     )
 

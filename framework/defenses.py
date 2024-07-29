@@ -13,7 +13,7 @@ DEFENSES_LIST: Final[List[str]] = ["seq_enclosure", "xml_tagging", "heuristic_de
                                    "ppl_detection", "prompt_guard"]
 
 
-def identity_prompt(prompt: str, device: Optional[str]) -> str:
+def identity_prompt(prompt: str, device: Optional[str]="cpu") -> str:
     """
     Uses the prompt as is without any modifications.
     (This is used when defense is set to 'None')
@@ -21,7 +21,7 @@ def identity_prompt(prompt: str, device: Optional[str]) -> str:
     return prompt
 
 
-def seq_enclosure(prompt: str, device: Optional[str]) -> str:
+def seq_enclosure(prompt: str, device: Optional[str]="cpu") -> str:
     """
     Encloses the prompt in a sequence of random characters.
     
@@ -44,7 +44,7 @@ def seq_enclosure(prompt: str, device: Optional[str]) -> str:
     return defense_prompt
 
 
-def xml_tagging(prompt: str, device: Optional[str]) -> str:
+def xml_tagging(prompt: str, device: Optional[str]="cpu") -> str:
     """
     Encloses the user input in prompts in XML tags to help the LLM evade adversarial inputs.
     
@@ -64,7 +64,7 @@ def xml_tagging(prompt: str, device: Optional[str]) -> str:
     return defense_prompt
 
 
-def heuristic_defense(prompt: str, device: Optional[str]) -> str:
+def heuristic_defense(prompt: str, device: Optional[str]="cpu") -> str:
     """
     Uses rule based heuristics to detect and remove adversarial prompt inputs.
     
@@ -99,7 +99,7 @@ def sandwiching(prompt: str) -> str:
     raise NotImplementedError("sandwiching() is not implemented yet!")
 
 
-def llm_eval(prompt: str, device: Optional[str]) -> str:
+def llm_eval(prompt: str, device: Optional[str]="cpu") -> str:
     """
     Uses a separate LLM to evaluate the prompt and remove adversarial inputs.
     
@@ -130,7 +130,7 @@ def llm_eval(prompt: str, device: Optional[str]) -> str:
     return prompt
 
 
-def ppl_detection(prompt: str, device: Optional[str]) -> str:
+def ppl_detection(prompt: str, device: Optional[str]="cpu") -> str:
     """
     Uses a separate LLM (GPT2) to calculate the perplexity of the message. If the perplexity
     is above a certain threshold we assume malicious content and therefore remove the message.
@@ -157,7 +157,7 @@ def ppl_detection(prompt: str, device: Optional[str]) -> str:
     return prompt
 
 
-def prompt_guard_defense(prompt: str, device: Optional[str]) -> str:
+def prompt_guard_defense(prompt: str, device: Optional[str]="cpu") -> str:
     """
     Uses Meta's PromptGuard model to detect whether the prompt is adversarial or not.
     https://huggingface.co/meta-llama/Prompt-Guard-86M

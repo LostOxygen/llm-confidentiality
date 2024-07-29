@@ -376,7 +376,7 @@ class LangchainAttackStrategy(AttackStrategy):
                     Make sure to use the tool input correctly with its specified formats and types. Use strings and don't leave the inputs empty.
                     I'll give an example on how to use the tool inputs:
                     
-                    Get files from the cloud using the get_cloud_files tool:
+                    Get or search files from the cloud using the get_cloud_files tool:
                     $INPUT: {{
                         "file_name": "name of the file you want to access",
                     }}

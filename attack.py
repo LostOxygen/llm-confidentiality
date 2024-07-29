@@ -327,10 +327,12 @@ def main(
                 torch.cuda.empty_cache()
 
             # print and log the results
+            avg_successes = sum(total_successes.values()) / len(total_successes)
             print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
             for attack, successes in total_successes.items():
                 print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
                     f"{iterations}")
+            print(f"{TColors.OKCYAN}{TColors.BOLD}>> Avg. Successes:{TColors.ENDC} {avg_successes}")
             log_results(
                     llm_name=llm_type+name_suffix,
                     defense_name=defense,

@@ -259,7 +259,7 @@ def main(
                 llm_suffix=name_suffix,
                 llm_guessing=llm_guessing,
                 temperature=temperature,
-                iterations=iterations,
+                iterations=iterations//len(attacks),
                 create_prompt_dataset=create_prompt_dataset,
                 create_response_dataset=create_response_dataset,
                 scenario=exec_scenario,
@@ -284,17 +284,17 @@ def main(
                     overwrite_chat = False # set to false to save this strategy run completetly
 
                 # print and log the results
-                avg_succ = sum(total_successes.values()) / len(total_successes)
+                avg_succ = round(sum(total_successes.values()) / iterations*100, 2)
                 print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
                 for attack, successes in total_successes.items():
                     print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}"
-                        f"/{iterations}")
-                print(f"{TColors.OKCYAN}{TColors.BOLD}>> Avg. Successes:{TColors.ENDC} {avg_succ}")
+                        f"/{iterations//len(attacks)}")
+                print(f"{TColors.OKCYAN}{TColors.BOLD}>> Successrate:{TColors.ENDC} {avg_succ}")
                 log_results(
                         llm_name=llm_type+name_suffix,
                         defense_name=defense,
                         success_dict=total_successes,
-                        iters=iterations,
+                        iters=iterations//len(attacks),
                         overwrite=overwrite_results,
                         scenario=exec_scenario.name,
                     )
@@ -331,12 +331,12 @@ def main(
                 torch.cuda.empty_cache()
 
             # print and log the results
-            avg_successes = sum(total_successes.values()) / len(total_successes)
+            avg_succ = round(sum(total_successes.values()) / iterations*100, 2)
             print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
             for attack, successes in total_successes.items():
                 print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
                     f"{iterations}")
-            print(f"{TColors.OKCYAN}{TColors.BOLD}>> Avg. Successes:{TColors.ENDC} {avg_successes}")
+            print(f"{TColors.OKCYAN}{TColors.BOLD}>> Successrate:{TColors.ENDC} {avg_succ}")
             log_results(
                     llm_name=llm_type+name_suffix,
                     defense_name=defense,

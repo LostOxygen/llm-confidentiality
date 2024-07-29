@@ -1,5 +1,6 @@
 """library for defense implementations and helper functions"""
-from typing import Final, List
+# pylint: disable=unused-argument
+from typing import Final, List, Optional
 import random
 import string
 
@@ -12,7 +13,7 @@ DEFENSES_LIST: Final[List[str]] = ["seq_enclosure", "xml_tagging", "heuristic_de
                                    "ppl_detection", "prompt_guard"]
 
 
-def identity_prompt(prompt: str) -> str:
+def identity_prompt(prompt: str, device: Optional[str]) -> str:
     """
     Uses the prompt as is without any modifications.
     (This is used when defense is set to 'None')
@@ -20,12 +21,13 @@ def identity_prompt(prompt: str) -> str:
     return prompt
 
 
-def seq_enclosure(prompt: str) -> str:
+def seq_enclosure(prompt: str, device: Optional[str]) -> str:
     """
     Encloses the prompt in a sequence of random characters.
     
     Parameters:
         prompt (str): the prompt to be enclosed
+        device (str): the device to run the model on
 
     Returns:
         defense_prompt: str - the prompt enclosed in a sequence of random characters
@@ -42,12 +44,13 @@ def seq_enclosure(prompt: str) -> str:
     return defense_prompt
 
 
-def xml_tagging(prompt: str) -> str:
+def xml_tagging(prompt: str, device: Optional[str]) -> str:
     """
     Encloses the user input in prompts in XML tags to help the LLM evade adversarial inputs.
     
     Parameters:
         prompt (str): the prompt to be enclosed
+        device (str): the device to run the model on
 
     Returns:
         defense_prompt: str - the prompt enclosed in XML tags
@@ -61,12 +64,13 @@ def xml_tagging(prompt: str) -> str:
     return defense_prompt
 
 
-def heuristic_defense(prompt: str) -> str:
+def heuristic_defense(prompt: str, device: Optional[str]) -> str:
     """
     Uses rule based heuristics to detect and remove adversarial prompt inputs.
     
     Parameters:
         prompt (str): the prompt to be checked
+        device (str): the device to run the model on
 
     Returns:
         defense_prompt: str - the sanitized prompt (can be empty)
@@ -95,12 +99,13 @@ def sandwiching(prompt: str) -> str:
     raise NotImplementedError("sandwiching() is not implemented yet!")
 
 
-def llm_eval(prompt: str) -> str:
+def llm_eval(prompt: str, device: Optional[str]) -> str:
     """
     Uses a separate LLM to evaluate the prompt and remove adversarial inputs.
     
     Parameters:
         prompt (str): the prompt to be evaluated
+        device (str): the device to run the model on
 
     Returns:
         defense_prompt: str - the evaluated and sanitized prompt
@@ -125,13 +130,14 @@ def llm_eval(prompt: str) -> str:
     return prompt
 
 
-def ppl_detection(prompt: str) -> str:
+def ppl_detection(prompt: str, device: Optional[str]) -> str:
     """
     Uses a separate LLM (GPT2) to calculate the perplexity of the message. If the perplexity
     is above a certain threshold we assume malicious content and therefore remove the message.
     
     Parameters:
         prompt (str): the prompt to be evaluated
+        device (str): the device to run the model on
 
     Returns:
         defense_prompt: str - the evaluated and sanitized prompt
@@ -151,19 +157,24 @@ def ppl_detection(prompt: str) -> str:
     return prompt
 
 
-def prompt_guard_defense(prompt: str) -> str:
+def prompt_guard_defense(prompt: str, device: Optional[str]) -> str:
     """
     Uses Meta's PromptGuard model to detect whether the prompt is adversarial or not.
     https://huggingface.co/meta-llama/Prompt-Guard-86M
 
     Parameters:
         prompt (str): the prompt to be enclosed
+        device (str): the device to run the model on
 
     Returns:
         defense_prompt: str - the evaluated and sanitized prompt
     """
 
-    classifier = pipeline("text-classification", model="meta-llama/Prompt-Guard-86M")
+    classifier = pipeline(
+        "text-classification",
+        model="meta-llama/Prompt-Guard-86M",
+        device=device,
+    )
     result = classifier(prompt)[0]["label"].lower()
     if result in ["jailbreak", "injection", "indirect"]:
         return f"The message entered was detected as {result} and "\

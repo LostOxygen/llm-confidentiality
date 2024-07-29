@@ -115,7 +115,7 @@ class SecretKeyAttackStrategy(AttackStrategy):
                 # build the malicious prompt using the attack function
                 mal_prompt = self.attack_func()
                 # apply the defense function to the malicious prompt
-                mal_prompt = self.defense_func(mal_prompt)
+                mal_prompt = self.defense_func(mal_prompt, self.device)
                 # predict the response of the opponent LLM
                 response, history = self.llm.chat(system_prompt, mal_prompt)
 
@@ -447,7 +447,7 @@ class LangchainAttackStrategy(AttackStrategy):
                     user_prompt = self.attack_func(user_prompt)
 
                     # wrap the user input into a defense function if given
-                    user_prompt = self.defense_func(user_prompt)
+                    user_prompt = self.defense_func(user_prompt, self.device)
 
                 # bind the tools to the LLM
                 self.llm.bind_tools_to_model(self.tools)

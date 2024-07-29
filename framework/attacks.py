@@ -8,7 +8,7 @@ from .utils import make_string_typoglycemiac
 
 ATTACK_LIST: Final[List[str]] = ["payload_splitting", "obfuscation", "jailbreak",
                                  "translation", "chatml_abuse", "typoglycemia",
-                                 "advs_suffix", "base_attack"]
+                                 "advs_suffix"]
 
 
 

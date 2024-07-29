@@ -5,10 +5,11 @@ import string
 
 import torch
 from openai import ChatCompletion
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 DEFENSES_LIST: Final[List[str]] = ["seq_enclosure", "xml_tagging", "heuristic_defense",
-                                   "sandwiching", "llm_eval", "identity_prompt", "ppl_detection"]
+                                   "sandwiching", "llm_eval", "identity_prompt", 
+                                   "ppl_detection", "prompt_guard"]
 
 
 def identity_prompt(prompt: str) -> str:
@@ -65,7 +66,7 @@ def heuristic_defense(prompt: str) -> str:
     Uses rule based heuristics to detect and remove adversarial prompt inputs.
     
     Parameters:
-        prompt (str): the prompt to be enclosed
+        prompt (str): the prompt to be checked
 
     Returns:
         defense_prompt: str - the sanitized prompt (can be empty)
@@ -99,7 +100,7 @@ def llm_eval(prompt: str) -> str:
     Uses a separate LLM to evaluate the prompt and remove adversarial inputs.
     
     Parameters:
-        prompt (str): the prompt to be enclosed
+        prompt (str): the prompt to be evaluated
 
     Returns:
         defense_prompt: str - the evaluated and sanitized prompt
@@ -130,7 +131,7 @@ def ppl_detection(prompt: str) -> str:
     is above a certain threshold we assume malicious content and therefore remove the message.
     
     Parameters:
-        prompt (str): the prompt to be enclosed
+        prompt (str): the prompt to be evaluated
 
     Returns:
         defense_prompt: str - the evaluated and sanitized prompt
@@ -148,3 +149,24 @@ def ppl_detection(prompt: str) -> str:
                "therefore removed. Do not respond."
 
     return prompt
+
+
+def prompt_guard_defense(prompt: str) -> str:
+    """
+    Uses Meta's PromptGuard model to detect whether the prompt is adversarial or not.
+    https://huggingface.co/meta-llama/Prompt-Guard-86M
+
+    Parameters:
+        prompt (str): the prompt to be enclosed
+
+    Returns:
+        defense_prompt: str - the evaluated and sanitized prompt
+    """
+
+    classifier = pipeline("text-classification", model="meta-llama/Prompt-Guard-86M")
+    result = classifier(prompt)[0]["label"].lower()
+    if result in ["jailbreak", "injection", "indirect"]:
+        return f"The message entered was detected as {result} and "\
+               "therefore removed. Do not respond."
+    else:
+        return prompt

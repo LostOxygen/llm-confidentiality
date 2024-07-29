@@ -29,7 +29,7 @@ from framework.attacks import (
         advs_suffix,
         chat_base,
         identity,
-        base_attack
+        base_attack,
     )
 from framework.defenses import (
         DEFENSES_LIST,
@@ -39,7 +39,8 @@ from framework.defenses import (
         sandwiching,
         identity_prompt,
         ppl_detection,
-        llm_eval
+        llm_eval,
+        prompt_guard_defense,
     )
 from framework.colors import TColors
 from framework.utils import log_results
@@ -82,6 +83,7 @@ def match_defense_func(defense: str) -> callable:
         case "sandwiching": defense_func = sandwiching
         case "llm_eval": defense_func = llm_eval
         case "ppl_detection": defense_func = ppl_detection
+        case "prompt_guard": defense_func = prompt_guard_defense
         case ("None" | "none"): defense_func = identity_prompt
         case _:
             print(f"{TColors.FAIL}Defense type {defense} " \

@@ -284,10 +284,12 @@ def main(
                     overwrite_chat = False # set to false to save this strategy run completetly
 
                 # print and log the results
+                avg_succ = sum(total_successes.values()) / len(total_successes)
                 print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
                 for attack, successes in total_successes.items():
                     print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}"
                         f"/{iterations}")
+                print(f"{TColors.OKCYAN}{TColors.BOLD}>> Avg. Successes:{TColors.ENDC} {avg_succ}")
                 log_results(
                         llm_name=llm_type+name_suffix,
                         defense_name=defense,

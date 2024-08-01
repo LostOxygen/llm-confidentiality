@@ -914,12 +914,10 @@ class LLM():
                         "user_prompt": user_prompt,
                     }
                 )
-                response = full_response["output"]
+                response = str(full_response["output"])
+                intermediate_steps = str(full_response["intermediate_steps"])
 
-                if not isinstance(response, str):
-                    response = str(response)
-
-                history = system_prompt+user_prompt+full_response["intermediate_steps"]+response
+                history = intermediate_steps
 
 
             case (

@@ -454,7 +454,7 @@ class LangchainAttackStrategy(AttackStrategy):
 
                 # start the conversation. this time the malicious prompt
                 # is inside the tool, so we use the normal user prompt
-                response, _ = self.llm.chat(system_prompt, user_prompt)
+                response, intermediate_steps = self.llm.chat(system_prompt, user_prompt)
 
                 # call the chat api to add the messages to the chat
                 self.chat_api_add_messages("system", system_prompt)
@@ -505,6 +505,7 @@ class LangchainAttackStrategy(AttackStrategy):
                         iteration=iteration,
                         prompt=user_prompt,
                         sys_prompt=system_prompt,
+                        intermediate_steps=intermediate_steps,
                         response=response,
                         success=curr_success,
                         secret_key=secret_key,

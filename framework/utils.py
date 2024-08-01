@@ -18,6 +18,7 @@ def log_conversation(
         response: str,
         success: bool,
         secret_key: str,
+        intermediate_steps: Optional[str] = "",
         scenario: Optional[str] = None,
         overwrite: Optional[bool] = False,
     ) -> None:
@@ -35,6 +36,7 @@ def log_conversation(
         response: str - the response of the opponent LLM
         success: bool - whether the response contains the secret key or not
         secret_key: str - the secret key
+        intermediate_steps: str - the intermediate steps of the llm for tool usage
         scenario: str - the scenario of the attack (if the tool attack strategy is used)
         overwrite: bool - whether to overwrite the file or not
 
@@ -64,6 +66,7 @@ def log_conversation(
         f.write(f">>Key: {secret_key}\n")
         f.write(f">>System Prompt: \n{sys_prompt}\n")
         f.write(f">>Prompt: \n{prompt}\n")
+        f.write(f"Intermediate Steps: \n{intermediate_steps}\n")
         f.write(f">>Response: \n{response}\n")
         f.write("\n"+"#"*100)
 

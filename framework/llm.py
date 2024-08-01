@@ -906,17 +906,20 @@ class LLM():
                     tools=self.tools,
                     handle_parsing_errors=True,
                     verbose=self.verbose,
+                    return_intermediate_steps=True,
                 )
 
-                response = agent_executor.invoke(
+                full_response = agent_executor.invoke(
                     {
                         "user_prompt": user_prompt,
                     }
-                )["output"]
+                )
+                response = full_response["output"]
 
                 if not isinstance(response, str):
                     response = str(response)
-                history = system_prompt + user_prompt + response
+
+                history = system_prompt+user_prompt+full_response["intermediate_steps"]+response
 
 
             case (

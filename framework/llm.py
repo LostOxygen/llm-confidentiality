@@ -6,7 +6,7 @@ from openai import OpenAI
 
 from langchain.tools import BaseTool
 from langchain.agents import AgentExecutor, create_structured_chat_agent
-from langchain_core.messages import AIMessage, ToolMessage, HumanMessage
+from langchain_core.messages import ToolMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_community.chat_models import ChatOllama
@@ -34,6 +34,7 @@ from framework.prompts import (
 
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 MAX_RETRIES: int = 10 # number of retries for GPT based chat requests
+NUM_TOOL_RETRIES: int = 10 # number of retries for tool based chat requests
 
 class LLM():
     """Implementation of the LLM class to handle the different LLMs"""
@@ -62,6 +63,9 @@ class LLM():
         self.tokenizer: Type[AutoTokenizer] = None
         self.is_finetuning: bool = is_finetuning
         self.stop_list = STOPPING_LIST
+
+        # count of tool retries
+        self.tool_retries = 0
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
@@ -647,6 +651,7 @@ class LLM():
         if self.tokenizer is not None:
             del self.tokenizer
 
+
     def bind_tools_to_model(self, tools: list[callable]) -> None:
         """
         Helper method to bind tools to the LLM
@@ -662,22 +667,31 @@ class LLM():
             tool_choice="auto",
         )
 
-    def tool_exception_message(self, inputs: dict) -> dict:
-        exception = inputs.pop("exception")
 
+    def tool_exception_message(self, inputs: dict) -> dict:
+        self.tool_retries += 1
         # Add historical messages to the original input,
         # so the model knows that it made a mistake with the last tool call.
-        messages = [
-            AIMessage(content="", tool_calls=[exception.tool_call]),
-            ToolMessage(
-                tool_call_id="1337", content="Wrong arguments for the tool call."
-            ),
-            HumanMessage(
-                content="The last tool call raised an exception. " \
-                        "Try calling the tool again with corrected arguments. " \
-                        "Check if you used the correct tool and the correct format."
-            ),
-        ]
+        if self.tool_retries >= NUM_TOOL_RETRIES:
+            messages = [
+                HumanMessage(
+                    content="Somehow the tool does not seem to work. Finish " \
+                            "the conversation and try again later."
+                ),
+            ]
+
+        else:
+            messages = [
+                ToolMessage(
+                    tool_call_id="1337", content="Wrong arguments for the tool call."
+                ),
+                HumanMessage(
+                    content="The last tool call raised an exception. " \
+                            "Try calling the tool again with corrected arguments. " \
+                            "Check if you used the correct tool and the correct format."
+                ),
+            ]
+
         inputs["last_output"] = messages
         return inputs
 
@@ -898,7 +912,17 @@ class LLM():
 
                 # if the tool calling fails, use the fallback chain
                 agent = agent.with_fallbacks(
-                    [self.tool_exception_message | agent]
+                    [self.tool_exception_message | agent,
+                     self.tool_exception_message | agent,
+                     self.tool_exception_message | agent,
+                     self.tool_exception_message | agent,
+                     self.tool_exception_message | agent,
+                     self.tool_exception_message | agent,
+                     self.tool_exception_message | agent,
+                     self.tool_exception_message | agent,
+                     self.tool_exception_message | agent,
+                     self.tool_exception_message | agent,
+                     self.tool_exception_message | agent]
                 )
 
                 agent_executor = AgentExecutor(

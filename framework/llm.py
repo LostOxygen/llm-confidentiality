@@ -411,6 +411,53 @@ class LLM():
                         )
 
             case (
+                    "llama3-8b-fine" | "llama3-70b-fine"
+                ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                # create quantization config
+                if str(self.device) in ["mps", "cpu"]:
+                    config=None
+                else:
+                    config = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_quant_type="nf4",
+                        bnb_4bit_use_double_quant=True,
+                        bnb_4bit_compute_dtype=torch.float16
+                    )
+
+                # complete the model name for chat or normal models
+                model_name = "meta-llama/"
+                if "-" not in self.llm_type:
+                    raise NotImplementedError(
+                        f"LLM specifier {self.llm_type} not complete." +\
+                        f"Did you mean {self.llm_type}-7b?"
+                    )
+                if self.llm_type.split("-")[1] == "8b":
+                    model_name += "Meta-Llama-3-8b-Instruct"
+
+                elif self.llm_type.split("-")[1] == "70b":
+                    model_name += "Meta-Llama-3-70b-Instruct"
+
+                else:
+                    model_name += "Meta-Llama-3-8b-Instruct"
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                                model_name,
+                                use_fast=False,
+                                cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                            )
+                self.tokenizer.pad_token = self.tokenizer.unk_token
+
+                self.model = AutoModelForCausalLM.from_pretrained(
+                            model_name,
+                            device_map="auto",
+                            quantization_config=config,
+                            low_cpu_mem_usage=True,
+                            trust_remote_code=True,
+                            cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                        )
+
+            case (
                     "llama3-8b" | "llama3-70b" | "llama3-400b"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))

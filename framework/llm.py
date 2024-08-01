@@ -6,7 +6,8 @@ from openai import OpenAI
 
 from langchain.tools import BaseTool
 from langchain.agents import AgentExecutor, create_structured_chat_agent
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import AIMessage, ToolMessage, HumanMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_community.chat_models import ChatOllama
 from langchain_experimental.llms.ollama_functions import OllamaFunctions
@@ -661,6 +662,26 @@ class LLM():
             tool_choice="auto",
         )
 
+    def tool_exception_message(self, inputs: dict) -> dict:
+        exception = inputs.pop("exception")
+
+        # Add historical messages to the original input,
+        # so the model knows that it made a mistake with the last tool call.
+        messages = [
+            AIMessage(content="", tool_calls=[exception.tool_call]),
+            ToolMessage(
+                tool_call_id="1337", content="Wrong arguments for the tool call."
+            ),
+            HumanMessage(
+                content="The last tool call raised an exception. " \
+                        "Try calling the tool again with corrected arguments. " \
+                        "Check if you used the correct tool and the correct format."
+            ),
+        ]
+        inputs["last_output"] = messages
+        return inputs
+
+
     @staticmethod
     def format_prompt(system_prompt: str, user_prompt: str, llm_type: str) -> str:
         """
@@ -866,12 +887,18 @@ class LLM():
                     [
                         ("system", system_prompt),
                         ("human", "{user_prompt}\n {agent_scratchpad}"),
+                        MessagesPlaceholder("last_output", optional=True),
                     ]
                 )
                 agent = create_structured_chat_agent(
                     tools=self.tools,
                     llm=self.model,
                     prompt=prompt,
+                )
+
+                # if the tool calling fails, use the fallback chain
+                agent = agent.with_fallbacks(
+                    [self.tool_exception_message | agent]
                 )
 
                 agent_executor = AgentExecutor(
@@ -997,3 +1024,5 @@ class LLM():
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
         return (response, history)
+
+

@@ -658,91 +658,325 @@ class LangchainAttackStrategy(AttackStrategy):
             None
 
         Returns:
-            tools: list[BaseTool] - the initialized tools
+            tools: list[BaseTool] - the initialized and selected tools
         """
-
-        # initialize the tools with the identity functions first
-        # then overwrite the first tool with the attack/defense functions accordingly
-        cloud_tool = GetCloudFilesTool(
-                metadata={
-                    "attack_func": identity,
-                    "defense_func": identity_prompt,
-                    "device": self.device,
-                },
-            )
-
-        mail_tool = GetMailsTool(
-                metadata={
-                    "attack_func": identity,
-                    "defense_func": identity_prompt,
-                    "device": self.device,
-                },
-            )
-
-        notes_tool = GetNotesTool(
-                metadata={
-                    "attack_func": identity,
-                    "defense_func": identity_prompt,
-                    "device": self.device,
-                },
-            )
-
-        calendar_tool = GetCalendarEventsTool(
-                metadata={
-                    "attack_func": identity,
-                    "defense_func": identity_prompt,
-                    "device": self.device,
-                },
-            )
-
+        tools_list = []
 
         match self.scenario:
-            case (
-                Scenarios.CloudWithCalendar | Scenarios.CloudWithMail |
-                Scenarios.CloudWithNotes | Scenarios.CloudWithCloud
-                ):
-                cloud_tool = GetCloudFilesTool(
+            case Scenarios.CloudPlain:
+                tools_list.append(
+                    GetCloudFilesTool(
                         metadata={
                             "attack_func": self.attack_func,
                             "defense_func": self.defense_func,
                             "device": self.device,
                         },
                     )
-            case (
-                Scenarios.MailWithNotes | Scenarios.MailWithMail |
-                Scenarios.MailWithCalendar | Scenarios.MailWithCloud
-                ):
-                mail_tool = GetMailsTool(
+                )
+            case Scenarios.CalendarPlain:
+                tools_list.append(
+                    GetCalendarEventsTool(
                         metadata={
                             "attack_func": self.attack_func,
                             "defense_func": self.defense_func,
                             "device": self.device,
                         },
                     )
-            case (
-                Scenarios.NotesWithCalendar | Scenarios.NotesWithCloud |
-                Scenarios.NotesWithNotes | Scenarios.NotesWithMail
-                ):
-                notes_tool = GetNotesTool(
+                )
+            case Scenarios.MailPlain:
+                tools_list.append(
+                    GetMailsTool(
                         metadata={
                             "attack_func": self.attack_func,
                             "defense_func": self.defense_func,
                             "device": self.device,
                         },
                     )
-            case (
-                Scenarios.CalendarWithCalendar | Scenarios.CalendarWithNotes |
-                Scenarios.CalendarWithCloud | Scenarios.CalendarWithMail
-                ):
-                calendar_tool = GetCalendarEventsTool(
+                )
+            case Scenarios.NotesPlain:
+                tools_list.append(
+                    GetNotesTool(
                         metadata={
                             "attack_func": self.attack_func,
                             "defense_func": self.defense_func,
                             "device": self.device,
                         },
                     )
+                )
+
+            case Scenarios.CalendarWithCloud:
+                tools_list.append(
+                    GetCalendarEventsTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetCloudFilesTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.CalendarWithMail:
+                tools_list.append(
+                    GetCalendarEventsTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetMailsTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.CalendarWithNotes:
+                tools_list.append(
+                    GetCalendarEventsTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetNotesTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.CalendarWithCalendar:
+                tools_list.append(
+                    GetCalendarEventsTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+
+            case Scenarios.MailWithCloud:
+                tools_list.append(
+                    GetMailsTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetCloudFilesTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.MailWithCalendar:
+                tools_list.append(
+                    GetMailsTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetCalendarEventsTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.MailWithNotes:
+                tools_list.append(
+                    GetMailsTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetNotesTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.MailWithMail:
+                tools_list.append(
+                    GetMailsTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+
+            case Scenarios.NotesWithCloud:
+                tools_list.append(
+                    GetNotesTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetCloudFilesTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.NotesWithCalendar:
+                tools_list.append(
+                    GetNotesTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetCalendarEventsTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.NotesWithMail:
+                tools_list.append(
+                    GetNotesTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetMailsTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.NotesWithNotes:
+                tools_list.append(
+                    GetNotesTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+
+            case Scenarios.CloudWithCalendar:
+                tools_list.append(
+                    GetCloudFilesTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetCalendarEventsTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.CloudWithMail:
+                tools_list.append(
+                    GetCloudFilesTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetMailsTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.CloudWithNotes:
+                tools_list.append(
+                    GetCloudFilesTool(
+                        metadata={
+                            "attack_func": identity,
+                            "defense_func": identity_prompt,
+                            "device": self.device,
+                        },
+                    )
+                )
+                tools_list.append(
+                    GetNotesTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
+            case Scenarios.CloudWithCloud:
+                tools_list.append(
+                    GetCloudFilesTool(
+                        metadata={
+                            "attack_func": self.attack_func,
+                            "defense_func": self.defense_func,
+                            "device": self.device,
+                        },
+                    )
+                )
 
             case _:
-                pass
+                raise ValueError(f"{TColors.FAIL}Invalid scenario{TColors.ENDC}")
 
-        return [cloud_tool, mail_tool, notes_tool, calendar_tool]
+        return tools_list

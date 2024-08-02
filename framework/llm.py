@@ -711,7 +711,7 @@ class LLM():
         """
         self.model.bind_tools(
             [convert_to_openai_function(t) for t in tools],
-            tool_choice="auto",
+            tool_choice="any",
         )
 
 
@@ -969,7 +969,7 @@ class LLM():
                     verbose=self.verbose,
                     return_intermediate_steps=True,
                     max_execution_time=120,
-                    max_iterations=20,
+                    max_iterations=10,
                 )
 
                 full_response = agent_executor.invoke(

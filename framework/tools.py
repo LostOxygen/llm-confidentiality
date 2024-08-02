@@ -26,6 +26,7 @@ class GetCloudFilesTool(BaseTool):
     )
     args_schema: Type[GetCloudFilesSchema] = GetCloudFilesSchema
     metadata: Optional[dict[str, Any]] = {}
+    handle_validation_error: str = "Tool inputs are invalid. Try again!"
 
     def _run(self, file_name: str) -> dict:
         """Use the tool."""
@@ -43,13 +44,16 @@ class GetCloudFilesTool(BaseTool):
                 value = defense_func(value, device)
                 results.append(value)
 
+        if not results:
+            return "No files found with that name. " \
+                   "Did you spell it correctly? Try again."
         return results
 
 
 class GetMailsSchema(BaseModel):
     """Input for GetMailsTool"""
 
-    query: str = Field(
+    query: dict = Field(
         ...,
         description="The mail search query."
     )
@@ -64,6 +68,7 @@ class GetMailsTool(BaseTool):
         "Example filters include from:sender, subject:subject, is:unread, is:read, exact phrase."
     )
     metadata: Optional[dict[str, Any]] = {}
+    handle_validation_error: str = "Tool inputs are invalid. Try again!"
 
     def _run(self, query: str) -> Union[dict, list, str]:
         """Use the tool."""
@@ -72,10 +77,10 @@ class GetMailsTool(BaseTool):
         defense_func = self.metadata["defense_func"]
         device = self.metadata["device"]
 
-        for mail in MAIL_INBOX:
-            query_type = query.split(":")[0].strip().lower()
-            query_content = query.split(":")[-1].strip().lower()
+        query_type = list(query.keys())[0].lower()
+        query_content = query[query_type].lower()
 
+        for mail in MAIL_INBOX:
             match query_type:
                 case "from":
                     if query_content in mail["from"].lower() or \
@@ -99,14 +104,15 @@ class GetMailsTool(BaseTool):
                     return MAIL_INBOX
 
         if not results:
-            return "No mails found with that query."
+            return "No mails found with that query. " \
+                   "Did you spell it correctly? Try again."
         return results
 
 
 class GetNotesSchema(BaseModel):
     """Input for GetNotesTool"""
 
-    query: str = Field(
+    query: dict = Field(
         ...,
         description = "The notes query to search for subjects or contents.",
     )
@@ -118,9 +124,10 @@ class GetNotesTool(BaseTool):
     args_schema: Type[GetNotesSchema] = GetNotesSchema
     description: str = (
         "Use this tool to search for notes with certain subjects or contents. Use the query "
-        "as subject:subject or receive all notes to search for content"
+        "as query:subject:subject or receive all notes to search for content"
     )
     metadata: Optional[dict[str, Any]] = {}
+    handle_validation_error: str = "Tool inputs are invalid. Try again!"
 
     def _run(self, query: str) -> Union[list, dict, str]:
         """Use the tool."""
@@ -130,10 +137,10 @@ class GetNotesTool(BaseTool):
         defense_func = self.metadata["defense_func"]
         device = self.metadata["device"]
 
-        for note in NOTES:
-            query_type = query.split(":")[0].strip().lower()
-            query_content = query.split(":")[-1].strip().lower()
+        query_type = list(query.keys())[0].lower()
+        query_content = query[query_type].lower()
 
+        for note in NOTES:
             match query_type:
                 case "subject":
                     if query_content in note["subject"].lower() or \
@@ -146,14 +153,15 @@ class GetNotesTool(BaseTool):
                     return NOTES
 
         if not results:
-            return "No notes found with that query."
+            return "No notes found with that query." \
+                   "Did you spell it correctly? Try again."
         return results
 
 
 class GetCalendarEventSchema(BaseModel):
     """Input for GetNotesTool"""
 
-    query: str = Field(
+    query: dict = Field(
         ...,
         description = "The calendar event query to search for specific events.",
     )
@@ -168,6 +176,7 @@ class GetCalendarEventsTool(BaseTool):
         "Use the query as date:date, topic:topic, or location:location."
     )
     metadata: Optional[dict[str, Any]] = {}
+    handle_validation_error: str = "Tool inputs are invalid. Try again!"
 
     def _run(self, query: str) -> Union[list, dict, str]:
         """Use the tool."""
@@ -177,10 +186,10 @@ class GetCalendarEventsTool(BaseTool):
         defense_func = self.metadata["defense_func"]
         device = self.metadata["device"]
 
-        for event in CALENDAR_EVENTS:
-            query_type = query.split(":")[0].strip().lower()
-            query_content = query.split(":")[-1].strip().lower()
+        query_type = list(query.keys())[0].lower()
+        query_content = query[query_type].lower()
 
+        for event in CALENDAR_EVENTS:
             match query_type:
                 case "topic":
                     if query_content in event["topic"].lower() or \
@@ -204,7 +213,8 @@ class GetCalendarEventsTool(BaseTool):
                     return CALENDAR_EVENTS
 
         if not results:
-            return "No notes found with that query."
+            return "No calendar events found with that query. " \
+                   "Did you spell it correctly? Try again."
         return results
 
 

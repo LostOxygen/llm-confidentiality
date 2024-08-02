@@ -959,17 +959,7 @@ class LLM():
 
                 # if the tool calling fails, use the fallback chain
                 agent = agent.with_fallbacks(
-                    [self.tool_exception_message | agent,
-                     self.tool_exception_message | agent,
-                     self.tool_exception_message | agent,
-                     self.tool_exception_message | agent,
-                     self.tool_exception_message | agent,
-                     self.tool_exception_message | agent,
-                     self.tool_exception_message | agent,
-                     self.tool_exception_message | agent,
-                     self.tool_exception_message | agent,
-                     self.tool_exception_message | agent,
-                     self.tool_exception_message | agent]
+                    [self.tool_exception_message | agent]
                 )
 
                 agent_executor = AgentExecutor(
@@ -978,6 +968,8 @@ class LLM():
                     handle_parsing_errors=True,
                     verbose=self.verbose,
                     return_intermediate_steps=True,
+                    max_execution_time=120,
+                    max_iterations=20,
                 )
 
                 full_response = agent_executor.invoke(

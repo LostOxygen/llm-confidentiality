@@ -11,7 +11,7 @@ If you want to cite our work, please use the [this](#citation) BibTeX entry.
 - Finetuning and Prefix-Tuning LLMs to harden them against these attacks using the datasets -> [jump](#finetuning-peft-and-prefix-tuning)
 
 >[!WARNING]
-><b>GPU utilization is based on the [accelerate](https://huggingface.co/docs/accelerate/index) library and is therefore currently not supported for Windows machines</b>
+><b>Hardware aceleration is only fully supported for CUDA machines running Linux. Windows or MacOS with CUDA/MPS could face some issues.</b>
 
 ## Setup
 Before running the code, install the requirements:
@@ -113,9 +113,9 @@ The ```base_chat``` attack consists of normal questions to test of the model spi
 
 
 ---
-# Finetuning (PEFT and Prefix-Tuning)
-This section covers the possible LLaMA2 finetuning options.
-PEFT is based on [this](https://github.com/huggingface/peft) paper and Prefix-Tuning is based on [this](https://arxiv.org/abs/2101.00190) paper.
+# Finetuning
+This section covers the possible LLaMA finetuning options.
+We use PEFT, which is based on [this](https://github.com/huggingface/peft) paper.
 
 ### Setup
 Additionally to the above setup run
@@ -141,7 +141,7 @@ python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERAT
 | Argument | Type | Default Value | Description |
 |----------|------|---------------|-------------|
 | ```-h, --help``` | - | - | Show this help message and exit |
-| ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to finetune |
+| ```-llm, --llm_type``` | <b>str</b> | ```llama3-8b``` |Specifies the type of llm to finetune |
 | ```-i, --iterations``` | <b>int</b> | ```10000``` | Specifies the number of iterations for the finetuning |
 | ```-advs, --advs_train``` | <b>bool</b> | ```False``` | Utilizes the adversarial training to harden the finetuned LLM |
 | ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | Specifies the attacks which will be used to harden the llm during finetuning. Only has an effect if ```--train_robust``` is set to True. For supported attacks see the previous section |
@@ -149,38 +149,7 @@ python finetuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --iterations ITERAT
 
 
 ### Supported Large Language Models
-| Model | Parameter Specifier | Link | Compute Instance |
-|-------|------|-----|-----|
-| LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
-
-
----
-## Prefix-Tuning to harden LLMs against attacks
-This is a new and more efficient approach to finetune LLMs. The prefix-tuning script uses huggingfaces accelerator for distributed training, so make sure to run ```accelerate config``` before running the script.
-
-### Usage
-```python
-accelerate launch prefix_tuning.py [-h] [-llm | --llm_type LLM_NAME] [-i | --epochs EPOCHS] [-bs | --batch_size BATCH_SIZE] [-lr | --learning_rate LEARNING_RATE] [-ml | --max_seq_length MAX_SEQ_LENGTH] [-pl | --prefix_length PREFIX_LENGTH] [-a | --attacks ATTACKS_LIST] [-n | --name_suffix NAME_SUFFIX]
-```
-
-### Arguments
-| Argument | Type | Default Value | Description |
-|----------|------|---------------|-------------|
-| ```-h, --help``` | - | - | Show this help message and exit |
-| ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to prefix tune |
-| ```-e, --epochs``` | <b>int</b> | ```10``` | Specifies the number of epochs for the prefix tuning |
-| ```-bs, --batch_size``` | <b>int</b> | ```2``` | Specifies the batch size for the prefix tuning |
-| ```-lr, --learning_rate``` | <b>float</b> | ```0.0001``` | Specifies the learning rate for the prefix tuning |
-| ```-ml, --max_length``` | <b>int</b> | ```1024``` | Specifies the max. sequence length in tokens |
-| ```-pl, --prefix_length``` | <b>int</b> | ```10``` | Specifies the number of virtual tokens to train as the tuned prefixes |
-| ```-a, --attacks``` | <b>List[str]</b> | ```payload_splitting``` | Specifies the attacks which will be used to harden the llm during finetuning. Only has an effect if ```--train_robust``` is set to True. For supported attacks see the previous section |
-| ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the finetuned model name |
-
-
-### Supported Large Language Models
-| Model | Parameter Specifier | Link | Compute Instance |
-|-------|------|-----|-----|
-| LLaMA2 (chat) | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
+Currently only the LLaMA models are supported (```llama2-7/13/70b``` / ```llama3-8/70b```).
 
 
 # Generate System Prompt Datasets
@@ -190,7 +159,7 @@ Simply run the ```generate_dataset.py``` script to create new system prompts as 
 | Argument | Type | Default Value | Description |
 |----------|------|---------------|-------------|
 | ```-h, --help``` | - | - | Show this help message and exit |
-| ```-llm, --llm_type``` | <b>str</b> | ```llama2-7b``` |Specifies the type of llm to prefix tune |
+| ```-llm, --llm_type``` | <b>str</b> | ```llama3-70b``` |Specifies the LLM used to generate the system prompt dataset |
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the model name if you want to use a custom model |
 | ```-ds, --dataset_size``` | <b>int</b> | ```1000``` | Size of the resulting system prompt dataset |
 

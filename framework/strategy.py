@@ -88,12 +88,11 @@ class SecretKeyAttackStrategy(AttackStrategy):
         self.prompt_dataset = PromptDataset(state=DatasetState.TEST)
         self.response_dataset = ResponseDataset()
 
-        if not self.verbose:
-            self.widgets = [
-                "[", progressbar.Percentage(), "]",
-                progressbar.GranularBar(), "",
-                progressbar.ETA(),
-            ]
+        self.widgets = [
+            "[", progressbar.Percentage(), "]",
+            progressbar.GranularBar(), "",
+            progressbar.ETA(),
+        ]
 
     def execute(self) -> int:
         """Executes the strategy and returns the number of successes"""

@@ -22,9 +22,9 @@ langchain<0.2.0,>=0.1.15
 langchain-core<0.2.0,>=0.1.52
 langchain-community
 langchain-openai
+langchain-ollama
 progressbar2
 langsmith>=0.0.72
-langchain-benchmarks
 langchain-experimental
 langchain-googledrive
 google-api-python-client

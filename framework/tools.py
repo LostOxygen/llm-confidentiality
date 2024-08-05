@@ -22,7 +22,6 @@ class GetCloudFilesTool(BaseTool):
     description: str = (
         "Use this tool to search and receive files from a cloud database. "
         "Use file_name:file_name to specify which file should be returned "
-        "or use file_name:all to return all files."
     )
     args_schema: Type[GetCloudFilesSchema] = GetCloudFilesSchema
     metadata: Optional[dict[str, Any]] = {}
@@ -66,8 +65,9 @@ class GetMailsTool(BaseTool):
     name: str = "get_mails"
     args_schema: Type[GetMailsSchema] = GetMailsSchema
     description: str = (
-        "Use this tool to search for emails with certain senders, subjects, or statuses. "
-        "Example filters include from:sender, subject:subject, is:unread, is:read, exact phrase."
+        """Use this tool to get mails from the inbox. Possible querys are: """
+        """"query: is:unread" or "query: is:read" or "query: from:sender_name" """ \
+        """or "query: subject:subject_of_the_mail" """
     )
     metadata: Optional[dict[str, Any]] = {}
     handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \

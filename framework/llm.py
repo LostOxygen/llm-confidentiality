@@ -9,7 +9,7 @@ from langchain.agents import AgentExecutor, create_structured_chat_agent
 from langchain_core.messages import ToolMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.utils.function_calling import convert_to_openai_function
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
 from langchain_experimental.llms.ollama_functions import OllamaFunctions
 from transformers import (
     AutoTokenizer,
@@ -458,51 +458,79 @@ class LLM():
                         )
 
             case (
-                    "llama3-8b" | "llama3-70b" | "llama3-400b"
-                ):
-                self.temperature = max(0.01, min(self.temperature, 5.0))
-                if self.llm_type.split("-")[1] == "8b":
-                    self.model = ChatOllama(model="llama3.1", temperature=self.temperature)
-                elif self.llm_type.split("-")[1] == "70b":
-                    self.model = ChatOllama(model="llama3.1:70b", temperature=self.temperature)
-                elif self.llm_type.split("-")[1] == "405b":
-                    self.model = ChatOllama(model="llama3.1:405b", temperature=self.temperature)
-                else:
-                    self.model = ChatOllama(model="llama3", temperature=self.temperature)
-
-                self.tokenizer = None
-
-            case (
+                    "llama3-8b" | "llama3-70b" | "llama3-400b" |
                     "llama3-8b-tools" | "llama3-70b-tools" | "llama3-405b-tools"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "8b":
-                    self.model = OllamaFunctions(
+                    self.model = ChatOllama(
                         model="llama3.1",
                         temperature=self.temperature,
-                        format="json",
-                        include_raw=True,
+                        #format="json",
                     )
                 elif self.llm_type.split("-")[1] == "70b":
-                    self.model = OllamaFunctions(
+                    self.model = ChatOllama(
                         model="llama3.1:70b",
                         temperature=self.temperature,
-                        format="json",
-                        include_raw=True,
+                        #format="json",
                     )
                 elif self.llm_type.split("-")[1] == "405b":
-                    self.model = OllamaFunctions(
+                    self.model = ChatOllama(
                         model="llama3.1:405b",
                         temperature=self.temperature,
-                        format="json",
-                        include_raw=True,
+                        #format="json",
                     )
                 else:
-                    self.model = OllamaFunctions(
+                    self.model = ChatOllama(
                         model="llama3.1",
                         temperature=self.temperature,
-                        format="json",
-                        include_raw=True,
+                        #format="json",
+                    )
+
+                self.tokenizer = None
+
+            case ("gemma2-9b" | "gemma2-27b" |"gemma2-9b-tools" | "gemma2-27b-tools"):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                if self.llm_type.split("-")[1] == "9b":
+                    self.model = ChatOllama(
+                        model="gemma2",
+                        temperature=self.temperature,
+                        #format="json",
+                    )
+                elif self.llm_type.split("-")[1] == "27b":
+                    self.model = ChatOllama(
+                        model="gemma2:27b",
+                        temperature=self.temperature,
+                        #format="json",
+                    )
+                else:
+                    self.model = ChatOllama(
+                        model="gemma2",
+                        temperature=self.temperature,
+                        #format="json",
+                    )
+
+                self.tokenizer = None
+
+            case ("phi3-3b" | "phi3-14b" | "phi3-3b-tools" | "phi3-14b-tools"):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                if self.llm_type.split("-")[1] == "3b":
+                    self.model = ChatOllama(
+                        model="phi3:mini",
+                        temperature=self.temperature,
+                        ##format="json",
+                    )
+                elif self.llm_type.split("-")[1] == "14b":
+                    self.model = ChatOllama(
+                        model="phi3:medium",
+                        temperature=self.temperature,
+                        #format="json",
+                    )
+                else:
+                    self.model = ChatOllama(
+                        model="phi3:mini",
+                        temperature=self.temperature,
+                        #format="json",
                     )
 
                 self.tokenizer = None
@@ -595,98 +623,6 @@ class LLM():
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
 
-            case ("gemma2-9b" | "gemma2-27b"):
-                self.temperature = max(0.01, min(self.temperature, 5.0))
-                if self.llm_type.split("-")[1] == "9b":
-                    self.model = ChatOllama(
-                        model="gemma2",
-                        temperature=self.temperature,
-                    )
-                elif self.llm_type.split("-")[1] == "27b":
-                    self.model = ChatOllama(
-                        model="gemma2:27b",
-                        temperature=self.temperature,
-                    )
-                else:
-                    self.model = ChatOllama(
-                        model="gemma2",
-                        temperature=self.temperature
-                    )
-
-                self.tokenizer = None
-
-            case ("gemma2-9b-tools" | "gemma2-27b-tools"):
-                self.temperature = max(0.01, min(self.temperature, 5.0))
-                if self.llm_type.split("-")[1] == "9b":
-                    self.model = OllamaFunctions(
-                        model="gemma2",
-                        temperature=self.temperature,
-                        format="json",
-                        include_raw=True,
-                    )
-                elif self.llm_type.split("-")[1] == "27b":
-                    self.model = OllamaFunctions(
-                        model="gemma2:27b",
-                        temperature=self.temperature,
-                        format="json",
-                        include_raw=True,
-                    )
-                else:
-                    self.model = OllamaFunctions(
-                        model="gemma2",
-                        temperature=self.temperature,
-                        format="json",
-                        include_raw=True,
-                    )
-
-                self.tokenizer = None
-
-            case ("phi3-3b" | "phi3-14b"):
-                self.temperature = max(0.01, min(self.temperature, 5.0))
-                if self.llm_type.split("-")[1] == "3b":
-                    self.model = ChatOllama(
-                        model="phi3:mini",
-                        temperature=self.temperature,
-                    )
-                elif self.llm_type.split("-")[1] == "14b":
-                    self.model = ChatOllama(
-                        model="phi3:medium",
-                        temperature=self.temperature,
-                    )
-                else:
-                    self.model = ChatOllama(
-                        model="phi3:mini",
-                        temperature=self.temperature
-                    )
-
-                self.tokenizer = None
-
-            case ("phi3-3b-tools" | "phi3-14b-tools"):
-                self.temperature = max(0.01, min(self.temperature, 5.0))
-                if self.llm_type.split("-")[1] == "3b":
-                    self.model = OllamaFunctions(
-                        model="phi3:mini",
-                        temperature=self.temperature,
-                        format="json",
-                        include_raw=True,
-                    )
-                elif self.llm_type.split("-")[1] == "14b":
-                    self.model = OllamaFunctions(
-                        model="phi3:medium",
-                        temperature=self.temperature,
-                        format="json",
-                        include_raw=True,
-                    )
-                else:
-                    self.model = OllamaFunctions(
-                        model="phi3:mini",
-                        temperature=self.temperature,
-                        format="json",
-                        include_raw=True,
-                    )
-
-                self.tokenizer = None
-
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
@@ -710,7 +646,8 @@ class LLM():
             None
         """
         self.model.bind_tools(
-            [convert_to_openai_function(t) for t in tools],
+            #[convert_to_openai_function(t) for t in tools],
+            tools,
             tool_choice="any",
         )
 

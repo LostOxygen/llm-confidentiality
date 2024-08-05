@@ -4,27 +4,26 @@ numpy
 torch
 openai
 accelerate
-tokenizers>=0.13.3
-transformers>=4.38.0
+tokenizers
+transformers
 huggingface-hub
 bitsandbytes @ git+https://github.com/TimDettmers/bitsandbytes
 einops
 wandb
 scipy
 peft @ git+https://github.com/huggingface/peft.git
-trl<0.9.0
+trl
 datasets
 pkbar
 sentence-transformers
 matplotlib
 tenacity
-langchain<0.2.0,>=0.1.15
-langchain-core<0.2.0,>=0.1.52
+langchain
+langchain-core
 langchain-community
 langchain-openai
 langchain-ollama
 progressbar2
-langsmith>=0.0.72
 langchain-experimental
 langchain-googledrive
 google-api-python-client

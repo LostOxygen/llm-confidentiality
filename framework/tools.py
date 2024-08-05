@@ -71,7 +71,8 @@ class GetMailsTool(BaseTool):
     )
     metadata: Optional[dict[str, Any]] = {}
     handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """"query: is:unread" or "query: is:read" or "query: from:sender_name" """ \
+                                   """"query: is:unread" or "query: is:read" or """ \
+                                   """query: from:sender_name" """ \
                                    """or "query: subject:subject_of_the_mail". Try again!"""
 
     def _run(self, query: str) -> Union[dict, list, str]:

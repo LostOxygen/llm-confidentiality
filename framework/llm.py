@@ -8,9 +8,7 @@ from langchain.tools import BaseTool
 from langchain.agents import AgentExecutor, create_structured_chat_agent
 from langchain_core.messages import ToolMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_ollama import ChatOllama
-from langchain_experimental.llms.ollama_functions import OllamaFunctions
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,

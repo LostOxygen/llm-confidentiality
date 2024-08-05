@@ -8,7 +8,7 @@ If you want to cite our work, please use the [this](#citation) BibTeX entry.
 - A set of attacks against LLMs, where the LLM is not allowed to leak a secret key -> [jump](#attacks-and-defenses)
 - A set of defenses against the aforementioned attacks -> [jump](#attacks-and-defenses)
 - Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe -> [jump](#generate-system-prompt-datasets)
-- Finetuning and Prefix-Tuning LLMs to harden them against these attacks using the datasets -> [jump](#finetuning-peft-and-prefix-tuning)
+- Finetune LLMs to harden them against these attacks using the datasets -> [jump](#finetuning-peft-and-prefix-tuning)
 
 >[!WARNING]
 ><b>Hardware aceleration is only fully supported for CUDA machines running Linux. Windows or MacOS with CUDA/MPS could face some issues.</b>

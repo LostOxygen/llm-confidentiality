@@ -26,7 +26,9 @@ class GetCloudFilesTool(BaseTool):
     )
     args_schema: Type[GetCloudFilesSchema] = GetCloudFilesSchema
     metadata: Optional[dict[str, Any]] = {}
-    handle_validation_error: str = "Tool inputs are invalid. Try again!"
+    handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
+                                   """file_name": "name of the file you want to access". """ \
+                                   """Try again!"""
 
     def _run(self, file_name: str) -> dict:
         """Use the tool."""
@@ -68,7 +70,9 @@ class GetMailsTool(BaseTool):
         "Example filters include from:sender, subject:subject, is:unread, is:read, exact phrase."
     )
     metadata: Optional[dict[str, Any]] = {}
-    handle_validation_error: str = "Tool inputs are invalid. Try again!"
+    handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
+                                   """"query: is:unread" or "query: is:read" or "query: from:sender_name" """ \
+                                   """or "query: subject:subject_of_the_mail". Try again!"""
 
     def _run(self, query: str) -> Union[dict, list, str]:
         """Use the tool."""
@@ -127,7 +131,9 @@ class GetNotesTool(BaseTool):
         "as query:subject:subject or receive all notes to search for content"
     )
     metadata: Optional[dict[str, Any]] = {}
-    handle_validation_error: str = "Tool inputs are invalid. Try again!"
+    handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
+                                   """"query: subject:subject_of_the_note". """ \
+                                   """Try again!"""
 
     def _run(self, query: str) -> Union[list, dict, str]:
         """Use the tool."""
@@ -176,7 +182,11 @@ class GetCalendarEventsTool(BaseTool):
         "Use the query as date:date, topic:topic, or location:location."
     )
     metadata: Optional[dict[str, Any]] = {}
-    handle_validation_error: str = "Tool inputs are invalid. Try again!"
+    handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
+                                   """"query: date:YYYY-MM-DD" or """ \
+                                   """query: location:location_of_the_event" or """ \
+                                   """query: topic:topic_of_the_event". """ \
+                                   """Try again!"""
 
     def _run(self, query: str) -> Union[list, dict, str]:
         """Use the tool."""

@@ -1,5 +1,5 @@
 """library implementing the different attack scenarios as enums"""
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, line-too-long
 from enum import Enum
 
 
@@ -31,3 +31,4 @@ class Scenarios(Enum):
     CloudWithCloud = 20
 
     # possibly also website summary with tools combined
+    # CloudPlain CalendarPlain MailPlain NotesPlain CalendarWithCloud CalendarWithMail CalendarWithNotes CalendarWithCalendar MailWithCloud MailWithCalendar MailWithNotes MailWithMail NotesWithCloud NotesWithCalendar NotesWithMail NotesWithNotes CloudWithCalendar CloudWithMail CloudWithNotes CloudWithCloud

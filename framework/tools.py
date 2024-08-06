@@ -21,12 +21,12 @@ class GetCloudFilesTool(BaseTool):
     name: str = "get_cloud_files"
     description: str = (
         """Use this tool to search and receive files from a cloud database. """
-        """Use "file_name:file_name" to specify which file should be returned """
+        """Use "file_name": "file_name" to specify which file should be returned """
     )
     args_schema: Type[GetCloudFilesSchema] = GetCloudFilesSchema
     metadata: Optional[dict[str, Any]] = {}
     handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """"file_name":"name of the file you want to access". """ \
+                                   """"file_name": "name_of_the_file". """ \
                                    """Try again!"""
 
     def _run(self, file_name: str) -> dict:
@@ -66,14 +66,14 @@ class GetMailsTool(BaseTool):
     args_schema: Type[GetMailsSchema] = GetMailsSchema
     description: str = (
         """Use this tool to get mails from the inbox. Possible queries are: """
-        """"is:unread" or "is:read" or "from:sender_name" """ \
-        """or "subject:subject_of_the_mail" """
+        """{"is": "unread"} or {"is": "read"} or {"from": "sender_name"} """ \
+        """or {"subject": "subject_of_the_mail"} """
     )
     metadata: Optional[dict[str, Any]] = {}
     handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """"is:unread" or "is:read" or """ \
-                                   """"from:sender_name" """ \
-                                   """or "subject:subject_of_the_mail". Try again!"""
+                                   """{"is": "unread"} or {"is": "read"} or """ \
+                                   """{"from": "sender_name"} """ \
+                                   """or {"subject": "subject_of_the_mail"}. Try again!"""
 
     def _run(self, query: str) -> Union[dict, list, str]:
         """Use the tool."""
@@ -128,12 +128,12 @@ class GetNotesTool(BaseTool):
     name: str = "get_notes"
     args_schema: Type[GetNotesSchema] = GetNotesSchema
     description: str = (
-        """Use this tool to search for notes with certain subjects or contents. Possible queries """
-        """are: "subject:subject_of_the_note" the receive the desired note."""
+        """Use this tool to search for notes with certain subjects or contents. The query should """
+        """be: {"subject": "subject_of_the_note"} to the receive the desired note."""
     )
     metadata: Optional[dict[str, Any]] = {}
     handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """"subject:subject_of_the_note". """ \
+                                   """{"subject": "subject_of_the_note"}. """ \
                                    """Try again!"""
 
     def _run(self, query: str) -> Union[list, dict, str]:
@@ -180,13 +180,14 @@ class GetCalendarEventsTool(BaseTool):
     args_schema: Type[GetCalendarEventSchema] = GetCalendarEventSchema
     description: str = (
         """Use this tool to search for calendar events with certain topics, dates, or locations. """
-        """Use "date:date", "topic:topic", or "location:location" as queries."""
+        """Use {"date": "YYYY-MM-DD"}, {"topic": "topic_of_the_event"}, or """ \
+        """{location": "location_of_the_event"} as queries."""
     )
     metadata: Optional[dict[str, Any]] = {}
     handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """"date:YYYY-MM-DD" or """ \
-                                   """"location:location_of_the_event" or """ \
-                                   """"topic:topic_of_the_event". """ \
+                                   """{"date: "YYYY-MM-DD"} or """ \
+                                   """{"location": "location_of_the_event"} or """ \
+                                   """{"topic": "topic_of_the_event"}. """ \
                                    """Try again!"""
 
     def _run(self, query: str) -> Union[list, dict, str]:

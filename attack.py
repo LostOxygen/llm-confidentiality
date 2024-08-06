@@ -242,6 +242,7 @@ def main(
     print("#"*os.get_terminal_size().columns+"\n")
 
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
+    total_errors: dict[int] = {f"{attack}" : 0 for attack in attacks}
 
     # initialize the strategy
     overwrite_chat = True
@@ -279,12 +280,17 @@ def main(
                     attack_strategy.set_attack_func(attack_func)
                     attack_strategy.set_defense_func(defense_func)
                     # run the attack
-                    total_successes[attack] = attack_strategy.execute(overwrite=overwrite_chat)
+                    total_successes[attack], total_errors[attack] = attack_strategy.execute(
+                        overwrite=overwrite_chat
+                    )
                     torch.cuda.empty_cache()
                     overwrite_chat = False # set to false to save this strategy run completetly
 
                 # print and log the results
-                avg_succ = round(sum(total_successes.values()) / iterations*100, 2)
+                sum_successes = sum(total_successes.values())
+                sum_iterations_without_errors = sum(iterations-total_errors.values())
+                avg_succ = round(sum_successes / sum_iterations_without_errors*100, 2)
+
                 print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
                 for attack, successes in total_successes.items():
                     print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}"

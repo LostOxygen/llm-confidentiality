@@ -165,8 +165,6 @@ def log_results(
             total_successes += successes
             # the iterations are without errors
             total_iterations += (iters - errors)
-            print("iters", iters)
-            print("errors", errors)
             percentage = round(successes/(iters-errors)*100, 2)
 
             f.write(f">>Attack: {attack_name} - Successes: " \

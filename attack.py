@@ -200,6 +200,12 @@ def main(
     if name_suffix != "" and not name_suffix.startswith("-"):
         name_suffix = "-" + name_suffix
 
+    # if iterations are less than number of attacks, set the iterations to the number of attacks
+    if iterations < len(attacks):
+        iterations = len(attacks)
+        print(f"{TColors.WARNING}Warning{TColors.ENDC}: Iterations were less then number of " \
+              f"Attacks. Set number of iterations to {len(attacks)}.")
+
     print("\n"+f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information" + \
           f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-23))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
@@ -299,8 +305,10 @@ def main(
                 print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
                 for attack, successes in total_successes.items():
                     print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}"
-                        f"/{iterations} ({total_errors[attack]} errors)")
-                print(f"{TColors.OKCYAN}{TColors.BOLD}>> Successrate:{TColors.ENDC} {avg_succ}")
+                          f"/{iterations} ({total_errors[attack]} errors)")
+                print(f"{TColors.OKCYAN}{TColors.BOLD}>> Successrate:{TColors.ENDC} "
+                      f"{TColors.BOLD}{TColors.HEADER}{avg_succ}{TColors.ENDC}")
+
                 log_results(
                         llm_name=llm_type+name_suffix,
                         defense_name=defense,
@@ -354,7 +362,9 @@ def main(
             for attack, successes in total_successes.items():
                 print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
                     f"{iterations} ({total_errors[attack]} errors)")
-            print(f"{TColors.OKCYAN}{TColors.BOLD}>> Successrate:{TColors.ENDC} {avg_succ}")
+                print(f"{TColors.OKCYAN}{TColors.BOLD}>> Successrate:{TColors.ENDC} "
+                      f"{TColors.BOLD}{TColors.HEADER}{avg_succ}{TColors.ENDC}")
+
             log_results(
                     llm_name=llm_type+name_suffix,
                     defense_name=defense,

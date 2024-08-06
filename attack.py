@@ -243,6 +243,8 @@ def main(
 
     total_successes: dict[int] = {f"{attack}" : 0 for attack in attacks}
     total_errors: dict[int] = {f"{attack}" : 0 for attack in attacks}
+    # divide the iterations by the number of attacks so every attack gets the same amount
+    iterations = iterations//len(attacks)
 
     # initialize the strategy
     overwrite_chat = True
@@ -288,19 +290,23 @@ def main(
 
                 # print and log the results
                 sum_successes = sum(total_successes.values())
-                sum_iterations_without_errors = sum(iterations-total_errors.values())
-                avg_succ = round(sum_successes / sum_iterations_without_errors*100, 2)
+                sum_iterations_without_errors = iterations*len(attacks) - sum(total_errors.values())
+                if sum_iterations_without_errors == 0:
+                    avg_succ = 0
+                else:
+                    avg_succ = round(sum_successes / sum_iterations_without_errors*100, 2)
 
                 print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
                 for attack, successes in total_successes.items():
                     print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}"
-                        f"/{iterations//len(attacks)}")
+                        f"/{iterations} ({total_errors[attack]} errors)")
                 print(f"{TColors.OKCYAN}{TColors.BOLD}>> Successrate:{TColors.ENDC} {avg_succ}")
                 log_results(
                         llm_name=llm_type+name_suffix,
                         defense_name=defense,
                         success_dict=total_successes,
-                        iters=iterations//len(attacks),
+                        error_dict=total_errors,
+                        iters=iterations,
                         overwrite=overwrite_results,
                         scenario=exec_scenario.name,
                     )
@@ -333,20 +339,27 @@ def main(
                 attack_strategy.set_attack_func(attack_func)
                 attack_strategy.set_defense_func(defense_func)
                 # run the attack
-                total_successes[attack] = attack_strategy.execute()
+                total_successes[attack], total_errors[attack] = attack_strategy.execute()
                 torch.cuda.empty_cache()
 
             # print and log the results
-            avg_succ = round(sum(total_successes.values()) / iterations*100, 2)
+            sum_successes = sum(total_successes.values())
+            sum_iterations_without_errors = iterations*len(attacks) - sum(total_errors.values())
+            if sum_iterations_without_errors == 0:
+                avg_succ = 0
+            else:
+                avg_succ = round(sum_successes / sum_iterations_without_errors*100, 2)
+
             print(f"{TColors.OKBLUE}{TColors.BOLD}>> Attack Results:{TColors.ENDC}")
             for attack, successes in total_successes.items():
                 print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
-                    f"{iterations}")
+                    f"{iterations} ({total_errors[attack]} errors)")
             print(f"{TColors.OKCYAN}{TColors.BOLD}>> Successrate:{TColors.ENDC} {avg_succ}")
             log_results(
                     llm_name=llm_type+name_suffix,
                     defense_name=defense,
                     success_dict=total_successes,
+                    error_dict=total_errors,
                     iters=iterations
                 )
 

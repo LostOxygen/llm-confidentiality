@@ -159,7 +159,9 @@ def log_results(
 
         total_successes: int = 0
         total_iterations: int = 0
-        for attack_name, successes, errors in zip(success_dict.items(), error_dict.values()):
+        for attack_name, successes, errors in zip(
+                success_dict.keys(), success_dict.values(), error_dict.values()
+            ):
             total_successes += successes
             # the iterations are without errors
             total_iterations += (iters - errors)

@@ -173,7 +173,10 @@ def log_results(
             f.write(f">>Attack: {attack_name} - Successes: " \
                     f"{successes}/{iters - errors} -> {percentage}%\n")
 
-        total_percentage = round(total_successes/total_iterations*100, 2)
+        if total_iterations == 0:
+            total_percentage = 0
+        else:
+            total_percentage = round(total_successes/total_iterations*100, 2)
         f.write(f">>Total Successes: {total_successes}/{total_iterations} -> {total_percentage}%\n")
         f.write("\n"+"#"*100)
 

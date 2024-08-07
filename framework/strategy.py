@@ -192,7 +192,8 @@ class SecretKeyAttackStrategy(AttackStrategy):
         if not self.verbose:
             # print total successes and fails
             print(f"Successes: {TColors.OKGREEN}{num_successes}{TColors.ENDC} " \
-                    f"Fails: {TColors.FAIL}{num_fails}{TColors.ENDC}")
+                  f"Fails: {TColors.FAIL}{num_fails}{TColors.ENDC} " \
+                  f"Errors: {TColors.WARNING}{num_errors}{TColors.ENDC}")
         return num_successes, num_errors
 
 
@@ -534,7 +535,8 @@ class LangchainAttackStrategy(AttackStrategy):
         if not self.verbose:
             # print total successes and fails
             print(f"Successes: {TColors.OKGREEN}{num_successes}{TColors.ENDC} " \
-                    f"Fails: {TColors.FAIL}{num_fails}{TColors.ENDC}")
+                  f"Fails: {TColors.FAIL}{num_fails}{TColors.ENDC} " \
+                  f"Errors: {TColors.WARNING}{num_errors}{TColors.ENDC}")
         return num_successes, num_errors
 
 

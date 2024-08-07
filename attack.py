@@ -362,8 +362,8 @@ def main(
             for attack, successes in total_successes.items():
                 print(f"Attack: {TColors.OKCYAN}{attack}{TColors.ENDC} - Successes: {successes}/"
                     f"{iterations} ({total_errors[attack]} errors)")
-                print(f"{TColors.OKCYAN}{TColors.BOLD}>> Successrate:{TColors.ENDC} "
-                      f"{TColors.BOLD}{TColors.HEADER}{avg_succ}{TColors.ENDC}")
+            print(f"{TColors.OKCYAN}{TColors.BOLD}>> Successrate:{TColors.ENDC} "
+                    f"{TColors.BOLD}{TColors.HEADER}{avg_succ}{TColors.ENDC}")
 
             log_results(
                     llm_name=llm_type+name_suffix,

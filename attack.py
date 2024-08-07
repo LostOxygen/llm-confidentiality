@@ -268,7 +268,7 @@ def main(
                 llm_suffix=name_suffix,
                 llm_guessing=llm_guessing,
                 temperature=temperature,
-                iterations=iterations//len(attacks),
+                iterations=iterations,
                 create_prompt_dataset=create_prompt_dataset,
                 create_response_dataset=create_response_dataset,
                 scenario=exec_scenario,

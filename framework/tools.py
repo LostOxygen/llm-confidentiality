@@ -82,6 +82,9 @@ class GetMailsTool(BaseTool):
         defense_func = self.metadata["defense_func"]
         device = self.metadata["device"]
 
+        if len(list(query.keys())) == 0:
+            return "Query seems to be empty or wrong. Try again!"
+
         query_type = list(query.keys())[0].lower()
         query_content = query[query_type].lower()
 
@@ -144,6 +147,9 @@ class GetNotesTool(BaseTool):
         defense_func = self.metadata["defense_func"]
         device = self.metadata["device"]
 
+        if len(list(query.keys())) == 0:
+            return "Query seems to be empty or wrong. Try again!"
+
         query_type = list(query.keys())[0].lower()
         query_content = query[query_type].lower()
 
@@ -197,6 +203,9 @@ class GetCalendarEventsTool(BaseTool):
         attack_func = self.metadata["attack_func"]
         defense_func = self.metadata["defense_func"]
         device = self.metadata["device"]
+
+        if len(list(query.keys())) == 0:
+            return "Query seems to be empty or wrong. Try again!"
 
         query_type = list(query.keys())[0].lower()
         query_content = query[query_type].lower()

@@ -26,7 +26,7 @@ def payload_splitting(malicious_input: Optional[str] = "") -> str:
     if malicious_input != "":
         # split the malicious input into three parts
         # Calculate the ideal lengths of each substring
-        string = malicious_input
+        string = str(malicious_input)
         total_length = len(string)
         part_length = total_length // 3
 

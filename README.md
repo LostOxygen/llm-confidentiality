@@ -111,7 +111,7 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 |[Refusal Suppression](https://arxiv.org/pdf/2311.16119) | ```refusal_suppression``` | |
 |[Context Ignoring](https://arxiv.org/pdf/2311.16119) | ```context_ignoring``` | |
 |[Context Termination](https://arxiv.org/pdf/2311.16119) | ```context_termination``` | |
-|[Context Switching_separators](https://arxiv.org/pdf/2311.16119) | ```context_switching_separators``` | |
+|[Context Switching Separators](https://arxiv.org/pdf/2311.16119) | ```context_switching_separators``` | |
 |[Few-Shot](https://arxiv.org/pdf/2311.16119) | ```few_shot``` | |
 |[Cognitive Hacking](https://arxiv.org/pdf/2311.16119) | ```cognitive_hacking``` | |
 |Base Chat | ```base_chat``` | |

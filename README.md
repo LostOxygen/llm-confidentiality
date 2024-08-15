@@ -107,6 +107,13 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 |[Masking](https://learnprompting.org/docs/prompt_hacking/offensive_measures/obfuscation) | ```masking``` | [Perplexity Detection](https://arxiv.org/abs/2308.14132) | ```ppl_detection```
 |[Typoglycemia](https://twitter.com/lauriewired/status/1682825103594205186?s=20) | ```typoglycemia``` | [PromptGuard](https://huggingface.co/meta-llama/Prompt-Guard-86M)| ```prompt_guard``` |
 |[Adversarial Suffix](https://llm-attacks.org/) | ```advs_suffix``` | |
+|[Prefix Injection](https://arxiv.org/pdf/2311.16119) | ```prefix_injection``` | |
+|[Refusal Suppression](https://arxiv.org/pdf/2311.16119) | ```refusal_suppression``` | |
+|[Context Ignoring](https://arxiv.org/pdf/2311.16119) | ```context_ignoring``` | |
+|[Context Termination](https://arxiv.org/pdf/2311.16119) | ```context_termination``` | |
+|[Context Switching_separators](https://arxiv.org/pdf/2311.16119) | ```context_switching_separators``` | |
+|[Few-Shot](https://arxiv.org/pdf/2311.16119) | ```few_shot``` | |
+|[Cognitive Hacking](https://arxiv.org/pdf/2311.16119) | ```cognitive_hacking``` | |
 |Base Chat | ```base_chat``` | |
 
 The ```base_chat``` attack consists of normal questions to test of the model spills it's context and confidential information even without a real attack.

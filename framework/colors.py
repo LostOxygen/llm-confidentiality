@@ -28,4 +28,11 @@ ATTACK_NAMES: Final[dict[str, str]] = {
     "advs_suffix": "Adversarial Suffix",
     "identity": "Identity",
     "base_attack": "Base Attack",
+    "prefix_injection": "Prefix Injection",
+    "refusal_suppression": "Refusal Suppression",
+    "context_ignoring": "Context Ignoring",
+    "context_termination": "Context Termination",
+    "context_switching_separators": "Context Switching Separators",
+    "few_shot": "Few-Shot",
+    "cognitive_hacking": "Cognitive Hacking"
 }

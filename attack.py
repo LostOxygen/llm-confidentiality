@@ -30,6 +30,13 @@ from framework.attacks import (
         chat_base,
         identity,
         base_attack,
+        prefix_injection,
+        refusal_suppression,
+        context_ignoring,
+        context_termination,
+        context_switching_separators,
+        few_shot,
+        cognitive_hacking,
     )
 from framework.defenses import (
         DEFENSES_LIST,
@@ -66,6 +73,13 @@ def match_attack_func(attack: str) -> callable:
         case "typoglycemia": attack_func = typoglycemia
         case "advs_suffix": attack_func = advs_suffix
         case "base_attack": attack_func = base_attack
+        case "prefix_injection": attack_func = prefix_injection
+        case "refusal_suppression": attack_func = refusal_suppression
+        case "context_ignoring": attack_func = context_ignoring
+        case "context_termination": attack_func = context_termination
+        case "context_switching_separators": attack_func = context_switching_separators
+        case "few_shot": attack_func = few_shot
+        case "cognitive_hacking": attack_func = cognitive_hacking
         case _:
             print(f"{TColors.FAIL}Attack type {attack} is not supported.")
             print(f"Choose from: {ATTACK_LIST}{TColors.ENDC}")

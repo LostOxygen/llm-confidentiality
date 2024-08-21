@@ -17,38 +17,8 @@ import torch
 from huggingface_hub import login
 
 from framework.strategy import SecretKeyAttackStrategy, LangchainAttackStrategy
-from framework.attacks import (
-        ATTACK_LIST,
-        payload_splitting,
-        obfuscation,
-        jailbreak,
-        translation,
-        chatml_abuse,
-        masking,
-        typoglycemia,
-        advs_suffix,
-        chat_base,
-        identity,
-        base_attack,
-        prefix_injection,
-        refusal_suppression,
-        context_ignoring,
-        context_termination,
-        context_switching_separators,
-        few_shot,
-        cognitive_hacking,
-    )
-from framework.defenses import (
-        DEFENSES_LIST,
-        seq_enclosure,
-        xml_tagging,
-        heuristic_defense,
-        sandwiching,
-        identity_prompt,
-        ppl_detection,
-        llm_eval,
-        prompt_guard_defense,
-    )
+from framework.attacks import ATTACK_LIST, match_attack
+from framework.defenses import DEFENSES_LIST, match_defense
 from framework.colors import TColors
 from framework.utils import log_results
 from framework.scenarios import Scenarios
@@ -57,56 +27,6 @@ from framework.scenarios import Scenarios
 if not os.path.isdir(str(Path.home() / "data")):
     os.mkdir(str(Path.home() / "data"))
 os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
-
-
-def match_attack_func(attack: str) -> callable:
-    """helper function to match the attack string with its corresponding function"""
-    match attack:
-        case "identity": attack_func = identity
-        case "chat_base": attack_func = chat_base
-        case "payload_splitting": attack_func = payload_splitting
-        case "obfuscation": attack_func = obfuscation
-        case "jailbreak": attack_func = jailbreak
-        case "translation": attack_func = translation
-        case "chatml_abuse": attack_func = chatml_abuse
-        case "masking": attack_func = masking
-        case "typoglycemia": attack_func = typoglycemia
-        case "advs_suffix": attack_func = advs_suffix
-        case "base_attack": attack_func = base_attack
-        case "prefix_injection": attack_func = prefix_injection
-        case "refusal_suppression": attack_func = refusal_suppression
-        case "context_ignoring": attack_func = context_ignoring
-        case "context_termination": attack_func = context_termination
-        case "context_switching_separators": attack_func = context_switching_separators
-        case "few_shot": attack_func = few_shot
-        case "cognitive_hacking": attack_func = cognitive_hacking
-        case _:
-            print(f"{TColors.FAIL}Attack type {attack} is not supported.")
-            print(f"Choose from: {ATTACK_LIST}{TColors.ENDC}")
-            sys.exit(1)
-
-    return attack_func
-
-
-def match_defense_func(defense: str) -> callable:
-    """helper function to match the defense string with its corresponding function"""
-    match defense:
-        case "seq_enclosure": defense_func = seq_enclosure
-        case "xml_tagging": defense_func = xml_tagging
-        case "heuristic_defense": defense_func = heuristic_defense
-        case "sandwiching": defense_func = sandwiching
-        case "llm_eval": defense_func = llm_eval
-        case "ppl_detection": defense_func = ppl_detection
-        case "prompt_guard": defense_func = prompt_guard_defense
-        case ("None" | "none"): defense_func = identity_prompt
-        case _:
-            print(f"{TColors.FAIL}Defense type {defense} " \
-                  f"is not supported.{TColors.ENDC}")
-            print(f"{TColors.CYAN}Used identity as default defense{TColors.ENDC}")
-            defense_func = identity_prompt
-
-    return defense_func
-
 
 def main(
         attacks: List[str],
@@ -276,8 +196,8 @@ def main(
 
             # initialize the attack strategy
             attack_strategy = LangchainAttackStrategy(
-                attack_func=match_attack_func(attacks[0]),
-                defense_func=match_defense_func(defenses[0]),
+                attack_func=match_attack(attacks[0]),
+                defense_func=match_defense(defenses[0]),
                 llm_type=llm_type,
                 llm_suffix=name_suffix,
                 llm_guessing=llm_guessing,
@@ -292,11 +212,11 @@ def main(
 
             for defense in defenses:
                 # set the defense function
-                defense_func = match_defense_func(defense)
+                defense_func = match_defense(defense)
 
                 for attack in attacks:
                     # set the attack function
-                    attack_func = match_attack_func(attack)
+                    attack_func = match_attack(attack)
 
                     # set the attack and defense functions
                     attack_strategy.set_attack_func(attack_func)
@@ -351,11 +271,11 @@ def main(
 
         for defense in defenses:
             # set the defense function
-            defense_func = match_defense_func(defense)
+            defense_func = match_defense(defense)
 
             for attack in attacks:
                 # set the attack function
-                attack_func = match_attack_func(attack)
+                attack_func = match_attack(attack)
 
                 # set the attack and defense functions
                 attack_strategy.set_attack_func(attack_func)

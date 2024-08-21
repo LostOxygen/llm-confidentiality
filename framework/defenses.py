@@ -1,6 +1,7 @@
 """library for defense implementations and helper functions"""
 # pylint: disable=unused-argument
 from typing import Final, List, Optional
+import sys
 import random
 import string
 
@@ -8,9 +9,31 @@ import torch
 from openai import ChatCompletion
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
+from .colors import TColors
+
 DEFENSES_LIST: Final[List[str]] = ["seq_enclosure", "xml_tagging", "heuristic_defense",
                                    "sandwiching", "llm_eval", "identity_prompt", 
                                    "ppl_detection", "prompt_guard"]
+
+
+def match_defense(defense: str) -> callable:
+    """helper function to match the defense string with its corresponding function"""
+    match defense:
+        case "seq_enclosure": defense_func = seq_enclosure
+        case "xml_tagging": defense_func = xml_tagging
+        case "heuristic_defense": defense_func = heuristic_defense
+        case "sandwiching": defense_func = sandwiching
+        case "llm_eval": defense_func = llm_eval
+        case "ppl_detection": defense_func = ppl_detection
+        case "prompt_guard": defense_func = prompt_guard_defense
+        case ("None" | "none"): defense_func = identity_prompt
+        case _:
+            print(f"{TColors.FAIL}Defense type {defense} " \
+                  f"is not supported.{TColors.ENDC}")
+            print(f"{TColors.CYAN}Used identity as default defense{TColors.ENDC}")
+            defense_func = identity_prompt
+
+    return defense_func
 
 
 def identity_prompt(prompt: str, device: Optional[str]="cpu") -> str:

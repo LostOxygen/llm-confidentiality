@@ -26,17 +26,7 @@ from trl import SFTTrainer
 from unsloth.chat_templates import get_chat_template
 from unsloth import FastLanguageModel, is_bfloat16_supported
 
-from framework.attacks import (
-        ATTACK_LIST,
-        payload_splitting,
-        obfuscation,
-        jailbreak,
-        translation,
-        chatml_abuse,
-        masking,
-        typoglycemia,
-        advs_suffix,
-    )
+from framework.attacks import ATTACK_LIST, match_attack
 from framework.colors import TColors
 from framework.dataset import (
     PromptDataset,
@@ -100,19 +90,7 @@ def get_attack_list(attacks: List[str]) -> List[Callable]:
 
     for attack in attacks:
         # set the attack function
-        match attack:
-            case "payload_splitting": attack_funcs.append(payload_splitting)
-            case "obfuscation": attack_funcs.append(obfuscation)
-            case "jailbreak": attack_funcs.append(jailbreak)
-            case "translation": attack_funcs.append(translation)
-            case "chatml_abuse": attack_funcs.append(chatml_abuse)
-            case "masking": attack_funcs.append(masking)
-            case "typoglycemia": attack_funcs.append(typoglycemia)
-            case "advs_suffix": attack_funcs.append(advs_suffix)
-            case _:
-                print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
-                print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
-                sys.exit(1)
+        attack_funcs.append(match_attack(attack))
 
     return attack_funcs
 

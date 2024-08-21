@@ -1,11 +1,13 @@
 # pylint: disable=line-too-long
 """library for attack implementations and helper functions"""
 from typing import List, Final, Optional
+import sys
 import base64
 import random
 
 from .prompts import BASE_QUESTIONS
 from .utils import make_string_typoglycemiac
+from .colors import TColors
 
 ATTACK_LIST: Final[List[str]] = ["payload_splitting", "obfuscation", "jailbreak",
                                  "translation", "chatml_abuse", "typoglycemia",
@@ -14,6 +16,33 @@ ATTACK_LIST: Final[List[str]] = ["payload_splitting", "obfuscation", "jailbreak"
                                  "context_termination", "context_switching_separators", 
                                  "few_shot", "cognitive_hacking"]
 
+def match_attack(attack: str) -> callable:
+    """helper function to match the attack string with its corresponding function"""
+    match attack:
+        case "identity": attack_func = identity
+        case "chat_base": attack_func = chat_base
+        case "payload_splitting": attack_func = payload_splitting
+        case "obfuscation": attack_func = obfuscation
+        case "jailbreak": attack_func = jailbreak
+        case "translation": attack_func = translation
+        case "chatml_abuse": attack_func = chatml_abuse
+        case "masking": attack_func = masking
+        case "typoglycemia": attack_func = typoglycemia
+        case "advs_suffix": attack_func = advs_suffix
+        case "base_attack": attack_func = base_attack
+        case "prefix_injection": attack_func = prefix_injection
+        case "refusal_suppression": attack_func = refusal_suppression
+        case "context_ignoring": attack_func = context_ignoring
+        case "context_termination": attack_func = context_termination
+        case "context_switching_separators": attack_func = context_switching_separators
+        case "few_shot": attack_func = few_shot
+        case "cognitive_hacking": attack_func = cognitive_hacking
+        case _:
+            print(f"{TColors.FAIL}Attack type {attack} is not supported.")
+            print(f"Choose from: {ATTACK_LIST}{TColors.ENDC}")
+            sys.exit(1)
+
+    return attack_func
 
 
 def payload_splitting(malicious_input: Optional[str] = "") -> str:

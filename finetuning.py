@@ -13,7 +13,6 @@ import psutil
 import argparse
 from typing import (
     Final,
-    List
 )
 
 import torch
@@ -74,7 +73,6 @@ CONFIG: Final[dict] = {
 def main(
         llm_type: str,
         iterations: int,
-        attacks: List[str],
         name_suffix: str,
     ) -> None:
     """
@@ -83,7 +81,6 @@ def main(
     Parameters:
         llm_type: str - specifies the LLM type to finetune
         iterations: int - specifies the number of iterations to finetune the LLM
-        attacks: List[str] - specifies the attack types to harden the LLM against
         name_suffix: str - specifies a name suffix for the finetuned model
 
     Returns:
@@ -119,11 +116,10 @@ def main(
         device = torch.device("cpu")
 
     # setting the suffixes
-    suffix: str = "robust"
+    suffix: str = "finetuned"
     name_suffix: str = "-"+name_suffix if name_suffix != "" else ""
-    attack_suffix: str = "-"+"-".join(attacks)
     # combine the finale output save name
-    save_name: str = llm_type + "-" + suffix + attack_suffix + name_suffix
+    save_name: str = llm_type + "-" + suffix + name_suffix
 
     # update the default config
     CONFIG["training"]["max_steps"] = iterations
@@ -149,7 +145,6 @@ def main(
     print(f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}Parameters" + \
           f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-14))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {llm_type}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Attacks: {TColors.ENDC}: {attacks}")
 
     # print the finetuning parameters
     print(f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Finetuning Parameters " \

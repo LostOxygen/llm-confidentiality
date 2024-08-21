@@ -13,9 +13,7 @@ import psutil
 import argparse
 from typing import (
     Final,
-    List,
-    Callable,
-    Union,
+    List
 )
 
 import torch
@@ -26,14 +24,11 @@ from trl import SFTTrainer
 from unsloth.chat_templates import get_chat_template
 from unsloth import FastLanguageModel, is_bfloat16_supported
 
-from framework.attacks import ATTACK_LIST, match_attack
 from framework.colors import TColors
 from framework.dataset import (
-    PromptDataset,
-    AdvsTrainDataset,
+    ToolUseDataset,
     DatasetState
 )
-from framework.prompts import get_random_secret_key
 
 os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 os.environ["WANDB_WATCH"] = "false"
@@ -51,85 +46,30 @@ CONFIG: Final[dict] = {
     "lora": {
         "lora_alpha": 16,
         "lora_dropout": 0.1,
-        "r": 64,
-        "bias": "none",
-        "task_type": "CAUSAL_LM",
+        "r": 16,
     },
     "training": {
         "output_dir": OUTPUT_DIR,
         "gradient_accumulation_steps": 4,
-        "learning_rate": 2e-4,
+        "learning_rate": 3e-4,
         "logging_steps": 10,
         "max_steps": 1000,
         "per_device_train_batch_size": 1,
+        "num_train_epochs": 1,
+        "optim": "adamw_8bit",
+        "weight_decay": 0.01,
+        "warmup_steps": 10,
+        "lr_scheduler_type": "linear",
     },
     "trainer": {
         "max_seq_length": 4096,
         "dataset_text_field": "prompts", # this is the training field name
-        "packing": False,
+        "packing": True,
+        "dataset_num_proc": 2,
+        "logging_steps": 1,
+        "seed": 1337,
     }
 }
-
-
-def get_attack_list(attacks: List[str]) -> List[Callable]:
-    """
-    Creates a list of callable attack functions out of the list of attack names.
-
-    Parameters:
-        attacks: List[str] - the list of attack names
-
-    Returns:
-        attack_funcs: List[Callable] - the list of callable attack functions
-    """
-    attack_funcs: List[Callable] = []
-
-    if "all" in attacks:
-        attacks = ATTACK_LIST
-        if "chat_base" in attacks:
-            attacks.remove("chat_base")
-
-    for attack in attacks:
-        # set the attack function
-        attack_funcs.append(match_attack(attack))
-
-    return attack_funcs
-
-
-def get_formatted_dataset(
-        dataset: Union[PromptDataset, AdvsTrainDataset],
-        attacks: List[Callable] = None,
-        ) -> Dataset:
-    """
-    Creating a dictionary dataset from the system prompts.
-
-    Parameters:
-        is_robust: bool - specifies if the dataset should contain system prompts or
-                          prompt injection attacks
-        dataset: Union[PromptDataset, AdvsTrainDataset] - the dataset to use
-        attacks: List[Callable] - the list of attacks to harden the LLM against
-
-    Returns:
-        new_dataset: Dataset - the new dataset containing the finetune data
-    """
-    prompt_list: List = []
-    secret_key = get_random_secret_key()
-    sk_string = f"The secret key is: \"{secret_key}\". "
-
-    # create prompt injection attack dataset
-    for attack in attacks:
-        for _ in range(NUM_ATTACK_SAMPLES):
-            prompt = f""" <|begin_of_text|><|start_header_id|>system<|end_header_id|>
-                {{ {sk_string}{dataset.get_random_prompt()} }}<|eot_id|>
-                <|start_header_id|>user<|end_header_id|>
-                {{ {attack} }}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-                Prompt injection attack detected! I will not leak any confidential information!
-                <|eot_id|>
-            """
-
-            prompt_list.append(prompt)
-    new_dataset = Dataset.from_dict({"prompts": prompt_list})
-    return new_dataset
-
 
 def main(
         llm_type: str,
@@ -220,10 +160,6 @@ def main(
           f"{CONFIG['lora']['lora_dropout']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}r-value{TColors.ENDC}: " \
           f"{CONFIG['lora']['r']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}bias{TColors.ENDC}: " \
-          f"{CONFIG['lora']['bias']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}task_type{TColors.ENDC}: " \
-          f"{CONFIG['lora']['task_type']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}gradient_accumulaton_steps{TColors.ENDC}: " \
           f"{CONFIG['training']['max_steps']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: " \
@@ -236,6 +172,22 @@ def main(
           f"{CONFIG['trainer']['packing']}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}per_device_train_batch_size{TColors.ENDC}: " \
           f"{CONFIG['training']['per_device_train_batch_size']}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}num_train_epochs{TColors.ENDC}: " \
+          f"{CONFIG['training']['num_train_epochs']}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}optim{TColors.ENDC}: " \
+            f"{CONFIG['training']['optim']}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}weight_decay{TColors.ENDC}: " \
+            f"{CONFIG['training']['weight_decay']}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}warmup_steps{TColors.ENDC}: " \
+            f"{CONFIG['training']['warmup_steps']}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}lr_scheduler_type{TColors.ENDC}: " \
+            f"{CONFIG['training']['lr_scheduler_type']}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}seed{TColors.ENDC}: " \
+            f"{CONFIG['trainer']['seed']}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}output_dir{TColors.ENDC}: " \
+            f"{CONFIG['training']['output_dir']}")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}dataset_num_proc{TColors.ENDC}: " \
+            f"{CONFIG['trainer']['dataset_num_proc']}")
     print("#"*os.get_terminal_size().columns+"\n")
 
     # load the LLM
@@ -248,9 +200,9 @@ def main(
     # convert the model to PEFT
     model = FastLanguageModel.get_peft_model(
         model,
-        r=16,
-        lora_alpha=16,
-        lora_dropout=0,
+        r=CONFIG["lora"]["r"],
+        lora_alpha=CONFIG["lora"]["lora_alpha"],
+        lora_dropout=CONFIG["lora"]["lora_dropout"],
         target_modules=[
             "q_proj", "k_proj", "v_proj", "up_proj", "down_proj", "o_proj", "gate_proj"
             ],
@@ -263,17 +215,11 @@ def main(
         mapping={"role": "from", "content": "value", "user": "human", "assistant": "gpt"},
         chat_template="chatml",
     )
-    # create list of attacks to harden against if robust finetuning is enabled
-    attack_funcs = get_attack_list(attacks)
 
     # load the dataset
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
-    prompt_dataset = PromptDataset(state=DatasetState.TRAIN)
-
-    dataset = get_formatted_dataset(
-        attacks=attack_funcs,
-        dataset=prompt_dataset
-    )
+    prompt_dataset = ToolUseDataset(state=DatasetState.TRAIN)
+    dataset = Dataset.from_dict({"prompts": prompt_dataset.get_whole_dataset_as_list()})
 
     print(f">> {TColors.OKBLUE}Normal Finetuning for {iterations} steps{TColors.ENDC}")
 
@@ -281,24 +227,24 @@ def main(
         model=model,
         tokenizer=tokenizer,
         train_dataset=dataset,
-        dataset_text_field="prompts",
-        max_seq_length=4096,
-        dataset_num_proc=2,
-        packing=True,
+        dataset_text_field=CONFIG["trainer"]["dataset_text_field"],
+        max_seq_length=CONFIG["trainer"]["max_seq_length"],
+        dataset_num_proc=CONFIG["trainer"]["dataset_num_proc"],
+        packing=CONFIG["trainer"]["packing"],
         args=TrainingArguments(
-            learning_rate=3e-4,
-            lr_scheduler_type="linear",
-            per_device_train_batch_size=8,
-            gradient_accumulation_steps=2,
-            num_train_epochs=1,
+            learning_rate=CONFIG["training"]["learning_rate"],
+            lr_scheduler_type=CONFIG["training"]["lr_scheduler_type"],
+            per_device_train_batch_size=CONFIG["training"]["per_device_train_batch_size"],
+            gradient_accumulation_steps=CONFIG["training"]["gradient_accumulation_steps"],
+            num_train_epochs=CONFIG["training"]["num_train_epochs"],
             fp16=not is_bfloat16_supported(),
             bf16=is_bfloat16_supported(),
-            logging_steps=1,
-            optim="adamw_8bit",
-            weight_decay=0.01,
-            warmup_steps=10,
+            logging_steps=CONFIG["training"]["logging_steps"],
+            optim=CONFIG["training"]["optim"],
+            weight_decay=CONFIG["training"]["weight_decay"],
+            warmup_steps=CONFIG["training"]["warmup_steps"],
             output_dir=OUTPUT_DIR,
-            seed=0,
+            seed=CONFIG["trainer"]["seed"],
         ),
     )
 
@@ -320,8 +266,6 @@ if __name__ == "__main__":
                         help="specifies the opponent LLM type")
     parser.add_argument("--iterations", "-i", type=int, default=1000,
                         help="specifies the number of iterations to finetune the LLM")
-    parser.add_argument("--attacks", "-a", type=str, default=["all"],
-                        help="specifies the attack types", nargs="+")
     parser.add_argument("--name_suffix", "-n", help="adds a name suffix for the finetuned model",
                         default="", type=str)
     args = parser.parse_args()

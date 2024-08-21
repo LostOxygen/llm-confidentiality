@@ -262,7 +262,7 @@ def main(
 
     # load the LLM
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name="unsloth/Meta-Llama-3.1-8B-bnb-4bit",
+        model_name="unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit",
         max_seq_length=4096,
         load_in_4bit=True,
         dtype=None,

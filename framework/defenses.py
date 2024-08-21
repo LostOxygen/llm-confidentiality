@@ -1,7 +1,6 @@
 """library for defense implementations and helper functions"""
 # pylint: disable=unused-argument
 from typing import Final, List, Optional
-import sys
 import random
 import string
 

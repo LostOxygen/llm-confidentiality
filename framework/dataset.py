@@ -68,19 +68,9 @@ class PromptDataset():
         This method is meant to be called only once when the dataset is created to
         push the existing SYSTEM_PROMPTS to the dataset
         """
-        match self.state:
-            case DatasetState.TRAIN:
-                with open(self.data_path, "a", encoding="utf-8") as file:
-                    if self.data["0"] == "empty":
-                        json.dump(SYSTEM_PROMPTS, file, ensure_ascii=False, indent=4)
-            case DatasetState.TEST:
-                pass
-            case DatasetState.NEW:
-                pass
-            case DatasetState.ADVERSARIAL:
-                pass
-            case _:
-                raise ValueError(f"{TColors.FAIL}Invalid dataset state.{TColors.ENDC}")
+        with open(self.data_path, "a", encoding="utf-8") as file:
+            if self.data["0"] == "empty":
+                json.dump(SYSTEM_PROMPTS, file, ensure_ascii=False, indent=4)
 
 
     def __load_dataset(self) -> dict:
@@ -153,18 +143,17 @@ class ToolUseDataset():
 
         match self.state:
             case DatasetState.TRAIN:
-                self.data_path: str = "./datasets/tool_usage_train.json"
+                self.data_path: str = "./datasets/tool_use_train.json"
             case DatasetState.TEST:
-                self.data_path: str = "./datasets/tool_usage_test.json"
+                self.data_path: str = "./datasets/tool_use_test.json"
             case DatasetState.NEW:
-                self.data_path: str = "./datasets/tool_usage_new.json"
+                self.data_path: str = "./datasets/tool_use_new.json"
             case _:
                 raise ValueError(f"{TColors.FAIL}Invalid dataset state.{TColors.ENDC}")
 
         self.__init_path()
         # the actual dataset hold in memory
         self.data = self.__load_dataset()
-        self.__initialize_dataset()
 
 
     def __len__(self) -> int:
@@ -181,27 +170,6 @@ class ToolUseDataset():
             with open(self.data_path, "w", encoding="utf-8") as file:
                 init_dict = {0: "empty"}
                 json.dump(init_dict, file, ensure_ascii=False, indent=4)
-
-
-    def __initialize_dataset(self) -> None:
-        """
-        Initializes the dataset
-        This method is meant to be called only once when the dataset is created to
-        push the existing SYSTEM_PROMPTS to the dataset
-        """
-        match self.state:
-            case DatasetState.TRAIN:
-                with open(self.data_path, "a", encoding="utf-8") as file:
-                    if self.data["0"] == "empty":
-                        json.dump(SYSTEM_PROMPTS, file, ensure_ascii=False, indent=4)
-            case DatasetState.TEST:
-                pass
-            case DatasetState.NEW:
-                pass
-            case DatasetState.ADVERSARIAL:
-                pass
-            case _:
-                raise ValueError(f"{TColors.FAIL}Invalid dataset state.{TColors.ENDC}")
 
 
     def __load_dataset(self) -> dict:

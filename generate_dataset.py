@@ -254,10 +254,18 @@ def main(
                         response, _ = llm.chat(sys_prompt, user_prompt_generating)
 
                         # extract the parts
-                        sender = re.search(r"#SENDER: (.*)", response).group(1)
-                        subject = re.search(r"#SUBJECT: (.*)", response).group(1)
-                        # message should contain the rest of the response including new lines
-                        message = re.search(r"#MESSAGE: (.*)", response, re.DOTALL).group(1)
+                        sender = re.search(r"#SENDER: (.*)", response)
+                        if sender == None:
+                            continue
+                        sender = sender.group(1)
+                        subject = re.search(r"#SUBJECT: (.*)", response)
+                        if subject == None:
+                            continue
+                        subject = subject.group(1)
+                        message = re.search(r"#MESSAGE: (.*)", response, re.DOTALL)
+                        if message == None:
+                            continue
+                        message = message.group(1)
 
                         # construct the prompt parts
                         tool_string: str = f"""
@@ -313,10 +321,22 @@ def main(
                         response, _ = llm.chat(sys_prompt, user_prompt_generating)
 
                         # extract the parts
-                        date = re.search(r"#DATE: (.*)", response).group(1)
-                        location = re.search(r"#LOCATION: (.*)", response).group(1)
-                        topic = re.search(r"#TOPIC: (.*)", response).group(1)
-                        description = re.search(r"#DESCRIPTION: (.*)", response, re.DOTALL).group(1)
+                        date = re.search(r"#DATE: (.*)", response)
+                        if date == None:
+                            continue
+                        date = date.group(1)
+                        location = re.search(r"#LOCATION: (.*)", response)
+                        if location == None:
+                            continue
+                        location = location.group(1)
+                        topic = re.search(r"#TOPIC: (.*)", response)
+                        if topic == None:
+                            continue
+                        topic = topic.group(1)
+                        description = re.search(r"#DESCRIPTION: (.*)", response, re.DOTALL)
+                        if description == None:
+                            continue
+                        description = description.group(1)
 
                         tool_string: str = f"""
                         {{
@@ -369,8 +389,15 @@ def main(
                         response, _ = llm.chat(sys_prompt, user_prompt_generating)
 
                         # extract the parts
-                        subject = re.search(r"#SUBJECT: (.*)", response).group(1)
-                        content = re.search(r"#CONTENT: (.*)", response, re.DOTALL).group(1)
+                        subject = re.search(r"#SUBJECT: (.*)", response)
+                        if subject == None:
+                            continue
+                        subject = subject.group(1)
+
+                        content = re.search(r"#CONTENT: (.*)", response, re.DOTALL)
+                        if content == None:
+                            continue
+                        content = content.group(1)
 
                         tool_string: str = f"""
                         {{
@@ -421,8 +448,15 @@ def main(
                         response, _ = llm.chat(sys_prompt, user_prompt_generating)
 
                         # extract the parts
-                        name = re.search(r"#NAME: (.*)", response).group(1)
-                        content = re.search(r"#CONTENT: (.*)", response, re.DOTALL).group(1)
+                        name = re.search(r"#NAME: (.*)", response)
+                        if name == None:
+                            continue
+                        name == name.group(1)
+
+                        content = re.search(r"#CONTENT: (.*)", response, re.DOTALL)
+                        if content == None:
+                            continue
+                        content = content.group(1)
 
                         tool_string: str = f"""
                         {{

@@ -255,15 +255,15 @@ def main(
 
                         # extract the parts
                         sender = re.search(r"#SENDER: (.*)", response)
-                        if sender == None:
+                        if sender is None:
                             continue
                         sender = sender.group(1)
                         subject = re.search(r"#SUBJECT: (.*)", response)
-                        if subject == None:
+                        if subject is None:
                             continue
                         subject = subject.group(1)
                         message = re.search(r"#MESSAGE: (.*)", response, re.DOTALL)
-                        if message == None:
+                        if message is None:
                             continue
                         message = message.group(1)
 
@@ -322,19 +322,19 @@ def main(
 
                         # extract the parts
                         date = re.search(r"#DATE: (.*)", response)
-                        if date == None:
+                        if date is None:
                             continue
                         date = date.group(1)
                         location = re.search(r"#LOCATION: (.*)", response)
-                        if location == None:
+                        if location is None:
                             continue
                         location = location.group(1)
                         topic = re.search(r"#TOPIC: (.*)", response)
-                        if topic == None:
+                        if topic is None:
                             continue
                         topic = topic.group(1)
                         description = re.search(r"#DESCRIPTION: (.*)", response, re.DOTALL)
-                        if description == None:
+                        if description is None:
                             continue
                         description = description.group(1)
 
@@ -390,12 +390,12 @@ def main(
 
                         # extract the parts
                         subject = re.search(r"#SUBJECT: (.*)", response)
-                        if subject == None:
+                        if subject is None:
                             continue
                         subject = subject.group(1)
 
                         content = re.search(r"#CONTENT: (.*)", response, re.DOTALL)
-                        if content == None:
+                        if content is None:
                             continue
                         content = content.group(1)
 
@@ -449,12 +449,12 @@ def main(
 
                         # extract the parts
                         name = re.search(r"#NAME: (.*)", response)
-                        if name == None:
+                        if name is None:
                             continue
-                        name == name.group(1)
+                        name = name.group(1)
 
                         content = re.search(r"#CONTENT: (.*)", response, re.DOTALL)
-                        if content == None:
+                        if content is None:
                             continue
                         content = content.group(1)
 

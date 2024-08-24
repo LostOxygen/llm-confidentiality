@@ -20,7 +20,7 @@ from huggingface_hub import login
 from datasets import Dataset
 from transformers import TrainingArguments
 from trl import SFTTrainer
-from unsloth.chat_templates import get_chat_template
+#from unsloth.chat_templates import get_chat_template
 from unsloth import FastLanguageModel, is_bfloat16_supported
 
 from framework.colors import TColors
@@ -206,11 +206,12 @@ def main(
         use_gradient_checkpointing="unsloth"
     )
     # apply chat template to the tokenizer
-    tokenizer = get_chat_template(
-        tokenizer,
-        mapping={"role": "from", "content": "value", "user": "human", "assistant": "gpt"},
-        chat_template="chatml",
-    )
+    # tokenizer = get_chat_template(
+    #     tokenizer,
+    #     mapping={"role": "from", "content": "value", "user": "human", "assistant": "gpt"},
+    #     chat_template="llama",
+    #     map_eos_token=True,
+    # )
 
     # load the dataset
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"

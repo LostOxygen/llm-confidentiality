@@ -35,7 +35,7 @@ def main(
         name_suffix: str,
         device: str,
         dataset_type: str,
-        is_train: bool,
+        is_test: bool,
     ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
@@ -47,7 +47,7 @@ def main(
         name_suffix: str - adds a name suffix for loading custom models
         device: str - specifies the device to run the LLM on (cpu, mps or cuda)
         tydataset_typepe: str - specifies the type of dataset (tool_usage, system_prompt)
-        is_train: bool - specifies whether the dataset will be train or test
+        is_test: bool - specifies whether the dataset will be train or test
 
     Returns:
         None
@@ -125,12 +125,12 @@ def main(
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Dataset Size{TColors.ENDC}: {dataset_size}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM Type{TColors.ENDC}: " \
           f"{TColors.HEADER}{llm_type}{TColors.OKCYAN}{name_suffix}{TColors.ENDC}")
-    if is_train:
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Dataset State{TColors.ENDC}: " \
-              f"{TColors.OKGREEN}Train{TColors.ENDC}")
-    else:
+    if is_test:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Dataset State{TColors.ENDC}: " \
               f"{TColors.OKGREEN}Test{TColors.ENDC}")
+    else:
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}Dataset State{TColors.ENDC}: " \
+              f"{TColors.OKGREEN}Train{TColors.ENDC}")
     print("#"*os.get_terminal_size().columns+"\n")
 
     # initialize the LLM
@@ -143,7 +143,7 @@ def main(
     )
 
     # set dataset state
-    if is_train:
+    if not is_test:
         dataset_state = DatasetState.TRAIN
     else:
         dataset_state = DatasetState.TEST
@@ -569,7 +569,7 @@ if __name__ == "__main__":
                         help="specifies the device to run the computations on (cpu, cuda, mps)")
     parser.add_argument("--dataset_type", "-dt", type=str, default="tool_usage",
                         help="specifies the type of dataset (tool_usage, system_prompt)")
-    parser.add_argument("--is_train", "-it", type=bool, default=True,
+    parser.add_argument("--is_test", "-it", action="store_true", default=False,
                         help="specifies whether the dataset will be train or test")
     args = parser.parse_args()
     main(**vars(args))

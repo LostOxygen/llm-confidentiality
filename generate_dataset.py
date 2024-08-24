@@ -88,12 +88,11 @@ def main(
             sys.exit(1)
 
     # set the devices correctly
-    if device == "cpu":
-        device = torch.device("cpu")
-    elif device == "cuda" and torch.cuda.is_available():
-        device = torch.device(device)
-    elif device == "mps" and torch.backends.mps.is_available():
-        device = torch.device(device)
+    device = torch.device("cpu")
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
     else:
         print(f"{TColors.WARNING}Warning{TColors.ENDC}: Device {TColors.OKCYAN}{device} " \
               f"{TColors.ENDC}is not available. Setting device to CPU instead.")

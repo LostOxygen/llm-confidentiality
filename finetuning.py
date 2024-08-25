@@ -201,7 +201,6 @@ def main(
             "q_proj", "k_proj", "v_proj", "up_proj", "down_proj", "o_proj", "gate_proj"
             ],
         use_rslora=True,
-        task_type="CAUSAL_LM",
         use_gradient_checkpointing="unsloth"
     )
     # apply chat template to the tokenizer

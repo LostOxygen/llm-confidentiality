@@ -247,11 +247,12 @@ def main(
     trainer.train()
 
     # save the model
-    model.save_pretrained_merged(
-        OUTPUT_DIR+save_name,
-        tokenizer,
-        save_method="merged_16bit"
-    )
+    # model.save_pretrained_merged(
+    #     OUTPUT_DIR+save_name,
+    #     tokenizer,
+    #     save_method="merged_16bit"
+    # )
+
     # saving to GGUF for ollama
     model.save_pretrained_gguf(
         OUTPUT_DIR+save_name,
@@ -268,7 +269,7 @@ def main(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
-    parser.add_argument("--llm_type", "-llm", type=str, default="llama3-8b-fine",
+    parser.add_argument("--llm_type", "-llm", type=str, default="llama3-8b",
                         help="specifies the opponent LLM type")
     parser.add_argument("--iterations", "-i", type=int, default=1000,
                         help="specifies the number of iterations to finetune the LLM")

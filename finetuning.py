@@ -201,7 +201,8 @@ def main(
             "q_proj", "k_proj", "v_proj", "up_proj", "down_proj", "o_proj", "gate_proj"
             ],
         use_rslora=True,
-        use_gradient_checkpointing="unsloth"
+        use_gradient_checkpointing="unsloth",
+        load_in_4bit=True,
     )
     # apply chat template to the tokenizer
     # tokenizer = get_chat_template(
@@ -246,8 +247,18 @@ def main(
     trainer.train()
 
     # save the model
-    model.save_pretrained_merged(save_name, tokenizer, save_method="merged_16bit")
-    # vllt noch quantisiert als GGUF für OLLAMA speichern?
+    model.save_pretrained_merged(
+        OUTPUT_DIR+save_name,
+        tokenizer,
+        save_method="merged_16bit"
+    )
+    # saving to GGUF for ollama
+    model.save_pretrained_gguf(
+        OUTPUT_DIR+save_name,
+        tokenizer,
+        # https://docs.unsloth.ai/basics/saving-models/saving-to-gguf
+        save_method=["q4_k_m"],
+    )
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
     end = time.perf_counter()

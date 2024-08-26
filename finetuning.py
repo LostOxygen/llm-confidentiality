@@ -202,7 +202,6 @@ def main(
             ],
         use_rslora=True,
         use_gradient_checkpointing="unsloth",
-        load_in_4bit=True,
     )
     # apply chat template to the tokenizer
     # tokenizer = get_chat_template(

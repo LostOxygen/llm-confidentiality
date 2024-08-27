@@ -265,6 +265,10 @@ def main(
     duration = (round(end - start) / 60.) / 60.
     print(f"{TColors.HEADER}Computation Time: {duration}{TColors.ENDC}")
 
+    print("\n"+f"## {TColors.BOLD}{TColors.HEADER}INFO:{TColors.ENDC} do not forget to " \
+          f"create the ollama model with: {TColors.OKBLUE}ollama create llama3-fine -f " \
+          f"{OUTPUT_DIR+save_name}")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")

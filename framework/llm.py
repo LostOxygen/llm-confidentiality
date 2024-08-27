@@ -409,7 +409,8 @@ class LLM():
                         )
 
             case (
-                    "llama3-8b-fine" | "llama3-70b-fine"
+                    "llama3-8b-fine" | "llama3-70b-fine" | "llama3-8b-fine-tools" |
+                    "llama3-70b-fine-tools"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "8b":

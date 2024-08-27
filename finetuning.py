@@ -257,7 +257,7 @@ def main(
         OUTPUT_DIR+save_name,
         tokenizer,
         # https://docs.unsloth.ai/basics/saving-models/saving-to-gguf
-        save_method=["q4_k_m"],
+        quantization_method=["q4_k_m"],
     )
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")

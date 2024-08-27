@@ -1,4 +1,4 @@
-FROM ./finetuned_models/llama3-8b-finetuned/unsloth.Q4_K_M.gguf
+FROM ../finetuned_models/llama3-8b-finetuned/unsloth.Q4_K_M.gguf
 TEMPLATE """{{ if .Messages }}
 {{- if or .System .Tools }}<|start_header_id|>system<|end_header_id|>
 {{- if .System }}

@@ -435,8 +435,7 @@ class LangchainAttackStrategy(AttackStrategy):
                     ```
                     Observation: action result
                     ... (you can repeat Thought/Action/Observation several times)
-                    Thought: I now know what to respond
-                    Final Answer: The final answer to the original input question
+                    Final Answer: [your final answer to the original input question]
 
 
                     Begin! Reminder to ALWAYS respond with a valid json blob of a single action and always end with the Final Answer.

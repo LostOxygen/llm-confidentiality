@@ -203,13 +203,6 @@ def main(
         use_rslora=True,
         use_gradient_checkpointing="unsloth",
     )
-    # apply chat template to the tokenizer
-    # tokenizer = get_chat_template(
-    #     tokenizer,
-    #     mapping={"role": "from", "content": "value", "user": "human", "assistant": "gpt"},
-    #     chat_template="llama",
-    #     map_eos_token=True,
-    # )
 
     # load the dataset
     assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
@@ -245,13 +238,6 @@ def main(
 
     trainer.train()
 
-    # save the model
-    # model.save_pretrained_merged(
-    #     OUTPUT_DIR+save_name,
-    #     tokenizer,
-    #     save_method="merged_16bit"
-    # )
-
     # saving to GGUF for ollama
     model.save_pretrained_gguf(
         OUTPUT_DIR+save_name,
@@ -267,7 +253,7 @@ def main(
 
     print("\n"+f"## {TColors.BOLD}{TColors.HEADER}INFO:{TColors.ENDC} do not forget to " \
           f"create the ollama model with: {TColors.OKBLUE}ollama create llama3-fine -f " \
-          f"{OUTPUT_DIR+save_name}")
+          f"./modelfiles/llama3.1-8b-modelfile")
 
 
 if __name__ == "__main__":

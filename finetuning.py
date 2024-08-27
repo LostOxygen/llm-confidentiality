@@ -100,7 +100,9 @@ def main(
     except FileNotFoundError:
         print(f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
               f"file and put it into the root directory.{TColors.ENDC}")
-        if llm_type in ["llama2", "llama2-7b", "llama2-13b", "llama2-70b"]:
+        if llm_type in [
+                "llama2", "llama2-7b", "llama2-13b", "llama2-70b", "llama3-8b", "llama3-70b"
+            ]:
             sys.exit(1)
 
     # set the devices correctly
@@ -184,9 +186,17 @@ def main(
             f"{CONFIG['trainer']['dataset_num_proc']}")
     print("#"*os.get_terminal_size().columns+"\n")
 
+    if llm_type == "llama3-8b":
+        model_name="unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit"
+    elif llm_type == "llama3-70b":
+        model_name="unsloth/Meta-Llama-3.1-70B-Instruct-bnb-4bit"
+    else:
+        print(f"{TColors.FAIL}LLM type not supported.{TColors.ENDC}")
+        sys.exit(1)
+
     # load the LLM
     model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name="unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit",
+        model_name=model_name,
         max_seq_length=4096,
         load_in_4bit=True,
         dtype=None,
@@ -253,7 +263,7 @@ def main(
 
     print("\n"+f"## {TColors.BOLD}{TColors.HEADER}INFO:{TColors.ENDC} do not forget to " \
           f"create the ollama model with: {TColors.OKBLUE}ollama create llama3-fine -f " \
-          f"./modelfiles/llama3.1-8b-modelfile")
+          f"./modelfiles/llama3.1-8/70b-modelfile")
 
 
 if __name__ == "__main__":

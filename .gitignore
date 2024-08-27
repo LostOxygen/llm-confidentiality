@@ -2,6 +2,9 @@
 logs/
 finetuned_models/
 wandb/
+_unsloth_sentencepiece_temp/
+llama.cpp/
+wandb/
 key.txt
 hf_token.txt
 wandb_key.txt

@@ -5,7 +5,7 @@ import torch
 from openai import OpenAI
 
 from langchain.tools import BaseTool
-from langchain.agents import AgentExecutor, create_structured_chat_agent
+from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.messages import ToolMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_ollama import ChatOllama
@@ -867,7 +867,7 @@ class LLM():
                         MessagesPlaceholder("last_output", optional=True),
                     ]
                 )
-                agent = create_structured_chat_agent(
+                agent = create_tool_calling_agent(
                     tools=self.tools,
                     llm=self.model,
                     prompt=prompt,
@@ -891,8 +891,12 @@ class LLM():
                 full_response = agent_executor.invoke(
                     {
                         "user_prompt": user_prompt,
+                        "tool_names": [tool.name for tool in self.tools],
+                        "tools": self.tools,
                     }
                 )
+
+
                 response = str(full_response["output"])
                 intermediate_steps = str(full_response["intermediate_steps"])
 

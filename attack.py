@@ -111,12 +111,12 @@ def main(
         device = torch.device("cpu")
 
     if "all" in attacks:
+        attacks = ATTACK_LIST
         if "llama3" in llm_type:
             # llama 3 models do not work with typoglycemia and obfuscation attacks
             attacks.pop(attacks.index("obfuscation"))
             attacks.pop(attacks.index("typoglycemia"))
-        else:
-            attacks = ATTACK_LIST
+
     if "all" in defenses:
         defenses = ["none"] + DEFENSES_LIST
 

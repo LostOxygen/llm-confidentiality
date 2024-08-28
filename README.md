@@ -63,7 +63,7 @@ python attack.py --attacks "payload_splitting" "obfuscation" --defense "xml_tagg
 | ```-s, --strategy``` | <b>str</b> | ```None``` | Specifies the strategy for the attack (whether to use normal attacks or ```tools``` attacks) |
 | ```-sc, --scenario``` | <b>str</b> | ```all``` | Specifies the scenario for the tool based attacks |
 | ```-dx, --device``` | <b>str</b> | ```cpu```| Specifies the device which is used for running the script (cpu, cuda, or mps)
-
+| ```-pf, --prompt_format``` | <b>str</b> | ```react``` | Specifies whether react or tool-finetuned prompt format is used for agents. (react or tool-finetuned) |
 The naming conventions for the models are as follows:
 ```python
 <model_name>-<param_count>-<robustness>-<attack_suffix>-<custom_suffix>

@@ -5,7 +5,7 @@ import torch
 from openai import OpenAI
 
 from langchain.tools import BaseTool
-from langchain.agents import AgentExecutor, create_tool_calling_agent
+from langchain.agents import AgentExecutor, create_tool_calling_agent, create_structured_chat_agent
 from langchain_core.messages import ToolMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_ollama import ChatOllama
@@ -45,12 +45,14 @@ class LLM():
             device: str = "cpu",
             tools: Optional[BaseTool] = None,
             verbose: Optional[bool] = False,
+            prompt_format: Optional[str] = "react",
         ) -> None:
         self.llm_suffix: str = llm_suffix
         self.llm_type: str = llm_type
         self.device: str = device
         self.tools: BaseTool = tools
         self.verbose: bool = verbose
+        self.prompt_format: str = prompt_format
 
         if self.llm_type not in ("gpt-3.5-turbo", "gpt-4"):
             # yes i know this is really dirty, but it does it's job
@@ -863,15 +865,23 @@ class LLM():
                 prompt = ChatPromptTemplate.from_messages(
                     [
                         ("system", system_prompt),
+                        ("placeholder", "{chat_history}"),
                         ("human", "{user_prompt}\n {agent_scratchpad}"),
                         MessagesPlaceholder("last_output", optional=True),
                     ]
                 )
-                agent = create_tool_calling_agent(
-                    tools=self.tools,
-                    llm=self.model,
-                    prompt=prompt,
-                )
+                if self.prompt_format == "react":
+                    agent = create_structured_chat_agent(
+                        tools=self.tools,
+                        llm=self.model,
+                        prompt=prompt,
+                    )
+                else:
+                    agent = create_tool_calling_agent(
+                        tools=self.tools,
+                        llm=self.model,
+                        prompt=prompt,
+                    )
 
                 # if the tool calling fails, use the fallback chain
                 agent = agent.with_fallbacks(

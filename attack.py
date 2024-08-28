@@ -41,7 +41,8 @@ def main(
         strategy: str,
         scenario: str,
         verbose: bool,
-        device: str
+        device: str,
+        prompt_format: str,
     ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
@@ -59,6 +60,7 @@ def main(
         strategy: str - specifies the attack strategy to use (secretkey or langchain)
         scenario: str - specifies the scenario to use for langchain attacks
         verbose: bool - enables a more verbose logging output
+        prompt_format: str - specifies the format of the llms prompt (react or tool-finetuned)
 
     Returns:
         None
@@ -145,6 +147,11 @@ def main(
         print(f"{TColors.WARNING}Warning{TColors.ENDC}: Iterations were less then number of " \
               f"Attacks. Set number of iterations to {len(attacks)}.")
 
+    if prompt_format == "tool-finetuned" and not llm_type.startswith("llama3"):
+        print(f"{TColors.WARNING}Warning{TColors.ENDC}: Tool finetuned format is only available " \
+              f"for LLaMA 3 models. Setting prompt_format to react instead.")
+        prompt_format = "react"
+
     print("\n"+f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information" + \
           f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-23))
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
@@ -176,6 +183,8 @@ def main(
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Scenario(s){TColors.ENDC}: {scenario_print}")
     else:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Strategy{TColors.ENDC}: normal secrey-key game")
+    print(f"## {TColors.OKBLUE}{TColors.BOLD}Format{TColors.ENDC}: " \
+          f"{TColors.OKGREEN}{prompt_format}{TColors.ENDC}")
     if verbose:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Verbose Logging{TColors.ENDC}: {verbose}")
     if create_prompt_dataset:
@@ -212,7 +221,8 @@ def main(
                 create_response_dataset=create_response_dataset,
                 scenario=exec_scenario,
                 verbose=verbose,
-                device=device
+                device=device,
+                prompt_format=prompt_format,
             )
 
             for defense in defenses:
@@ -271,7 +281,8 @@ def main(
                 create_prompt_dataset=create_prompt_dataset,
                 create_response_dataset=create_response_dataset,
                 verbose=verbose,
-                device=device
+                device=device,
+                prompt_format=prompt_format,
             )
 
         for defense in defenses:
@@ -347,5 +358,7 @@ if __name__ == "__main__":
                         action="store_true", default=False)
     parser.add_argument("--device", "-dx", type=str, default="cpu",
                         help="specifies the device to run the computations on (cpu, cuda, mps)")
+    parser.add_argument("--prompt_format", "-pf", type=str, default="react",
+                        help="specifies the format of the llms prompt (react or tool-finetuned)")
     args = parser.parse_args()
     main(**vars(args))

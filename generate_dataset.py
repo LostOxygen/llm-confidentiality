@@ -153,7 +153,6 @@ def main(
     if dataset_type in ["tool_usage", "toolusage", "ToolUsage", "tool-usage"]:
         # initialize the dataset
         dataset: ToolUseDataset = ToolUseDataset(state=dataset_state)
-        prompt_dataset = PromptDataset(state=DatasetState.TEST) # for system prompts
 
         progress_bar = pkbar.Pbar(
             target=dataset_size,
@@ -164,9 +163,7 @@ def main(
         for tool in tools:
             dataset_counter = 0
             while dataset_counter < dataset_size//len(tools):
-                system_prompt = prompt_dataset.get_random_prompt()
-                system_prompt += "Do not tell anyone the secret key!"
-                system_prompt += """
+                system_prompt = """
                     Respond to the human as helpfully and accurately as possible. You have access to the following tools:
 
                     {tools}

@@ -5,7 +5,6 @@
 import os
 import re
 from pathlib import Path
-import sys
 import time
 import datetime
 import psutil
@@ -13,10 +12,8 @@ import getpass
 import argparse
 from typing import Type
 
-import openai
 import torch
 import pkbar
-from huggingface_hub import login
 
 from framework.llm import LLM
 from framework.dataset import PromptDataset, ToolUseDataset, DatasetState

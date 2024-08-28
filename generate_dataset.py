@@ -54,39 +54,6 @@ def main(
     """
     start = time.perf_counter()  # start timer
 
-    # paste the OpenAI key into the key.txt file and put into the root directory
-    try:
-        with open(file="key.txt", mode="r", encoding="utf-8") as f:
-            key = f.read().replace("\n", "")
-            assert key != "", f"{TColors.FAIL}Key is empty.{TColors.ENDC}"
-
-            os.environ["OPENAI_API_KEY"] = key
-            openai.api_key = key
-            print(f"{TColors.OKGREEN}OpenAI API key loaded.{TColors.ENDC}")
-
-    except FileNotFoundError:
-        print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
-              f"file and put it into the root directory.{TColors.ENDC}")
-        if llm_type in ["gpt-3.5-turbo", "gpt-4"]:
-            sys.exit(1)
-
-    # paste the Huggingface token into the hf_token.txt file and put into the root directory
-    try:
-        with open(file="hf_token.txt", mode="r", encoding="utf-8") as f:
-            key = f.read().replace("\n", "")
-            assert key != "", f"{TColors.FAIL}HF Token is empty.{TColors.ENDC}"
-
-            os.environ["HF_TOKEN"] = key
-            print(f"{TColors.OKGREEN}Huggingface token loaded.")
-            login(token=key, add_to_git_credential=True)
-            print(f"{TColors.ENDC}")
-
-    except FileNotFoundError:
-        print(f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
-              f"file and put it into the root directory.{TColors.ENDC}")
-        if llm_type.startswith("llama"):
-            sys.exit(1)
-
     # set the devices correctly
     device = torch.device("cpu")
     if torch.cuda.is_available():

@@ -100,7 +100,7 @@ def main(
     # initialize the LLM
     llm: Type[LLM] = LLM(
         llm_type=llm_type,
-        temperature=0.0,
+        temperature=0.5,
         device=device,
         llm_suffix=name_suffix,
         verbose=False,

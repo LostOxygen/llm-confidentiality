@@ -109,7 +109,7 @@ class GetMailsTool(BaseTool):
                         results.append(mail)
 
                 case _:
-                    return MAIL_INBOX
+                    pass
 
         if not results:
             return "No mails found with that query. " \
@@ -163,7 +163,7 @@ class GetNotesTool(BaseTool):
                         results.append(note)
 
                 case _:
-                    return NOTES
+                    pass
 
         if not results:
             return "No notes found with that query." \
@@ -231,7 +231,7 @@ class GetCalendarEventsTool(BaseTool):
                         results.append(event)
 
                 case _:
-                    return CALENDAR_EVENTS
+                    pass
 
         if not results:
             return "No calendar events found with that query. " \

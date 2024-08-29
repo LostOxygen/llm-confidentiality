@@ -91,31 +91,32 @@ class GetMailsTool(BaseTool):
         if len(list(query.keys())) == 0:
             return "Query seems to be empty or wrong. Try again!"
 
-        query_type = list(query.keys())[0].lower()
-        query_content = query[query_type].lower()
+        query_types = [query_key.lower() for query_key in query.keys()]
 
         for mail in MAIL_INBOX:
-            match query_type:
-                case "from":
-                    if query_content in mail["from"].lower() or \
-                        mail["from"].lower() in query_content:
-                        mail["message"] = defense_func(attack_func(mail["message"]), device)
-                        results.append(mail)
+            for query_type in query_types:
+                query_content = query[query_type].lower()
+                match query_type:
+                    case "from":
+                        if query_content in mail["from"].lower() or \
+                            mail["from"].lower() in query_content:
+                            mail["message"] = defense_func(attack_func(mail["message"]), device)
+                            results.append(mail)
 
-                case "subject":
-                    if query_content in mail["subject"].lower() or \
-                        mail["subject"].lower() in query_content:
-                        mail["message"] = defense_func(attack_func(mail["message"]), device)
-                        results.append(mail)
+                    case "subject":
+                        if query_content in mail["subject"].lower() or \
+                            mail["subject"].lower() in query_content:
+                            mail["message"] = defense_func(attack_func(mail["message"]), device)
+                            results.append(mail)
 
-                case "is":
-                    if query_content in mail["is"] or \
-                        mail["is"] in query_content:
-                        mail["message"] = defense_func(attack_func(mail["message"]), device)
-                        results.append(mail)
+                    case "is":
+                        if query_content in mail["is"] or \
+                            mail["is"] in query_content:
+                            mail["message"] = defense_func(attack_func(mail["message"]), device)
+                            results.append(mail)
 
-                case _:
-                    pass
+                    case _:
+                        pass
 
         if not results:
             return "No mails found with that query. " \
@@ -160,20 +161,21 @@ class GetNotesTool(BaseTool):
         if len(list(query.keys())) == 0:
             return "Query seems to be empty or wrong. Try again!"
 
-        query_type = list(query.keys())[0].lower()
-        query_content = query[query_type].lower()
+        query_types = [query_key.lower() for query_key in query.keys()]
 
         for note in NOTES:
-            match query_type:
-                case "subject":
-                    if query_content in note["subject"].lower() or \
-                        note["subject"].lower() in query_content:
-                        note = attack_func(note)
-                        note = defense_func(note, device)
-                        results.append(note)
+            for query_type in query_types:
+                query_content = query[query_type].lower()
+                match query_type:
+                    case "subject":
+                        if query_content in note["subject"].lower() or \
+                            note["subject"].lower() in query_content:
+                            note = attack_func(note)
+                            note = defense_func(note, device)
+                            results.append(note)
 
-                case _:
-                    pass
+                    case _:
+                        pass
 
         if not results:
             return "No notes found with that query." \
@@ -221,31 +223,31 @@ class GetCalendarEventsTool(BaseTool):
         if len(list(query.keys())) == 0:
             return "Query seems to be empty or wrong. Try again!"
 
-        query_type = list(query.keys())[0].lower()
-        query_content = query[query_type].lower()
+        query_types = [query_key.lower() for query_key in query.keys()]
 
         for event in CALENDAR_EVENTS:
-            match query_type:
-                case "topic":
-                    if query_content in event["topic"].lower() or \
-                        event["topic"].lower() in query_content:
-                        event["topic"] = defense_func(attack_func(event["topic"]), device)
-                        results.append(event)
+            for query_type in query_types:
+                query_content = query[query_type].lower()
+                match query_type:
+                    case "topic":
+                        if query_content == event["topic"].lower():
+                            event["topic"] = defense_func(attack_func(event["topic"]), device)
+                            results.append(event)
 
-                case "date":
-                    if query_content in event["date"].lower() or \
-                        event["date"].lower() in query_content:
-                        event["topic"] = defense_func(attack_func(event["topic"]), device)
-                        results.append(event)
+                    case "date":
+                        if query_content in event["date"].lower() or \
+                            event["date"].lower() in query_content:
+                            event["topic"] = defense_func(attack_func(event["topic"]), device)
+                            results.append(event)
 
-                case "location":
-                    if query_content in event["location"].lower() or \
-                        event["location"].lower() in query_content:
-                        event["topic"] = defense_func(attack_func(event["topic"]), device)
-                        results.append(event)
+                    case "location":
+                        if query_content in event["location"].lower() or \
+                            event["location"].lower() in query_content:
+                            event["topic"] = defense_func(attack_func(event["topic"]), device)
+                            results.append(event)
 
-                case _:
-                    pass
+                    case _:
+                        pass
 
         if not results:
             return "No calendar events found with that query. " \

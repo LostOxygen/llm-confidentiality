@@ -1,4 +1,5 @@
 """library for langchain tools"""
+import ast
 from typing import Callable, Type, Union, Optional, Any
 
 from langchain.tools import BaseTool
@@ -54,7 +55,7 @@ class GetCloudFilesTool(BaseTool):
 class GetMailsSchema(BaseModel):
     """Input for GetMailsTool"""
 
-    query: dict = Field(
+    query: Union[dict, str] = Field(
         ...,
         description="The mail search query."
     )
@@ -77,10 +78,15 @@ class GetMailsTool(BaseTool):
 
     def _run(self, query: str) -> Union[dict, list, str]:
         """Use the tool."""
+
         results = []
         attack_func = self.metadata["attack_func"]
         defense_func = self.metadata["defense_func"]
         device = self.metadata["device"]
+
+        if isinstance(query, str):
+            # convert the string back into a dictionary
+            query = ast.literal_eval(query)
 
         if len(list(query.keys())) == 0:
             return "Query seems to be empty or wrong. Try again!"
@@ -120,7 +126,7 @@ class GetMailsTool(BaseTool):
 class GetNotesSchema(BaseModel):
     """Input for GetNotesTool"""
 
-    query: dict = Field(
+    query: Union[dict, str] = Field(
         ...,
         description = "The notes query to search for subjects or contents.",
     )
@@ -146,6 +152,10 @@ class GetNotesTool(BaseTool):
         attack_func = self.metadata["attack_func"]
         defense_func = self.metadata["defense_func"]
         device = self.metadata["device"]
+
+        if isinstance(query, str):
+            # convert the string back into a dictionary
+            query = ast.literal_eval(query)
 
         if len(list(query.keys())) == 0:
             return "Query seems to be empty or wrong. Try again!"
@@ -174,7 +184,7 @@ class GetNotesTool(BaseTool):
 class GetCalendarEventSchema(BaseModel):
     """Input for GetNotesTool"""
 
-    query: dict = Field(
+    query: Union[dict, str] = Field(
         ...,
         description = "The calendar event query to search for specific events.",
     )
@@ -203,6 +213,10 @@ class GetCalendarEventsTool(BaseTool):
         attack_func = self.metadata["attack_func"]
         defense_func = self.metadata["defense_func"]
         device = self.metadata["device"]
+
+        if isinstance(query, str):
+            # convert the string back into a dictionary
+            query = ast.literal_eval(query)
 
         if len(list(query.keys())) == 0:
             return "Query seems to be empty or wrong. Try again!"

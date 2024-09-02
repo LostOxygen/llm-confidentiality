@@ -86,6 +86,7 @@ class GetMailsTool(BaseTool):
 
         if isinstance(query, str):
             # convert the string back into a dictionary
+            query = query.replace("'", "\"")
             query = ast.literal_eval(query)
 
         if len(list(query.keys())) == 0:
@@ -156,6 +157,7 @@ class GetNotesTool(BaseTool):
 
         if isinstance(query, str):
             # convert the string back into a dictionary
+            query = query.replace("'", "\"")
             query = ast.literal_eval(query)
 
         if len(list(query.keys())) == 0:
@@ -218,6 +220,7 @@ class GetCalendarEventsTool(BaseTool):
 
         if isinstance(query, str):
             # convert the string back into a dictionary
+            query = query.replace("'", "\"")
             query = ast.literal_eval(query)
 
         if len(list(query.keys())) == 0:

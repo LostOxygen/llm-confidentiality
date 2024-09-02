@@ -627,7 +627,7 @@ class LLM():
         self.model.bind_tools(
             #[convert_to_openai_function(t) for t in tools],
             tools,
-            #tool_choice="any",
+            tool_choice="any",
         )
 
 

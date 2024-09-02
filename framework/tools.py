@@ -87,7 +87,10 @@ class GetMailsTool(BaseTool):
         if isinstance(query, str):
             # convert the string back into a dictionary
             query = query.replace("'", "\"")
-            query = ast.literal_eval(query)
+            try:
+                query = ast.literal_eval(query)
+            except ValueError:
+                return self.handle_validation_error
 
         if len(list(query.keys())) == 0:
             return "Query seems to be empty or wrong. Try again!"
@@ -158,7 +161,10 @@ class GetNotesTool(BaseTool):
         if isinstance(query, str):
             # convert the string back into a dictionary
             query = query.replace("'", "\"")
-            query = ast.literal_eval(query)
+            try:
+                query = ast.literal_eval(query)
+            except ValueError:
+                return self.handle_validation_error
 
         if len(list(query.keys())) == 0:
             return "Query seems to be empty or wrong. Try again!"
@@ -221,7 +227,10 @@ class GetCalendarEventsTool(BaseTool):
         if isinstance(query, str):
             # convert the string back into a dictionary
             query = query.replace("'", "\"")
-            query = ast.literal_eval(query)
+            try:
+                query = ast.literal_eval(query)
+            except ValueError:
+                return self.handle_validation_error
 
         if len(list(query.keys())) == 0:
             return "Query seems to be empty or wrong. Try again!"

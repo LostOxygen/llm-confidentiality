@@ -411,6 +411,8 @@ class LangchainAttackStrategy(AttackStrategy):
                     Get files from the cloud with 'get_cloud_files' tool:
                     "file_name": "name_of_the_file"
 
+                    Do not use extra \" around the {{}} brackets and remember to close every bracket.
+
                     Use the tools to help the user and provide the final answer to the user prompt. Do not repeat the plain data
                     you got from the tools, but use the data to answer the users requests.
                     """

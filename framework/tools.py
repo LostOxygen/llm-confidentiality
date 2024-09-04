@@ -89,7 +89,8 @@ class GetMailsTool(BaseTool):
             query = query.replace("'", "\"")
             try:
                 query = ast.literal_eval(query)
-            except ValueError:
+            # pylint: disable=bare-except
+            except:
                 return self.handle_validation_error
 
         if len(list(query.keys())) == 0:
@@ -163,7 +164,8 @@ class GetNotesTool(BaseTool):
             query = query.replace("'", "\"")
             try:
                 query = ast.literal_eval(query)
-            except ValueError:
+            # pylint: disable=bare-except
+            except:
                 return self.handle_validation_error
 
         if len(list(query.keys())) == 0:
@@ -229,7 +231,8 @@ class GetCalendarEventsTool(BaseTool):
             query = query.replace("'", "\"")
             try:
                 query = ast.literal_eval(query)
-            except ValueError:
+            # pylint: disable=bare-except
+            except:
                 return self.handle_validation_error
 
         if len(list(query.keys())) == 0:

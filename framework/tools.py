@@ -211,7 +211,7 @@ class GetCalendarEventsTool(BaseTool):
     )
     metadata: Optional[dict[str, Any]] = {}
     handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """{"date: "YYYY-MM-DD"} or """ \
+                                   """{"date": "YYYY-MM-DD"} or """ \
                                    """{"location": "location_of_the_event"} or """ \
                                    """{"topic": "topic_of_the_event"}. """ \
                                    """Try again!"""

@@ -67,14 +67,11 @@ class GetMailsTool(BaseTool):
     args_schema: Type[GetMailsSchema] = GetMailsSchema
     description: str = (
         """Use this tool to get mails from the inbox. Possible queries are: """
-        """{"is": "unread"} or {"is": "read"} or {"from": "sender_name"} """ \
-        """or {"subject": "subject_of_the_mail"} """
+        """{"subject": "subject_of_the_mail"} """
     )
     metadata: Optional[dict[str, Any]] = {}
     handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """{"is": "unread"} or {"is": "read"} or """ \
-                                   """{"from": "sender_name"} """ \
-                                   """or {"subject": "subject_of_the_mail"}. Try again!"""
+                                   """{"subject": "subject_of_the_mail"}. Try again!"""
 
     def _run(self, query: str) -> Union[dict, list, str]:
         """Use the tool."""

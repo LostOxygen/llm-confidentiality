@@ -86,7 +86,8 @@ class GetMailsTool(BaseTool):
             query = query.replace("'", "\"")
             try:
                 query = ast.literal_eval(query)
-            except ValueError:
+            # pylint: disable=bare-except
+            except:
                 return self.handle_validation_error
 
         if len(list(query.keys())) == 0:
@@ -160,7 +161,8 @@ class GetNotesTool(BaseTool):
             query = query.replace("'", "\"")
             try:
                 query = ast.literal_eval(query)
-            except ValueError:
+            # pylint: disable=bare-except
+            except:
                 return self.handle_validation_error
 
         if len(list(query.keys())) == 0:
@@ -208,7 +210,7 @@ class GetCalendarEventsTool(BaseTool):
     )
     metadata: Optional[dict[str, Any]] = {}
     handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """{"date: "YYYY-MM-DD"} or """ \
+                                   """{"date": "YYYY-MM-DD"} or """ \
                                    """{"location": "location_of_the_event"} or """ \
                                    """{"topic": "topic_of_the_event"}. """ \
                                    """Try again!"""
@@ -226,7 +228,8 @@ class GetCalendarEventsTool(BaseTool):
             query = query.replace("'", "\"")
             try:
                 query = ast.literal_eval(query)
-            except ValueError:
+            # pylint: disable=bare-except
+            except:
                 return self.handle_validation_error
 
         if len(list(query.keys())) == 0:

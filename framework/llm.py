@@ -5,10 +5,16 @@ import torch
 from openai import OpenAI
 
 from langchain.tools import BaseTool
-from langchain.agents import AgentExecutor, create_tool_calling_agent, create_structured_chat_agent
+from langchain.agents import (
+    AgentExecutor,
+    create_tool_calling_agent,
+    create_structured_chat_agent,
+    create_openai_tools_agent,
+)
 from langchain_core.messages import ToolMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_ollama import ChatOllama
+from langchain_openai import ChatOpenAI
 from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
@@ -18,11 +24,6 @@ from transformers import (
     GenerationConfig,
     pipeline
 )
-# from tenacity import (
-#     retry,
-#     stop_after_attempt,
-#     wait_random_exponential,
-# )
 
 from framework.prompts import (
     AttackStopping,
@@ -209,8 +210,21 @@ class LLM():
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
 
-            case ("gpt-4" | "gpt-4-turbo" | "gpt-4-tools" | "gpt-4-turbo-tools"):
+            case ("gpt-4" | "gpt-4-turbo"):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
+                self.model = None
+
+            case ("gpt-4-tools" | "gpt-4-turbo-tools"):
+                self.temperature = max(0.0, min(self.temperature, 2.0))
+                if "turbo" in self.llm_type:
+                    model = "gpt-4-turbo"
+                else:
+                    model = "gpt-4o-mini"
+
+                self.model = ChatOpenAI(
+                    model=model,
+                    temperature=self.temperature,
+                )
 
             case (
                     "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
@@ -800,6 +814,40 @@ class LLM():
                 <|im_start|>assistant
                 {response}<|im_end|>
                 """
+
+            case ("gpt-4-tools" | "gpt-4-turbo-tools"):
+                prompt = ChatPromptTemplate.from_messages(
+                    [
+                        ("system", system_prompt),
+                        ("placeholder", "{chat_history}"),
+                        ("human", "{user_prompt}\n {agent_scratchpad}"),
+                        ("placeholder", "{agent_scratchpad}"),
+                    ]
+                )
+
+                agent = create_openai_tools_agent(self.model, self.tools, prompt)
+                agent_executor = AgentExecutor(
+                    agent=agent,
+                    tools=self.tools,
+                    handle_parsing_errors=True,
+                    verbose=self.verbose,
+                    return_intermediate_steps=True,
+                    max_execution_time=40,
+                    max_iterations=10,
+                )
+
+                full_response = agent_executor.invoke(
+                    {
+                        "user_prompt": user_prompt,
+                        "tool_names": [tool.name for tool in self.tools],
+                        "tools": self.tools,
+                    }
+                )
+
+                response = str(full_response["output"])
+                intermediate_steps = str(full_response["intermediate_steps"])
+
+                history = intermediate_steps
 
             case (
                     "llama2" | "llama2-7b" | "llama2-13b" | "llama2-70b" |

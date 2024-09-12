@@ -147,9 +147,13 @@ def main(
         print(f"{TColors.WARNING}Warning{TColors.ENDC}: Iterations were less then number of " \
               f"Attacks. Set number of iterations to {len(attacks)}.")
 
-    if prompt_format == "tool-finetuned" and not llm_type.startswith("llama3"):
+    print("prompt_format", prompt_format)
+    print("llm_type", llm_type)
+    if prompt_format == "tool-finetuned" and not llm_type.startswith("llama3") and \
+        prompt_format == "tool-finetuned" and not llm_type.startswith("gpt"):
         print(f"{TColors.WARNING}Warning{TColors.ENDC}: Tool finetuned format is only available " \
-              f"for LLaMA 3 models. Setting prompt_format to react instead.")
+              f"for LLaMA 3 and GPT models. Setting prompt_format to react instead.")
+        print("wolololo")
         prompt_format = "react"
 
     print("\n"+f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information" + \

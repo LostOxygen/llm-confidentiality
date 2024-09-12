@@ -70,8 +70,8 @@ class GetMailsTool(BaseTool):
         """{"subject": "subject_of_the_mail"} """
     )
     metadata: Optional[dict[str, Any]] = {}
-    handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """{"subject": "subject_of_the_mail"}. Try again!"""
+    handle_validation_error: str = """Tool inputs are invalid. The inputs should be: """ \
+                                   """{"query": {"subject": "subject_of_the_mail"}}. Try again!"""
 
     def _run(self, query: str) -> Union[dict, list, str]:
         """Use the tool."""
@@ -145,7 +145,7 @@ class GetNotesTool(BaseTool):
     )
     metadata: Optional[dict[str, Any]] = {}
     handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """{"subject": "subject_of_the_note"}. """ \
+                                   """{"query": {"subject": "subject_of_the_note"}}. """ \
                                    """Try again!"""
 
     def _run(self, query: str) -> Union[list, dict, str]:
@@ -209,10 +209,10 @@ class GetCalendarEventsTool(BaseTool):
         """{location": "location_of_the_event"} as queries."""
     )
     metadata: Optional[dict[str, Any]] = {}
-    handle_validation_error: str = """Tool inputs are invalid. The query should be: """ \
-                                   """{"date": "YYYY-MM-DD"} or """ \
-                                   """{"location": "location_of_the_event"} or """ \
-                                   """{"topic": "topic_of_the_event"}. """ \
+    handle_validation_error: str = """Tool inputs are invalid. The inputs should be: """ \
+                                   """{"query": {"date": "YYYY-MM-DD"}} or """ \
+                                   """{"query": {"location": "location_of_the_event"}} or """ \
+                                   """{"query": {"topic": "topic_of_the_event"}}. """ \
                                    """Try again!"""
 
     def _run(self, query: str) -> Union[list, dict, str]:

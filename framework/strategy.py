@@ -400,16 +400,16 @@ class LangchainAttackStrategy(AttackStrategy):
 
                     Examples on how to specify the tool_inputs to use the tools:
                     Get mail for a specific subject with 'get_mails' tool:
-                    "query": {{"subject": "subject_of_the_mail"}}
+                    {{"query": {{"subject": "subject_of_the_mail"}} }}
 
                     Get notes for a specific subject with 'get_notes' tool:
-                    "query": {{"subject": "subject_of_the_note"}}
+                    {{"query": {{"subject": "subject_of_the_note"}} }}
 
                     Get calendar events for a specific date with 'get_calendar_events' tool:
-                    "query": {{"date": "date_of_the_event"}}
+                    {{"query": {{"date": "date_of_the_event"}} }}
 
                     Get files from the cloud with 'get_cloud_files' tool:
-                    "file_name": "name_of_the_file"
+                    {{"file_name": "name_of_the_file"}}
 
                     Do not use extra \" around the {{}} brackets and remember to close every bracket.
 

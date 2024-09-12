@@ -826,6 +826,12 @@ class LLM():
                 )
 
                 agent = create_openai_tools_agent(self.model, self.tools, prompt)
+
+                # if the tool calling fails, use the fallback chain
+                agent = agent.with_fallbacks(
+                    [self.tool_exception_message | agent]
+                )
+
                 agent_executor = AgentExecutor(
                     agent=agent,
                     tools=self.tools,

@@ -209,7 +209,7 @@ class LLM():
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
 
-            case ("gpt-3.5" | "gpt-3.5-turbo" | "gpt-4" | "gpt-4-turbo"):
+            case ("gpt-4" | "gpt-4-turbo" | "gpt-4-tools" | "gpt-4-turbo-tools"):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
 
             case (
@@ -771,16 +771,15 @@ class LLM():
                     formatted_messages.replace("<start_of_turn>", "").replace("<end_of_turn>", "")
                 , "", 1)
 
-            case ("gpt-3.5" | "gpt-3.5-turbo" | "gpt-4" | "gpt-4-turbo"):
+            case ("gpt-4" | "gpt-4-turbo"):
                 messages = [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ]
-
-                if self.llm_type in ("gpt-3.5", "gpt-3.5-turbo"):
-                    model = "gpt-3.5-turbo"
-                elif self.llm_type in ("gpt-4", "gpt-4-turbo"):
-                    model = "gpt-4"
+                if "turbo" in self.llm_type:
+                    model = "gpt-4-turbo"
+                else:
+                    model = "gpt-4o-mini"
 
                 client = OpenAI(
                     api_key=os.environ.get("OPENAI_API_KEY"),
@@ -790,7 +789,7 @@ class LLM():
                     model=model,
                     messages=messages,
                     temperature=self.temperature,
-                    seed=1337
+                    seed=1337,
                 )
 
                 response = completion.choices[0].message.content

@@ -150,9 +150,9 @@ def main(
     print("prompt_format", prompt_format)
     print("llm_type", llm_type)
     if prompt_format == "tool-finetuned" and not llm_type.startswith("llama3") and \
-        prompt_format == "tool-finetuned" and not llm_type.startswith("gpt"):
+        not llm_type.startswith("gpt") and not llm_type.startswith("reflection") :
         print(f"{TColors.WARNING}Warning{TColors.ENDC}: Tool finetuned format is only available " \
-              f"for LLaMA 3 and GPT models. Setting prompt_format to react instead.")
+              f"for LLama and GPT models. Setting prompt_format to react instead.")
         print("wolololo")
         prompt_format = "react"
 

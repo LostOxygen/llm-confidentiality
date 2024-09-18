@@ -81,10 +81,11 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 ## Supported Large Language Models
 | Model | Parameter Specifier | Link | Compute Instance |
 |-------|------|-----|-----|
-| GPT-4-Turbo | ```gpt-4``` / ```gpt-4-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
+| GPT-4 (o1, o1-mini, turbo)| ```gpt-4o``` / ```gpt-4o-mini``` / ```gpt-4-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
 | LLaMA 2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 | LLaMA 2 hardened | ```llama2-7b-robust``` / ```llama2-13b-robust``` / ```llama2-70b-robust```|  [Link](https://huggingface.co/meta-llama) | Local Inference |
 | LLaMA 3.1 | ```llama3-8b``` / ```llama3-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference (first: ```ollama pull llama3.1/llama3.1:70b/llama3.1:405b```) |
+| Reflection Llama | ```reflection-llama```| [Link](https://huggingface.co/mattshumer/ref_70_e3) | Local Inference (first: ```ollama pull reflection```) |
 | Vicuna | ```vicuna-7b``` / ```vicuna-13b``` / ```vicuna-33b``` | [Link](https://huggingface.co/lmsys/vicuna-33b-v1.3) | Local Inference |
 | StableBeluga (2) | ```beluga-7b``` / ```beluga-13b``` / ```beluga2-70b```| [Link](https://huggingface.co/stabilityai/StableBeluga2) | Local Inference |
 | Orca 2 | ```orca2-7b``` / ```orca2-13b``` / ```orca2-70b``` | [Link](https://huggingface.co/microsoft/Orca-2-7b) | Local Inference |

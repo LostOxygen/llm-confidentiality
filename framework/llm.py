@@ -482,6 +482,19 @@ class LLM():
 
                 self.tokenizer = None
 
+            case (
+                    "reflection" | "reflection-llama" | "reflection-tools" |
+                    "reflection-llama-tools"
+                ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                self.model = ChatOllama(
+                    model="reflection",
+                    temperature=self.temperature,
+                    #format="json",
+                )
+
+                self.tokenizer = None
+
             case ("gemma2-9b" | "gemma2-27b" |"gemma2-9b-tools" | "gemma2-27b-tools"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if self.llm_type.split("-")[1] == "9b":
@@ -785,13 +798,17 @@ class LLM():
                     formatted_messages.replace("<start_of_turn>", "").replace("<end_of_turn>", "")
                 , "", 1)
 
-            case ("gpt-4" | "gpt-4-turbo"):
+            case ("gpt-4" | "gpt-4o" | "gpt-4o-mini" | "gpt-4-turbo"):
                 messages = [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ]
                 if "turbo" in self.llm_type:
                     model = "gpt-4-turbo"
+                elif "mini" in self.llm_type:
+                    model = "gpt-4o-mini"
+                elif "gpt-4o" in self.llm_type:
+                    model = "gpt-4o"
                 else:
                     model = "gpt-4o-mini"
 
@@ -913,7 +930,7 @@ class LLM():
                     "llama3-tools" | "llama3-8b-tools" | "llama3-70b-tools" | 
                     "llama3-8b-fine-tools" | "llama3-70b-fine-tools" |
                     "llama3-400b-tools" | "gemma2-9b-tools" | "gemma2-27b-tools" |
-                     "phi3-3b-tools" | "phi3-14b-tools" 
+                     "phi3-3b-tools" | "phi3-14b-tools" | "reflection-llama"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [

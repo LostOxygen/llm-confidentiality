@@ -913,7 +913,8 @@ class LLM():
             case (
                     "llama3" | "llama3-8b" | "llama3-70b" | "llama3-400b" |
                     "llama3-8b-fine" | "llama3-70b-fine" |
-                    "gemma2-9b" | "gemma2-27b" | "phi3-3b" | "phi3-14b" 
+                    "gemma2-9b" | "gemma2-27b" | "phi3-3b" | "phi3-14b" |
+                    "reflection" | "reflection-llama"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [
@@ -930,7 +931,8 @@ class LLM():
                     "llama3-tools" | "llama3-8b-tools" | "llama3-70b-tools" | 
                     "llama3-8b-fine-tools" | "llama3-70b-fine-tools" |
                     "llama3-400b-tools" | "gemma2-9b-tools" | "gemma2-27b-tools" |
-                     "phi3-3b-tools" | "phi3-14b-tools" | "reflection-llama"
+                    "phi3-3b-tools" | "phi3-14b-tools" | "reflection-llama-tools" |
+                    "reflection-tools"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [

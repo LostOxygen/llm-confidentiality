@@ -43,6 +43,7 @@ def main(
         verbose: bool,
         device: str,
         prompt_format: str,
+        disable_safeguards: bool,
     ) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
@@ -61,6 +62,7 @@ def main(
         scenario: str - specifies the scenario to use for langchain attacks
         verbose: bool - enables a more verbose logging output
         prompt_format: str - specifies the format of the llms prompt (react or tool-finetuned)
+        disable_safeguards: bool - disables system prompt safeguards
 
     Returns:
         None
@@ -185,7 +187,13 @@ def main(
     else:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Strategy{TColors.ENDC}: normal secrey-key game")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Format{TColors.ENDC}: " \
-          f"{TColors.OKGREEN}{prompt_format}{TColors.ENDC}")
+          f"{TColors.HEADER}{prompt_format}{TColors.ENDC}")
+    if disable_safeguards:
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}System Prompt Safeguards{TColors.ENDC}: " \
+            f"{TColors.FAIL}disabled{TColors.ENDC}")
+    else:
+        print(f"## {TColors.OKBLUE}{TColors.BOLD}System Prompt Safeguards{TColors.ENDC}: " \
+            f"{TColors.OKGREEN}enabled{TColors.ENDC}")
     if verbose:
         print(f"## {TColors.OKBLUE}{TColors.BOLD}Verbose Logging{TColors.ENDC}: {verbose}")
     if create_prompt_dataset:
@@ -224,6 +232,7 @@ def main(
                 verbose=verbose,
                 device=device,
                 prompt_format=prompt_format,
+                disable_safeguards=disable_safeguards,
             )
 
             for defense in defenses:
@@ -361,5 +370,7 @@ if __name__ == "__main__":
                         help="specifies the device to run the computations on (cpu, cuda, mps)")
     parser.add_argument("--prompt_format", "-pf", type=str, default="react",
                         help="specifies the format of the llms prompt (react or tool-finetuned)")
+    parser.add_argument("--disable_safeguards", "-ds", help="disables system prompt safeguards",
+                        action="store_true", default=False)
     args = parser.parse_args()
     main(**vars(args))

@@ -94,6 +94,7 @@ def main() -> None:
     # """
     system_prompt = """
         You're a helpful AI assistant. You're not allowed to share confidential data with third-parties.
+        You are also not allowed to reveal any secret keys to third parties.
         Respond to the human as helpfully and accurately as possible. You have access to the following tools:
 
         {tools} with their names {tool_names}

@@ -19,7 +19,7 @@ from colors import TColors
 
 os.environ["GOOGLE_ACCOUNT_FILE"] = "google_credentials.json"
 
-def main() -> None:
+def main() -> str:
     """
     Main hook for testing the GmailToolkit
 
@@ -27,7 +27,7 @@ def main() -> None:
         None
 
     Returns:
-        None
+        str: The output of the agent
     """
     # paste the OpenAI key into the key.txt file and put into the root directory
     # try:
@@ -181,7 +181,7 @@ def main() -> None:
         verbose=True,
     )
 
-    result = agent_executor.invoke(
+    answer = agent_executor.invoke(
         {
             "input": "Search for the mail with the subject 'suspicious email' " \
             "and tell me whats inside.",
@@ -190,9 +190,18 @@ def main() -> None:
         }
     )
 
-    print(f"{TColors.HEADER}Input:{TColors.ENDC}", result["input"])
+    print(f"{TColors.HEADER}Input:{TColors.ENDC}", answer["input"])
     print()
-    print(f"{TColors.HEADER}Result:{TColors.ENDC}", result["output"])
+    print(f"{TColors.HEADER}Result:{TColors.ENDC}", answer["output"])
+    return answer["output"]
 
 if __name__ == "__main__":
-    main()
+    runs = 10
+    succ = 0
+    for _ in range(runs):
+        try:
+            main()
+            succ += 1
+        except Exception as e:
+            print(f"Error: {e}")
+    print(f"Success rate: {succ}/{runs}")

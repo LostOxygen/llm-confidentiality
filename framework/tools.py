@@ -97,7 +97,11 @@ class GetMailsTool(BaseTool):
 
         for mail in MAIL_INBOX:
             for query_type in query_types:
-                query_content = query[query_type].lower()
+                if isinstance(query, str):
+                    query_content = query[query_type].lower()
+                else:
+                    return self.handle_validation_error
+
                 match query_type:
                     case "from":
                         if query_content in mail["from"].lower() or \
@@ -172,7 +176,11 @@ class GetNotesTool(BaseTool):
 
         for note in NOTES:
             for query_type in query_types:
-                query_content = query[query_type].lower()
+                if isinstance(query, str):
+                    query_content = query[query_type].lower()
+                else:
+                    return self.handle_validation_error
+
                 match query_type:
                     case "subject":
                         if query_content in note["subject"].lower() or \
@@ -239,7 +247,11 @@ class GetCalendarEventsTool(BaseTool):
 
         for event in CALENDAR_EVENTS:
             for query_type in query_types:
-                query_content = query[query_type].lower()
+                if isinstance(query, str):
+                    query_content = query[query_type].lower()
+                else:
+                    return self.handle_validation_error
+
                 match query_type:
                     case "topic":
                         if query_content == event["topic"].lower():

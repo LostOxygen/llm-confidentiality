@@ -452,9 +452,22 @@ class LLM():
 
             case (
                     "llama3-8b" | "llama3-70b" | "llama3-400b" |
+                    "llama3-1b" | "llama3-3b" | "llama3-1b-tools" | "llama3-3b-tools" |
                     "llama3-8b-tools" | "llama3-70b-tools" | "llama3-405b-tools"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
+                if self.llm_type.split("-")[1] == "1b":
+                    self.model = ChatOllama(
+                        model="llama3.2:1b",
+                        temperature=self.temperature,
+                        #format="json",
+                    )
+                if self.llm_type.split("-")[1] == "3b":
+                    self.model = ChatOllama(
+                        model="llama3.2",
+                        temperature=self.temperature,
+                        #format="json",
+                    )
                 if self.llm_type.split("-")[1] == "8b":
                     self.model = ChatOllama(
                         model="llama3.1",
@@ -912,6 +925,7 @@ class LLM():
 
             case (
                     "llama3" | "llama3-8b" | "llama3-70b" | "llama3-400b" |
+                    "llama3-1b" | "llama3-3b" |
                     "llama3-8b-fine" | "llama3-70b-fine" |
                     "gemma2-9b" | "gemma2-27b" | "phi3-3b" | "phi3-14b" |
                     "reflection" | "reflection-llama"
@@ -930,6 +944,7 @@ class LLM():
             case (
                     "llama3-tools" | "llama3-8b-tools" | "llama3-70b-tools" | 
                     "llama3-8b-fine-tools" | "llama3-70b-fine-tools" |
+                    "llama3-1b-tools" | "llama3-3b-tools" |
                     "llama3-400b-tools" | "gemma2-9b-tools" | "gemma2-27b-tools" |
                     "phi3-3b-tools" | "phi3-14b-tools" | "reflection-llama-tools" |
                     "reflection-tools"

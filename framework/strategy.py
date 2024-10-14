@@ -509,17 +509,17 @@ class LangchainAttackStrategy(AttackStrategy):
                 # if the base scenarios are used, we want to use the strategies directly
                 # otherwise, the attack/defense should only be applied on the tool data and
                 # hence gets deactivated here
-                if self.scenario in [
-                    Scenarios.CloudPlain,
-                    Scenarios.CalendarPlain,
-                    Scenarios.MailPlain,
-                    Scenarios.NotesPlain,
-                ]:
-                    # obfuscate the user prompt using the attack strategies
-                    user_prompt = self.attack_func(user_prompt)
+                # if self.scenario in [
+                #     Scenarios.CloudPlain,
+                #     Scenarios.CalendarPlain,
+                #     Scenarios.MailPlain,
+                #     Scenarios.NotesPlain,
+                # ]:
+                # obfuscate the user prompt using the attack strategies
+                user_prompt = self.attack_func(user_prompt)
 
-                    # wrap the user input into a defense function if given
-                    user_prompt = self.defense_func(user_prompt, self.device)
+                # wrap the user input into a defense function if given
+                user_prompt = self.defense_func(user_prompt, self.device)
 
                 # bind the tools to the LLM
                 self.llm.bind_tools_to_model(self.tools)

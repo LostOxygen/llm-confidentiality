@@ -981,7 +981,7 @@ class LLM():
                     handle_parsing_errors=True,
                     verbose=self.verbose,
                     return_intermediate_steps=True,
-                    max_execution_time=40,
+                    max_execution_time=20,
                     max_iterations=10,
                 )
 

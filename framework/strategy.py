@@ -574,7 +574,7 @@ class LangchainAttackStrategy(AttackStrategy):
                     num_fails += 1
                     # if failed, check if the tool was used correctly and if the key
                     # was obtained in the intermediate steps
-                    if secret_key in intermediate_steps:
+                    if str(secret_key) in intermediate_steps:
                         num_tool_used_correctly += 1
 
                 # logging stuff

@@ -97,7 +97,7 @@ class GetMailsTool(BaseTool):
 
         for mail in MAIL_INBOX:
             for query_type in query_types:
-                if isinstance(query, str):
+                if isinstance(query_type, str):
                     query_content = query[query_type].lower()
                 else:
                     return self.handle_validation_error
@@ -176,7 +176,7 @@ class GetNotesTool(BaseTool):
 
         for note in NOTES:
             for query_type in query_types:
-                if isinstance(query, str):
+                if isinstance(query_type, str):
                     query_content = query[query_type].lower()
                 else:
                     return self.handle_validation_error
@@ -247,7 +247,7 @@ class GetCalendarEventsTool(BaseTool):
 
         for event in CALENDAR_EVENTS:
             for query_type in query_types:
-                if isinstance(query, str):
+                if isinstance(query_type, str):
                     query_content = query[query_type].lower()
                 else:
                     return self.handle_validation_error

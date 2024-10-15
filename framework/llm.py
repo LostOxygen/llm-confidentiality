@@ -493,6 +493,16 @@ class LLM():
                 self.tokenizer = None
 
             case (
+                    "qwen2.5" | "qwen2.5-tools" |
+                    "qwen2.5-72b" | "qwen2.5-72b-tools"
+                ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                self.model = ChatOllama(
+                    model="qwen2.5:72b",
+                    temperature=self.temperature,
+                )
+
+            case (
                     "reflection" | "reflection-llama" | "reflection-tools" |
                     "reflection-llama-tools"
                 ):
@@ -925,7 +935,7 @@ class LLM():
                     "llama3-1b" | "llama3-3b" |
                     "llama3-8b-fine" | "llama3-70b-fine" |
                     "gemma2-9b" | "gemma2-27b" | "phi3-3b" | "phi3-14b" |
-                    "reflection" | "reflection-llama"
+                    "reflection" | "reflection-llama" | "qwen2.5" | "qwen2.5-tools"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [
@@ -944,7 +954,7 @@ class LLM():
                     "llama3-1b-tools" | "llama3-3b-tools" |
                     "llama3-400b-tools" | "gemma2-9b-tools" | "gemma2-27b-tools" |
                     "phi3-3b-tools" | "phi3-14b-tools" | "reflection-llama-tools" |
-                    "reflection-tools"
+                    "reflection-tools" | "qwen2.5-tools" | "qwen2.5-72b-tools"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [

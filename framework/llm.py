@@ -4,6 +4,7 @@ from typing import Tuple, Final, Type, Optional
 import torch
 from openai import OpenAI
 
+from peft import PeftModel
 from langchain.tools import BaseTool
 from langchain.agents import (
     AgentExecutor,
@@ -54,10 +55,6 @@ class LLM():
         self.tools: BaseTool = tools
         self.verbose: bool = verbose
         self.prompt_format: str = prompt_format
-
-        if self.llm_type not in ("gpt-3.5-turbo", "gpt-4"):
-            # yes i know this is really dirty, but it does it's job
-            from peft import PeftModel
 
         self.temperature: float = temperature
         self.model: Type[AutoModelForCausalLM] = None

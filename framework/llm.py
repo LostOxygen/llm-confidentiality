@@ -935,7 +935,7 @@ class LLM():
                     "llama3-1b" | "llama3-3b" |
                     "llama3-8b-fine" | "llama3-70b-fine" |
                     "gemma2-9b" | "gemma2-27b" | "phi3-3b" | "phi3-14b" |
-                    "reflection" | "reflection-llama" | "qwen2.5" | "qwen2.5-tools"
+                    "reflection" | "reflection-llama" | "qwen2.5" | "qwen2.5-72b"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [

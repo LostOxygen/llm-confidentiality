@@ -107,12 +107,13 @@ def heuristic_defense(prompt: str, device: Optional[str]="cpu") -> str:
     return prompt
 
 
-def sandwiching(prompt: str) -> str:
+def sandwiching(prompt: str, device: Optional[str]="cpu") -> str:
     """
     Encloses the user input prompt between two other prompts to help the LLM evade advs. inputs.
     
     Parameters:
         prompt (str): the prompt to be enclosed
+        device (str): the device to run the model on
 
     Returns:
         defense_prompt: str - the prompt enclosed in two other prompts

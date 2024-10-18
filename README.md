@@ -12,7 +12,7 @@ If you want to cite our work, please use the [this](#citation) BibTeX entry.
 - Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe -> [jump](#generate-system-prompt-datasets)
 
 >[!WARNING]
-><b>Hardware aceleration is only fully supported for CUDA machines running Linux. MPS on MacOS should somehow work but Windows with CUDA could face some issues.</b>
+><b>Hardware aceleration is only fully supported for CUDA machines running Linux. MPS on MacOS should somewhat work but Windows with CUDA could face some issues.</b>
 
 ## Setup
 Before running the code, install the requirements:

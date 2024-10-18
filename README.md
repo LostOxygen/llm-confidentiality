@@ -4,21 +4,22 @@ This is the code repository accompanying our paper [Whispers in the Machine: Con
 
 If you want to cite our work, please use the [this](#citation) BibTeX entry.
 
-### This framework was developed to study the confidentiality of Large Language Models (LLMs). The framework contains several features:
+### This framework was developed to study the confidentiality of Large Language Models (LLMs) in integrated systems. The framework contains several features:
 - A set of attacks against LLMs, where the LLM is not allowed to leak a secret key -> [jump](#attacks-and-defenses)
 - A set of defenses against the aforementioned attacks -> [jump](#attacks-and-defenses)
+- The possibility to test the LLM's confidentiality in dummy tool-using scenarios as well as with the mentioned attacks and defenses -> [jump](#attacks-and-defenses)
+- Testing LLMs in real-world tool-scenarios using LangChains Google Drive and Google Mail integrations -> [jump](#real-world-tool-scenarios)
 - Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe -> [jump](#generate-system-prompt-datasets)
-- Finetune LLMs to harden them against these attacks using the datasets -> [jump](#finetuning-peft-and-prefix-tuning)
 
 >[!WARNING]
-><b>Hardware aceleration is only fully supported for CUDA machines running Linux. Windows or MacOS with CUDA/MPS could face some issues.</b>
+><b>Hardware aceleration is only fully supported for CUDA machines running Linux. MPS on MacOS should somehow work but Windows with CUDA could face some issues.</b>
 
 ## Setup
 Before running the code, install the requirements:
 ```
 python -m pip install --upgrade -r requirements.txt
 ```
-Create both a ```key.txt``` file containing your OpenAI API key as well as a ```hf_token.txt``` file containing your Huggingface Token for private Repos (such as LLaMA2) in the root directory of this project.
+If you want to use models hosted by OpenAI or Huggingface, create both a ```key.txt``` file containing your OpenAI API key as well as a ```hf_token.txt``` file containing your Huggingface Token for private Repos (such as Llama2) in the root directory of this project.
 
 Sometimes it can be necessary to login to your Huggingface account via the CLI:
 ```
@@ -37,15 +38,12 @@ accelerate launch [parameters] <script.py> [script parameters]
 ```
 
 # Attacks and Defenses
-## Usage
-```
-python attack.py [-h] [-a | --attacks [ATTACK1, ATTACK2, ..]] [-d | --defense DEFENSE] [-llm | --llm_type LLM_TYPE] [-m | --iterations ITERATIONS] [-t | --temperature TEMPERATURE]
-```
 
 ## Example Usage
 ```python
-python attack.py --attacks "payload_splitting" "obfuscation" --defense "xml_tagging" --iterations 15 --llm_type "llama2-7b" --temperature 0.7
+python attack.py --strategy "tools" --scenario "CalendarWithCloud" --attacks "payload_splitting" "obfuscation" --defense "xml_tagging" --iterations 15 --llm_type "llama3-70b" --temperature 0.7 --device cuda --prompt_format "react"
 ```
+Would run the attacks ```payload_splitting``` and ```obfuscation``` against the LLM ```llama3-70b``` in the scenario ```CalendarWithCloud``` using the defense ```xml_tagging``` for 15 iterations with a temperature of 0.7 on a cuda device using the react prompt format in a tool-integrated system.
 
 ## Arguments
 | Argument | Type | Default Value | Description |
@@ -172,6 +170,10 @@ Simply run the ```generate_dataset.py``` script to create new system prompts as 
 | ```-llm, --llm_type``` | <b>str</b> | ```llama3-70b``` |Specifies the LLM used to generate the system prompt dataset |
 | ```-n, --name_suffix``` | <b>str</b> | ```""``` | Specifies a suffix for the model name if you want to use a custom model |
 | ```-ds, --dataset_size``` | <b>int</b> | ```1000``` | Size of the resulting system prompt dataset |
+
+
+# Real-World Tool Scenarios
+To test the confidentiality of LLMs in real-world tool scenarios, we provide the possibility to test LLMs in Google Drive and Google Mail integrations. To do so, run the ```/various_scripts/llm_mail_test.py```script with your Google API credentials.
 
 # Citation
 If you want to cite our work, please use the following BibTeX entry:

@@ -11,8 +11,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from .colors import TColors
 
 DEFENSES_LIST: Final[List[str]] = ["seq_enclosure", "xml_tagging", "heuristic_defense",
-                                   "llm_eval", "identity_prompt", 
-                                   "ppl_detection", "prompt_guard"]
+                                   "identity_prompt", "ppl_detection", "prompt_guard"]
 
 
 def match_defense(defense: str) -> callable:
@@ -24,6 +23,7 @@ def match_defense(defense: str) -> callable:
         case "llm_eval": defense_func = llm_eval
         case "ppl_detection": defense_func = ppl_detection
         case "prompt_guard": defense_func = prompt_guard_defense
+        case "sandwiching": defense_func = sandwiching
         case ("None" | "none"): defense_func = identity_prompt
         case _:
             print(f"{TColors.FAIL}Defense type {defense} " \

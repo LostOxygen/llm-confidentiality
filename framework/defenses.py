@@ -21,7 +21,6 @@ def match_defense(defense: str) -> callable:
         case "seq_enclosure": defense_func = seq_enclosure
         case "xml_tagging": defense_func = xml_tagging
         case "heuristic_defense": defense_func = heuristic_defense
-        case "sandwiching": defense_func = sandwiching
         case "llm_eval": defense_func = llm_eval
         case "ppl_detection": defense_func = ppl_detection
         case "prompt_guard": defense_func = prompt_guard_defense

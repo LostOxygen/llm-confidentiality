@@ -28,7 +28,7 @@ def match_defense(defense: str) -> callable:
         case _:
             print(f"{TColors.FAIL}Defense type {defense} " \
                   f"is not supported.{TColors.ENDC}")
-            print(f"{TColors.CYAN}Used identity as default defense{TColors.ENDC}")
+            print(f"{TColors.OKCYAN}Used identity as default defense{TColors.ENDC}")
             defense_func = identity_prompt
 
     return defense_func

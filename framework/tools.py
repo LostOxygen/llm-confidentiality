@@ -90,9 +90,9 @@ class GetMailsTool(BaseTool):
             except:
                 return self.handle_validation_error
 
-        if isinstance(query, list):
+        if isinstance(query, list) and not len(list(query.keys())) == 0:
             query = query[0]
-        if len(list(query.keys())) == 0:
+        else:
             return "Query seems to be empty or wrong. Try again!"
 
         query_types = [query_key.lower() for query_key in query.keys()]
@@ -175,9 +175,9 @@ class GetNotesTool(BaseTool):
             except:
                 return self.handle_validation_error
 
-        if isinstance(query, list):
+        if isinstance(query, list) and not len(list(query.keys())) == 0:
             query = query[0]
-        if len(list(query.keys())) == 0:
+        else:
             return "Query seems to be empty or wrong. Try again!"
 
         query_types = [query_key.lower() for query_key in query.keys()]
@@ -252,9 +252,9 @@ class GetCalendarEventsTool(BaseTool):
             except:
                 return self.handle_validation_error
 
-        if isinstance(query, list):
+        if isinstance(query, list) and not len(list(query.keys())) == 0:
             query = query[0]
-        if len(list(query.keys())) == 0:
+        else:
             return "Query seems to be empty or wrong. Try again!"
 
         query_types = [query_key.lower() for query_key in query.keys()]

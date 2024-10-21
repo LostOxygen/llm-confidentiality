@@ -529,7 +529,7 @@ def context_switching_separators(malicious_input: Optional[str] = "") -> str:
 
 def few_shot(malicious_input: Optional[str] = "") -> str:
     """
-    Implementation of a few-shot attack utilizing utilizing the few-shot paradigm of providing the model with a Input-Output pattern to follow.
+    Implementation of a few-shot attack utilizing the few-shot paradigm of providing the model with an input-output pattern to follow.
 
     Parameters:
         None

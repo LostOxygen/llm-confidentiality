@@ -10,7 +10,7 @@ If you want to cite our work, please use the [this](#citation) BibTeX entry.
 - The possibility to test the LLM's confidentiality in dummy tool-using scenarios as well as with the mentioned attacks and defenses -> [jump to section](#attacks-and-defenses)
 - Testing LLMs in real-world tool-scenarios using LangChains Google Drive and Google Mail integrations -> [jump to section](#real-world-tool-scenarios)
 - Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe -> [jump to section](#generate-system-prompt-datasets)
-- Instructions for reproducability can be found at the end of this README -> [jump to section](#reproducability)
+- Instructions for <b>reproducibility</b> can be found at the end of this README -> [jump to section](#Reproducibility)
 
 >[!WARNING]
 ><b>Hardware aceleration is only fully supported for CUDA machines running Linux. MPS on MacOS should somewhat work but Windows with CUDA could face some issues.</b>
@@ -176,7 +176,7 @@ Simply run the ```generate_dataset.py``` script to create new system prompts as 
 # Real-World Tool Scenarios
 To test the confidentiality of LLMs in real-world tool scenarios, we provide the possibility to test LLMs in Google Drive and Google Mail integrations. To do so, run the ```/various_scripts/llm_mail_test.py```script with your Google API credentials.
 
-# Reproducability
+# Reproducibility
 >[!WARNING]
 ><b>Depeding on which LLM is evaluated the evaluation can be very demanding in terms of GPU VRAM and time.</b>
 

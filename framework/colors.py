@@ -45,5 +45,5 @@ DEFENSE_NAMES: Final[dict[str, str]] = {
     "ppl_detection": "PPL Detection",
     "prompt_guard": "PromptGuard",
     "sandwiching": "Sandwiching",
-    "identity": "Identity"
+    "identity_prompt": "Identity"
 }

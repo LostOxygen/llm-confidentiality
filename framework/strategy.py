@@ -8,7 +8,7 @@ from progressbar import ProgressBar
 
 from langchain.tools import BaseTool
 from framework.utils import log_conversation
-from framework.colors import TColors, ATTACK_NAMES
+from framework.colors import TColors, ATTACK_NAMES, DEFENSE_NAMES
 from framework.prompts import get_random_secret_key, ATTACK_KEYWORDS
 from framework.api import ChatAPI
 from framework.llm import LLM
@@ -104,7 +104,8 @@ class SecretKeyAttackStrategy(AttackStrategy):
         num_errors: int = 0
 
         print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
-            f"{ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
+            f"{ATTACK_NAMES[self.attack_func.__name__]} Attack with "
+            f"{DEFENSE_NAMES[self.defense_func.__name__]} Defense{TColors.ENDC}")
 
         with ProgressBar(max_value=self.iterations, widgets=self.widgets) as pbar:
             for iteration in range(0, self.iterations):
@@ -380,7 +381,8 @@ class LangchainAttackStrategy(AttackStrategy):
         ]
 
         print(f"{TColors.OKBLUE}{TColors.BOLD}>> Starting " \
-            f"{ATTACK_NAMES[self.attack_func.__name__]} Attack{TColors.ENDC}")
+            f"{ATTACK_NAMES[self.attack_func.__name__]} Attack with "
+            f"{DEFENSE_NAMES[self.defense_func.__name__]} Defense{TColors.ENDC}")
 
         with ProgressBar(max_value=self.iterations, widgets=self.widgets) as pbar:
             for iteration in range(0, self.iterations):

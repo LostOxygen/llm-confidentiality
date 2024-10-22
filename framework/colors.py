@@ -36,3 +36,14 @@ ATTACK_NAMES: Final[dict[str, str]] = {
     "few_shot": "Few-Shot",
     "cognitive_hacking": "Cognitive Hacking"
 }
+
+DEFENSE_NAMES: Final[dict[str, str]] = {
+    "seq_enclosure": "Sequence Enclosure",
+    "xml_tagging": "XML Tagging",
+    "heuristic_defense": "Heuristic Defense",
+    "llm_eval": "LLM Evaluation",
+    "ppl_detection": "PPL Detection",
+    "prompt_guard": "PromptGuard",
+    "sandwiching": "Sandwiching",
+    "identity": "Identity"
+}

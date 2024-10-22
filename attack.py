@@ -122,7 +122,7 @@ def main(
             attacks.pop(attacks.index("typoglycemia"))
 
     if "all" in defenses:
-        defenses = ["none"] + DEFENSES_LIST
+        defenses = DEFENSES_LIST
 
     # set the scenario string properly
     scenario = [s.lower() for s in scenario]

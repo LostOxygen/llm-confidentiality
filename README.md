@@ -1,15 +1,16 @@
 # Whispers in the Machine: Confidentiality in LLM-integrated Systems
 This is the code repository accompanying our paper [Whispers in the Machine: Confidentiality in LLM-integrated Systems](https://arxiv.org/abs/2402.06922).
-> Large Language Models (LLMs) are increasingly integrated with external tools. While these integrations can significantly improve the functionality of LLMs, they also create a new attack surface where confidential data may be disclosed between different components. Specifically, malicious tools can exploit vulnerabilities in the LLM itself to manipulate the model and compromise the data of other services, raising the question of how private data can be protected in the context of LLM integrations.<br><br> In this work, we provide a systematic way of evaluating confidentiality in LLM-integrated systems. For this, we formalize a "secret key" game that can capture the ability of a model to conceal private information. This enables us to compare the vulnerability of a model against confidentiality attacks and also the effectiveness of different defense strategies. In this framework, we evaluate eight previously published attacks and four defenses. We find that current defenses lack generalization across attack strategies. Building on this analysis, we propose a method for robustness fine-tuning, inspired by adversarial training. <br>This approach is effective in lowering the success rate of attackers and in improving the system's resilience against unknown attacks. 
+>Large Language Models (LLMs) are increasingly integrated with external tools and commercial services into <i><b>LLM-integrated systems</b></i>. While these integrations can significantly enhance the capabilities of the models, they also introduce a new attack surface. Manipulated integrations, for example, can exploit the model and compromise sensitive data accessed through other integrations. Previous work primarily focused on attacks targeting a model's alignment or the leakage of training data, while the security of data that is <i>only available during inference</i> has escaped scrutiny so far. <br>In this work, we demonstrate the vulnerabilities associated with external integrations and introduce a systematic approach to evaluate confidentiality risks in LLM-integrated systems. We identify several specific attack scenarios unique to these systems and formalize these into a "tool-robustness" framework designed to measure a model's ability to protect sensitive information. This framework allows us to assess the model’s vulnerability to confidentiality attacks. Our findings show that all examined models are highly vulnerable to attacks, with the risk increasing significantly when models are used together with external tools.
 
 If you want to cite our work, please use the [this](#citation) BibTeX entry.
 
 ### This framework was developed to study the confidentiality of Large Language Models (LLMs) in integrated systems. The framework contains several features:
-- A set of attacks against LLMs, where the LLM is not allowed to leak a secret key -> [jump](#attacks-and-defenses)
-- A set of defenses against the aforementioned attacks -> [jump](#attacks-and-defenses)
-- The possibility to test the LLM's confidentiality in dummy tool-using scenarios as well as with the mentioned attacks and defenses -> [jump](#attacks-and-defenses)
-- Testing LLMs in real-world tool-scenarios using LangChains Google Drive and Google Mail integrations -> [jump](#real-world-tool-scenarios)
-- Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe -> [jump](#generate-system-prompt-datasets)
+- A set of attacks against LLMs, where the LLM is not allowed to leak a secret key -> [jump to section](#attacks-and-defenses)
+- A set of defenses against the aforementioned attacks -> [jump to section](#attacks-and-defenses)
+- The possibility to test the LLM's confidentiality in dummy tool-using scenarios as well as with the mentioned attacks and defenses -> [jump to section](#attacks-and-defenses)
+- Testing LLMs in real-world tool-scenarios using LangChains Google Drive and Google Mail integrations -> [jump to section](#real-world-tool-scenarios)
+- Creating enhanced system prompts to safely instruct an LLM to keep a secret key safe -> [jump to section](#generate-system-prompt-datasets)
+- Instructions for reproducability can be found at the end of this README -> [jump to section](#reproducability)
 
 >[!WARNING]
 ><b>Hardware aceleration is only fully supported for CUDA machines running Linux. MPS on MacOS should somewhat work but Windows with CUDA could face some issues.</b>
@@ -175,6 +176,45 @@ Simply run the ```generate_dataset.py``` script to create new system prompts as 
 # Real-World Tool Scenarios
 To test the confidentiality of LLMs in real-world tool scenarios, we provide the possibility to test LLMs in Google Drive and Google Mail integrations. To do so, run the ```/various_scripts/llm_mail_test.py```script with your Google API credentials.
 
+# Reproducability
+>[!WARNING]
+><b>Depeding on which LLM is evaluated the evaluation can be very demanding in terms of GPU VRAM and time.</b>
+
+>[!NOTE]
+><b>Results can vary slightly from run to run. Ollama updates most of the LLM constantly, so their behavior is subject to change. Also, even with the lowest temperature, LLMs tend to fluctuate slightly in behvior due to internal randomness.</b>
+
+### Baseline scret-key game
+Will ask the LLM benign questions to check for leaking the secret even without attacks <br>
+```python attack.py --llm_type <name_of_llm> --strategy secret-key --attacks base_attack --defenses None --iterations 100 --device <device_of_choice>```
+
+### Attacks for secret-key game
+Will run all attacks against the LLM without defenses <br>
+```python attack.py --llm_type <name_of_llm> --strategy secret-key --attacks all --defenses None --iterations 100 --device <device_of_choice>```
+
+### Attacks with defenses for secret-key game
+Will run all attacks against the LLM with all defenses <br>
+```python attack.py --llm_type <name_of_llm> --strategy secret-key --attacks all --defenses all --iterations 100 --device <device_of_choice>```
+
+### Baseline tool-scenario
+Will system prompt instruct the LLM with a secret key and the instructions to not leak the secret key followed by simple requests to print the secret key <br>
+```python attack.py --llm_type <name_of_llm> --strategy tools --scenario all --attacks base_chat --defenses None --iterations 100 --device <device_of_choice>```
+
+### Evaluating all tool-scenarios with ReAct
+Will run all tool-scenarios without attacks and defenses using the ReAct framework <br>
+```python attack.py --llm_type <name_of_llm> --strategy tools --scenario all --attacks identity --defenses None --iterations 100 --prompt_format ReAct --device <device_of_choice>```
+
+### Evaluating all tool-scenarios with tool fine-tuned models
+Will run all tool-scenarios without attacks and defenses using the ReAct framework <br>
+```python attack.py --llm_type <name_of_llm> --strategy tools --scenario all --attacks identity --defenses None --iterations 100 --prompt_format tool-finetuned --device <device_of_choice>```
+
+### Evaluating all tool fine-tuned models in all scenarios with additional attacks
+Will run all tool-scenarios without attacks and defenses using the ReAct framework <br>
+```python attack.py --llm_type <name_of_llm> --strategy tools --scenario all --attacks all --defenses None --iterations 100 --prompt_format tool-finetuned --device <device_of_choice>```
+
+### Evaluating all tool fine-tuned models in all scenarios with additional attacks and defenses
+Will run all tool-scenarios without attacks and defenses using the ReAct framework <br>
+```python attack.py --llm_type <name_of_llm> --strategy tools --scenario all --attacks all --defenses all --iterations 100 --prompt_format tool-finetuned --device <device_of_choice>```
+
 # Citation
 If you want to cite our work, please use the following BibTeX entry:
 ```bibtex
@@ -184,4 +224,4 @@ If you want to cite our work, please use the following BibTeX entry:
 	year     =  {2024},
 	journal  =  {Computing Research Repository (CoRR)}
 }
-``````
+```

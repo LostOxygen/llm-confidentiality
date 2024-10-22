@@ -22,7 +22,7 @@ def match_defense(defense: str) -> callable:
         case "heuristic_defense": defense_func = heuristic_defense
         case "llm_eval": defense_func = llm_eval
         case "ppl_detection": defense_func = ppl_detection
-        case "prompt_guard": defense_func = prompt_guard_defense
+        case "prompt_guard": defense_func = prompt_guard
         case "sandwiching": defense_func = sandwiching
         case ("None" | "none"): defense_func = identity_prompt
         case _:
@@ -179,7 +179,7 @@ def ppl_detection(prompt: str, device: Optional[str]="cpu") -> str:
     return prompt
 
 
-def prompt_guard_defense(prompt: str, device: Optional[str]="cpu") -> str:
+def prompt_guard(prompt: str, device: Optional[str]="cpu") -> str:
     """
     Uses Meta's PromptGuard model to detect whether the prompt is adversarial or not.
     https://huggingface.co/meta-llama/Prompt-Guard-86M

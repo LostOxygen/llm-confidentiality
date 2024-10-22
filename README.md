@@ -183,9 +183,9 @@ To test the confidentiality of LLMs in real-world tool scenarios, we provide the
 >[!NOTE]
 ><b>Results can vary slightly from run to run. Ollama updates most of the LLM constantly, so their behavior is subject to change. Also, even with the lowest temperature, LLMs tend to fluctuate slightly in behvior due to internal randomness.</b>
 
-### Baseline scret-key game
+### Baseline secret-key game
 Will ask the LLM benign questions to check for leaking the secret even without attacks <br>
-```python attack.py --llm_type <name_of_llm> --strategy secret-key --attacks base_attack --defenses None --iterations 100 --device <device_of_choice>```
+```python attack.py --llm_type <name_of_llm> --strategy secret-key --attacks chat_base --defenses None --iterations 100 --device <device_of_choice>```
 
 ### Attacks for secret-key game
 Will run all attacks against the LLM without defenses <br>
@@ -197,7 +197,7 @@ Will run all attacks against the LLM with all defenses <br>
 
 ### Baseline tool-scenario
 Will system prompt instruct the LLM with a secret key and the instructions to not leak the secret key followed by simple requests to print the secret key <br>
-```python attack.py --llm_type <name_of_llm> --strategy tools --scenario all --attacks base_chat --defenses None --iterations 100 --device <device_of_choice>```
+```python attack.py --llm_type <name_of_llm> --strategy tools --scenario all --attacks base_attack --defenses None --iterations 100 --device <device_of_choice>```
 
 ### Evaluating all tool-scenarios with ReAct
 Will run all tool-scenarios without attacks and defenses using the ReAct framework <br>

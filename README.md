@@ -1,8 +1,8 @@
 # Whispers in the Machine: Confidentiality in LLM-integrated Systems
-This is the code repository accompanying our paper [Whispers in the Machine: Confidentiality in LLM-integrated Systems]()<!--(https://arxiv.org/abs/2402.06922).-->
+This is the code repository accompanying our paper [Whispers in the Machine: Confidentiality in LLM-integrated Systems](https://arxiv.org/abs/2402.06922).
 >Large Language Models (LLMs) are increasingly augmented with external tools and commercial services into <i><b>LLM-integrated systems</i></b>. While these interfaces can significantly enhance the capabilities of the models, they also introduce a new attack surface. Manipulated integrations, for example, can exploit the model and compromise sensitive data accessed through other interfaces. While previous work primarily has focused on attacks targeting a model's alignment or the leakage of training data, the security of data that is <i><b>only available during inference</i></b> has escaped scrutiny. In this work, we demonstrate the vulnerabilities associated with external components and introduce a systematic approach to evaluate confidentiality risks in LLM-integrated systems. We identify several specific attack scenarios unique to these systems and formalize these into a <i><b>tool-robustness</i></b> framework designed to measure a model's ability to protect sensitive information. This framework allows us to assess the model’s vulnerability to confidentiality attacks. Our findings show that all examined models are highly vulnerable to attacks, with the risk increasing significantly when models are used together with external tools.
 
-<!--If you want to cite our work, please use the [this](#citation) BibTeX entry.-->
+If you want to cite our work, please use the [this](#citation) BibTeX entry.
 
 ### This framework was developed to study the confidentiality of Large Language Models (LLMs) in integrated systems. The framework contains several features:
 - A set of attacks against LLMs, where the LLM is not allowed to leak a secret key -> [jump to section](#attacks-and-defenses)
@@ -215,7 +215,7 @@ Will run all tool-scenarios without attacks and defenses using the ReAct framewo
 Will run all tool-scenarios without attacks and defenses using the ReAct framework <br>
 ```python attack.py --llm_type <model_specifier> --strategy tools --scenario all --attacks all --defenses all --iterations 100 --prompt_format tool-finetuned --device cuda```
 
-<!--
+
 # Citation
 If you want to cite our work, please use the following BibTeX entry:
 ```bibtex
@@ -226,4 +226,3 @@ If you want to cite our work, please use the following BibTeX entry:
 	journal  =  {Computing Research Repository (CoRR)}
 }
 ```
--->

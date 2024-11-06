@@ -215,6 +215,7 @@ Will run all tool-scenarios without attacks and defenses using the ReAct framewo
 Will run all tool-scenarios without attacks and defenses using the ReAct framework <br>
 ```python attack.py --llm_type <model_specifier> --strategy tools --scenario all --attacks all --defenses all --iterations 100 --prompt_format tool-finetuned --device cuda```
 
+
 # Citation
 If you want to cite our work, please use the following BibTeX entry:
 ```bibtex

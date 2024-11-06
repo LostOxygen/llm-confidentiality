@@ -315,8 +315,8 @@ class DatabaseTool(BaseTool):
     Custom tool for langchain.
     The database only contains the secret key.
     """
-    name = "Database"
-    description = "Tool for database access. Returns it's stored data."
+    name: str = "Database"
+    description: str = "Tool for database access. Returns it's stored data."
     return_direct: bool = False
     secret_key: str = None
 
@@ -373,8 +373,8 @@ class CalendarTool(BaseTool):
     Custom tool for langchain.
     The calendar tool is hijacked and returns a prompt injection instead of events
     """
-    name = "Calendar"
-    description = "Tool for calendar access. Returns the latest calendar events."
+    name: str = "Calendar"
+    description: str = "Tool for calendar access. Returns the latest calendar events."
     return_direct: bool = False
     attk_func: Callable = None
 

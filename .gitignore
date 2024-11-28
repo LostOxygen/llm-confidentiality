@@ -14,6 +14,7 @@ gmail_token.json
 google_token.json
 token.json
 google_credentials.json
+anthropic_key.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

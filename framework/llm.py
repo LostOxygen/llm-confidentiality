@@ -32,6 +32,8 @@ from framework.prompts import (
     STOPPING_LIST,
 )
 
+import anthropic
+
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 MAX_RETRIES: int = 10 # number of retries for GPT based chat requests
 NUM_TOOL_RETRIES: int = 10 # number of retries for tool based chat requests
@@ -649,6 +651,14 @@ class LLM():
                             cache_dir=os.environ["TRANSFORMERS_CACHE"],
                         )
 
+            case ("anthropic"):
+                self.temperature = max(0.0, min(self.temperature, 5.0))
+                self.model = anthropic.Anthropic(
+                    # defaults to os.environ.get("ANTHROPIC_API_KEY")
+                    api_key=os.environ.get("ANTHROPIC_API_KEY"),
+                )
+                self.tokenizer = None
+
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
@@ -796,6 +806,24 @@ class LLM():
         """
 
         match self.llm_type:
+            case ("anthropic"):
+                message = self.model.messages.create(
+                    model="research-claude-cabernet",
+                    max_tokens=4096,
+                    messages=[
+                        {
+                            "role": "user", 
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": user_prompt,
+                                }
+                            ],
+                        }
+                    ]
+                )
+                response = message.content
+
             case ("gemma-2b" | "gemma-7b"):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
                 with torch.no_grad():

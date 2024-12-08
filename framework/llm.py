@@ -452,44 +452,45 @@ class LLM():
             case (
                     "llama3-8b" | "llama3-70b" | "llama3-400b" |
                     "llama3-1b" | "llama3-3b" | "llama3-1b-tools" | "llama3-3b-tools" |
-                    "llama3-8b-tools" | "llama3-70b-tools" | "llama3-405b-tools"
+                    "llama3-8b-tools" | "llama3-70b-tools" | "llama3-405b-tools" |
+                    "llama3.3" | "llama3.3-70b" | "llama3.3-tools" | "llama3.3-70b-tools"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
-                if self.llm_type.split("-")[1] == "1b":
+                if "." in self.llm_type:
+                    if self.llm_type.split("-")[1] == "1b":
+                        self.model = ChatOllama(
+                            model="llama3.3",
+                            temperature=self.temperature,
+                        )
+                elif self.llm_type.split("-")[1] == "1b":
                     self.model = ChatOllama(
                         model="llama3.2:1b",
                         temperature=self.temperature,
-                        #format="json",
                     )
-                if self.llm_type.split("-")[1] == "3b":
+                elif self.llm_type.split("-")[1] == "3b":
                     self.model = ChatOllama(
                         model="llama3.2",
                         temperature=self.temperature,
-                        #format="json",
                     )
-                if self.llm_type.split("-")[1] == "8b":
+                elif self.llm_type.split("-")[1] == "8b":
                     self.model = ChatOllama(
                         model="llama3.1",
                         temperature=self.temperature,
-                        #format="json",
                     )
                 elif self.llm_type.split("-")[1] == "70b":
                     self.model = ChatOllama(
                         model="llama3.1:70b",
                         temperature=self.temperature,
-                        #format="json",
                     )
                 elif self.llm_type.split("-")[1] == "405b":
                     self.model = ChatOllama(
                         model="llama3.1:405b",
                         temperature=self.temperature,
-                        #format="json",
                     )
                 else:
                     self.model = ChatOllama(
-                        model="llama3.1",
+                        model="llama3.3",
                         temperature=self.temperature,
-                        #format="json",
                     )
 
                 self.tokenizer = None
@@ -963,7 +964,8 @@ class LLM():
                     "llama3-1b" | "llama3-3b" |
                     "llama3-8b-fine" | "llama3-70b-fine" |
                     "gemma2-9b" | "gemma2-27b" | "phi3-3b" | "phi3-14b" |
-                    "reflection" | "reflection-llama" | "qwen2.5" | "qwen2.5-72b"
+                    "reflection" | "reflection-llama" | "qwen2.5" | "qwen2.5-72b" |
+                    "llama3.3" | "llama3.3-70b"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [
@@ -982,7 +984,8 @@ class LLM():
                     "llama3-1b-tools" | "llama3-3b-tools" |
                     "llama3-400b-tools" | "gemma2-9b-tools" | "gemma2-27b-tools" |
                     "phi3-3b-tools" | "phi3-14b-tools" | "reflection-llama-tools" |
-                    "reflection-tools" | "qwen2.5-tools" | "qwen2.5-72b-tools"
+                    "reflection-tools" | "qwen2.5-tools" | "qwen2.5-72b-tools" |
+                    "llama3.3-tools" | "llama3.3-70b-tools"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [

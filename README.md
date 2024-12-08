@@ -84,9 +84,10 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 | GPT-4 (o1, o1-mini, turbo)| ```gpt-4o``` / ```gpt-4o-mini``` / ```gpt-4-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
 | LLaMA 2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 | LLaMA 2 hardened | ```llama2-7b-robust``` / ```llama2-13b-robust``` / ```llama2-70b-robust```|  [Link](https://huggingface.co/meta-llama) | Local Inference |
-| Llama 3.1 | ```llama3-8b``` / ```llama3-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference (first: ```ollama pull llama3.1/llama3.1:70b/llama3.1:405b```) |
 | Qwen 2.5 | ```qwen2.5-72b``` | [Link](https://qwenlm.github.io/blog/qwen2.5/) | Local Inference (first: ```ollama pull qwen2.5:72b```) |
-| Llama 3.2 | ```llama3-1b```/ ```llama3-3b```| [Link](https://ai.meta.com/blog/llama-3-2-connect-2024-vision-edge-mobile-devices/) | Local Inference (first: ```ollama pull llama3.2/llama3.2:1b```) |
+| Llama 3.1 | ```llama3-8b``` / ```llama3-70b``` | [Link](https://www.llama.com/docs/model-cards-and-prompt-formats/llama3_1) | Local Inference (first: ```ollama pull llama3.1/llama3.1:70b/llama3.1:405b```) |
+| Llama 3.2 | ```llama3-1b```/ ```llama3-3b```| [Link](https://www.llama.com/docs/model-cards-and-prompt-formats/llama3_2) | Local Inference (first: ```ollama pull llama3.2/llama3.2:1b```) |
+| Llama 3.3 | ```llama3.3-70b``` | [Link](https://www.llama.com/docs/model-cards-and-prompt-formats/llama3_3) | Local Inference (first: ```ollama pull llama3.3/llama3.3:70b```) |
 | Reflection Llama | ```reflection-llama```| [Link](https://huggingface.co/mattshumer/ref_70_e3) | Local Inference (first: ```ollama pull reflection```) |
 | Vicuna | ```vicuna-7b``` / ```vicuna-13b``` / ```vicuna-33b``` | [Link](https://huggingface.co/lmsys/vicuna-33b-v1.3) | Local Inference |
 | StableBeluga (2) | ```beluga-7b``` / ```beluga-13b``` / ```beluga2-70b```| [Link](https://huggingface.co/stabilityai/StableBeluga2) | Local Inference |

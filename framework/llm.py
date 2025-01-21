@@ -457,7 +457,7 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if "." in self.llm_type:
-                    if self.llm_type.split("-")[1] == "1b":
+                    if self.llm_type.split("-")[1] == "70b":
                         self.model = ChatOllama(
                             model="llama3.3",
                             temperature=self.temperature,

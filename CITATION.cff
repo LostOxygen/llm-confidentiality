@@ -28,33 +28,18 @@ identifiers:
     value: 'https://arxiv.org/abs/2402.06922'
 repository-code: 'https://github.com/LostOxygen/llm-confidentiality'
 abstract: >-
-  Large Language Models (LLMs) are increasingly integrated
-  with external tools. While these integrations can
-  significantly improve the functionality of LLMs, they also
-  create a new attack surface where confidential data may be
-  disclosed between different components. Specifically,
-  malicious tools can exploit vulnerabilities in the LLM
-  itself to manipulate the model and compromise the data of
-  other services, raising the question of how private data
-  can be protected in the context of LLM integrations.
-
-
-  In this work, we provide a systematic way of evaluating
-  confidentiality in LLM-integrated systems. For this, we
-  formalize a "secret key" game that can capture the ability
-  of a model to conceal private information. This enables us
-  to compare the vulnerability of a model against
-  confidentiality attacks and also the effectiveness of
-  different defense strategies. In this framework, we
-  evaluate eight previously published attacks and four
-  defenses. We find that current defenses lack
-  generalization across attack strategies. Building on this
-  analysis, we propose a method for robustness fine-tuning,
-  inspired by adversarial training.
-
-  This approach is effective in lowering the success rate of
-  attackers and in improving the system's resilience against
-  unknown attacks.
+  Large Language Models (LLMs) are increasingly augmented with external tools and commercial services 
+  into LLM-integrated systems. While these interfaces can significantly enhance the capabilities of the models, 
+  they also introduce a new attack surface. Manipulated integrations, for example, can exploit the model and 
+  compromise sensitive data accessed through other interfaces. While previous work primarily focused on attacks 
+  targeting a model's alignment or the leakage of training data, the security of data that is only available during 
+  inference has escaped scrutiny so far. In this work, we demonstrate the vulnerabilities associated with external 
+  components and introduce a systematic approach to evaluate confidentiality risks in LLM-integrated systems. 
+  
+  We identify two specific attack scenarios unique to these systems and formalize these into a tool-robustness 
+  framework designed to measure a model's ability to protect sensitive information. Our findings show that all 
+  examined models are highly vulnerable to confidentiality attacks, with the risk increasing significantly when 
+  models are used together with external tools.     
 keywords:
   - large language models
   - llm

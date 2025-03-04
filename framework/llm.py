@@ -671,7 +671,7 @@ class LLM():
                     self.llm_type = "deepseek-r1-7b"
 
                 self.model = ChatOllama(
-                    model=f"deepseek-r1:{self.llm_type.split("-")[1]}",
+                    model=f"deepseek-r1:{self.llm_type.split("-")[2]}",
                     temperature=self.temperature,
                     ##format="json",
                 )

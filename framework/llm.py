@@ -1,5 +1,6 @@
 """library for LLM models, functions and helper stuff"""
 import os
+import subprocess
 from typing import Tuple, Final, Type, Optional
 import torch
 from openai import OpenAI
@@ -457,39 +458,17 @@ class LLM():
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 if "." in self.llm_type:
-                    if self.llm_type.split("-")[1] == "70b":
-                        self.model = ChatOllama(
-                            model="llama3.3",
-                            temperature=self.temperature,
-                        )
-                elif self.llm_type.split("-")[1] == "1b":
-                    self.model = ChatOllama(
-                        model="llama3.2:1b",
-                        temperature=self.temperature,
+                    subprocess.call(
+                        f"ollama pull llama3.3:{self.llm_type.split("-")[1]}",
+                        shell=True
                     )
-                elif self.llm_type.split("-")[1] == "3b":
                     self.model = ChatOllama(
-                        model="llama3.2",
-                        temperature=self.temperature,
-                    )
-                elif self.llm_type.split("-")[1] == "8b":
-                    self.model = ChatOllama(
-                        model="llama3.1",
-                        temperature=self.temperature,
-                    )
-                elif self.llm_type.split("-")[1] == "70b":
-                    self.model = ChatOllama(
-                        model="llama3.1:70b",
-                        temperature=self.temperature,
-                    )
-                elif self.llm_type.split("-")[1] == "405b":
-                    self.model = ChatOllama(
-                        model="llama3.1:405b",
+                        model=f"llama3.3:{self.llm_type.split("-")[1]}",
                         temperature=self.temperature,
                     )
                 else:
                     self.model = ChatOllama(
-                        model="llama3.3",
+                        model=f"llama3.1:{self.llm_type.split("-")[1]}",
                         temperature=self.temperature,
                     )
 
@@ -500,6 +479,10 @@ class LLM():
                     "qwen2.5-72b" | "qwen2.5-72b-tools"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
+                subprocess.call(
+                    "ollama pull qwen2.5:72b",
+                    shell=True
+                )
                 self.model = ChatOllama(
                     model="qwen2.5:72b",
                     temperature=self.temperature,
@@ -510,6 +493,10 @@ class LLM():
                     "reflection-llama-tools"
                 ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
+                subprocess.call(
+                    "ollama pull reflection",
+                    shell=True
+                )
                 self.model = ChatOllama(
                     model="reflection",
                     temperature=self.temperature,
@@ -520,44 +507,49 @@ class LLM():
 
             case ("gemma2-9b" | "gemma2-27b" |"gemma2-9b-tools" | "gemma2-27b-tools"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
-                if self.llm_type.split("-")[1] == "9b":
-                    self.model = ChatOllama(
-                        model="gemma2",
-                        temperature=self.temperature,
-                        #format="json",
-                    )
-                elif self.llm_type.split("-")[1] == "27b":
-                    self.model = ChatOllama(
-                        model="gemma2:27b",
-                        temperature=self.temperature,
-                        #format="json",
-                    )
-                else:
-                    self.model = ChatOllama(
-                        model="gemma2",
-                        temperature=self.temperature,
-                        #format="json",
-                    )
+                subprocess.call(
+                    f"ollama pull gemma2:{self.llm_type.split("-")[1]}",
+                    shell=True
+                )
+
+                self.model = ChatOllama(
+                    model=f"gemma2:{self.llm_type.split("-")[1]}",
+                    temperature=self.temperature,
+                    #format="json",
+                )
 
                 self.tokenizer = None
 
             case ("phi3-3b" | "phi3-14b" | "phi3-3b-tools" | "phi3-14b-tools"):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
+
                 if self.llm_type.split("-")[1] == "3b":
+                    subprocess.call(
+                        "ollama pull phi3:3.8b",
+                        shell=True
+                    )
                     self.model = ChatOllama(
-                        model="phi3:mini",
+                        model="phi3:3.8b",
                         temperature=self.temperature,
                         ##format="json",
                     )
                 elif self.llm_type.split("-")[1] == "14b":
+                    subprocess.call(
+                        "ollama pull phi3:14b",
+                        shell=True
+                    )
                     self.model = ChatOllama(
-                        model="phi3:medium",
+                        model="phi3:14b",
                         temperature=self.temperature,
                         #format="json",
                     )
                 else:
+                    subprocess.call(
+                        "ollama pull phi3:3.8b",
+                        shell=True
+                    )
                     self.model = ChatOllama(
-                        model="phi3:mini",
+                        model="phi3:3.8b",
                         temperature=self.temperature,
                         #format="json",
                     )
@@ -670,11 +662,29 @@ class LLM():
                 if self.llm_type == "deepseek-r1":
                     self.llm_type = "deepseek-r1-7b"
 
-                self.model = ChatOllama(
-                    model=f"deepseek-r1:{self.llm_type.split("-")[2]}",
-                    temperature=self.temperature,
-                    ##format="json",
-                )
+                if "tools" in self.llm_type:
+                    subprocess.call(
+                        "ollama pull MFDoom/deepseek-r1-tool-calling:"\
+                        f"{self.llm_type.split("-")[2]}",
+                        shell=True
+                    )
+
+                    self.model = ChatOllama(
+                        model=f"MFDoom/deepseek-r1-tool-calling:{self.llm_type.split("-")[2]}",
+                        temperature=self.temperature,
+                        ##format="json",
+                    )
+                else:
+                    subprocess.call(
+                        f"ollama pull deepseek-r1:{self.llm_type.split("-")[2]}",
+                        shell=True
+                    )
+
+                    self.model = ChatOllama(
+                        model=f"deepseek-r1:{self.llm_type.split("-")[2]}",
+                        temperature=self.temperature,
+                        ##format="json",
+                    )
 
                 self.tokenizer = None
 

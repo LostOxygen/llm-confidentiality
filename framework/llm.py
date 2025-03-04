@@ -660,6 +660,24 @@ class LLM():
                 )
                 self.tokenizer = None
 
+            case (
+                    "deepseek-r1" | "deepseek-r1-1.5b" | "deepseek-r1-7b" | "deepseek-r1-8b" |
+                    "deepseek-r1-14b" |"deepseek-r1-32b" |"deepseek-r1-70b" | 
+                    "deepseek-r1-1.5b-tools" | "deepseek-r1-7b-tools" | "deepseek-r1-8b-tools" | 
+                    "deepseek-r1-14b-tools" | "deepseek-r1-32b-tools" | "deepseek-r1-70b-tools"
+                ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                if self.llm_type == "deepseek-r1":
+                    self.llm_type = "deepseek-r1-7b"
+
+                self.model = ChatOllama(
+                    model=f"deepseek-r1:{self.llm_type.split("-")[1]}",
+                    temperature=self.temperature,
+                    ##format="json",
+                )
+
+                self.tokenizer = None
+
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
@@ -965,7 +983,9 @@ class LLM():
                     "llama3-8b-fine" | "llama3-70b-fine" |
                     "gemma2-9b" | "gemma2-27b" | "phi3-3b" | "phi3-14b" |
                     "reflection" | "reflection-llama" | "qwen2.5" | "qwen2.5-72b" |
-                    "llama3.3" | "llama3.3-70b"
+                    "llama3.3" | "llama3.3-70b" | "deepseek-r1" | "deepseek-r1-1.5b" | 
+                    "deepseek-r1-7b" | "deepseek-r1-8b" | "deepseek-r1-14b" | 
+                    "deepseek-r1-32b" |"deepseek-r1-70b"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [
@@ -985,7 +1005,9 @@ class LLM():
                     "llama3-400b-tools" | "gemma2-9b-tools" | "gemma2-27b-tools" |
                     "phi3-3b-tools" | "phi3-14b-tools" | "reflection-llama-tools" |
                     "reflection-tools" | "qwen2.5-tools" | "qwen2.5-72b-tools" |
-                    "llama3.3-tools" | "llama3.3-70b-tools"
+                    "llama3.3-tools" | "llama3.3-70b-tools" | "deepseek-r1-1.5b-tools" | 
+                    "deepseek-r1-7b-tools" | "deepseek-r1-8b-tools" | "deepseek-r1-14b-tools" | 
+                    "deepseek-r1-32b-tools" | "deepseek-r1-70b-tools"
                 ):
                 prompt = ChatPromptTemplate.from_messages(
                     [

@@ -151,7 +151,7 @@ def main(
 
     if prompt_format == "tool-finetuned" and not llm_type.startswith("llama3") and \
         not llm_type.startswith("gpt") and not llm_type.startswith("reflection") and \
-        not llm_type.startswith("qwen2.5") and not "deepseek" in llm_type:
+        not llm_type.startswith("qwen2.5") and "deepseek" not in llm_type:
         print(f"{TColors.WARNING}Warning{TColors.ENDC}: Tool finetuned format is only available " \
               f"for LLama, Deepseek, and GPT models. Setting prompt_format to react instead.")
         prompt_format = "react"

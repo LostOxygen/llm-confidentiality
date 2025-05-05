@@ -183,7 +183,7 @@ To test the confidentiality of LLMs in real-world tool scenarios, we provide the
 ><b>Depeding on which LLM is evaluated the evaluation can be very demanding in terms of GPU VRAM and time.</b>
 
 >[!NOTE]
-><b>Results can vary slightly from run to run. Ollama updates most of their LLMs constantly, so their behavior is subject to change. Also, even with the lowest temperature LLMs tend to fluctuate slightly in behvior due to internal randomness.</b>
+><b>Results can vary slightly from run to run. Ollama updates most of their LLMs constantly, so their behavior is subject to change. Also, even with the lowest temperature LLMs tend to fluctuate slightly in behavior due to internal randomness.</b>
 
 ### Baseline secret-key game
 Will ask the LLM benign questions to check for leaking the secret even without attacks <br>

@@ -1213,6 +1213,7 @@ class LLM():
                 response = response[0].replace(formatted_messages, "", 1)
 
             case ("codellama-7b-quant"):
+                formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
                 response = self.model(formatted_messages, max_tokens=2048)
                 history = response
                 response = response[0]["text"]

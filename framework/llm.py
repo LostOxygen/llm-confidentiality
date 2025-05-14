@@ -70,6 +70,46 @@ class LLM():
 
         # pre load the models and tokenizer and adjust the temperature
         match self.llm_type:
+            case ("codellama-7b"):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    "meta-llama/Llama-2-7b-chat-hf",
+                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    use_fast=False,
+                )
+                self.tokenizer.pad_token = self.tokenizer.unk_token
+
+                self.model: AutoModelForCausalLM = AutoModelForCausalLM.from_pretrained(
+                    "meta-llama/Llama-2-7b-chat-hf",
+                    device_map="cuda",
+                    low_cpu_mem_usage=True,
+                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    trust_remote_code=True,
+                )
+
+            case "codellama-7b-quant":
+                os.environ["HF_HOME"] = os.environ["TRANSFORMERS_CACHE"]
+                from llama_cpp import Llama
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                alt_model_id = "TheBloke/CodeLlama-7B-Instruct-GGUF"
+                alt_model_file = "codellama-7b-instruct.Q4_K_M.gguf"
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    "meta-llama/Llama-2-7b-chat-hf",
+                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    use_fast=False,
+                )
+                self.tokenizer.pad_token = self.tokenizer.unk_token
+
+                self.model: Llama = Llama.from_pretrained(
+                    repo_id=alt_model_id,
+                    filename=alt_model_file,
+                    n_gpu_layers=-1,
+                    n_ctx=4096,
+                    chat_format="llama-2",
+                    temperature=self.temperature,
+                )
+
             case (
                     "llama2-7b-pipe" | "llama2-13b-pipe" | "llama2-70b-pipe"
                 ):
@@ -794,7 +834,8 @@ class LLM():
                 "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
                 "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
                 "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust" |
-                "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix"
+                "llama2-7b-prefix" | "llama2-13b-prefix" | "llama2-70b-prefix" |
+                "codellama-7b" | "codellama-7b-quant"
                 ):
                 formatted_messages = f"""<s>[INST] <<SYS>>
                     {system_prompt}
@@ -954,7 +995,7 @@ class LLM():
                     "llama2-base" | "llama2-7b-base" | "llama2-13b-base" | "llama2-70b-base" |
                     "llama2-7b-finetuned" | "llama2-13b-finetuned" | "llama2-70b-finetuned" |
                     "llama2-7b-robust" | "llama2-13b-robust" | "llama2-70b-robust" |
-                    "orca2-7b" | "orca2-13b" | "orca2-70b"
+                    "orca2-7b" | "orca2-13b" | "orca2-70b" | "codellama-7b"
                 ):
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
 
@@ -1170,6 +1211,11 @@ class LLM():
                 # so only the models' actual response remains
                 history = response[0]
                 response = response[0].replace(formatted_messages, "", 1)
+
+            case ("codellama-7b-quant"):
+                response = self.model(formatted_messages, max_tokens=2048)
+                history = response
+                response = response[0]["text"]
 
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")

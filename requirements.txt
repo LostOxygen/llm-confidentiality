@@ -34,3 +34,4 @@ google-auth-oauthlib==1.2.1
 unstructured==0.16.4
 unstructured-client==0.29.0
 anthropic
+ctransformers[cuda]

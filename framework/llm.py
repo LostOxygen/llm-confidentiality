@@ -1216,7 +1216,8 @@ class LLM():
                 formatted_messages = self.format_prompt(system_prompt, user_prompt, self.llm_type)
                 response = self.model(formatted_messages, max_tokens=2048)
                 history = response
-                response = response[0]["text"]
+                print("RESPONSEEEEEEEE: ", response)
+                response = response["text"]
 
             case _:
                 raise NotImplementedError(f"LLM type {self.llm_type} not implemented")

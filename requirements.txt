@@ -1,3 +1,4 @@
+--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124
 sentencepiece==0.2.0
 protobuf==5.29.3
 numpy==1.26.4
@@ -34,4 +35,4 @@ google-auth-oauthlib==1.2.1
 unstructured==0.16.4
 unstructured-client==0.29.0
 anthropic
-ctransformers[cuda]
+llama-cpp-python 

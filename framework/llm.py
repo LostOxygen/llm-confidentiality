@@ -108,6 +108,7 @@ class LLM():
                     n_ctx=4096,
                     chat_format="llama-2",
                     temperature=self.temperature,
+                    verbose=False,
                 )
 
             case (

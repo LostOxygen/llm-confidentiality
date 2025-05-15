@@ -99,6 +99,8 @@ class LLM():
 
                 if "2bit" in self.llm_type:
                     alt_model_file = "codellama-7b-instruct.Q2_K.gguf"
+                elif "3bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q3_K_M.gguf"
                 elif "4bit" in self.llm_type:
                     alt_model_file = "codellama-7b-instruct.Q4_K.gguf"
                 elif "5bit" in self.llm_type:

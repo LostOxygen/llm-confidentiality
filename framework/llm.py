@@ -137,6 +137,53 @@ class LLM:
                     verbose=False,
                 )
 
+            case (
+                "llama2-7b-quant"
+                | "llama2-7b-quant-2bit"
+                | "llama2-7b-quant-3bit"
+                | "llama2-7b-quant-4bit"
+                | "llama2-7b-quant-5bit"
+                | "llama2-7b-quant-6bit"
+                | "llama2-7b-quant-8bit"
+            ):
+                os.environ["HF_HOME"] = os.environ["TRANSFORMERS_CACHE"]
+                from llama_cpp import Llama
+
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                alt_model_id = "TheBloke/Llama-2-7B-Chat-GGUF"
+
+                if "2bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q2_K.gguf"
+                elif "3bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q3_K_M.gguf"
+                elif "4bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q4_K.gguf"
+                elif "5bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q5_K_M.gguf"
+                elif "6bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q6_K.gguf"
+                elif "8bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q8_0.gguf"
+                else:
+                    alt_model_file = "llama-2-7b-chat.Q4_K_M.gguf"
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    "meta-llama/Llama-2-7b-chat-hf",
+                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    use_fast=False,
+                )
+                self.tokenizer.pad_token = self.tokenizer.unk_token
+
+                self.model: Llama = Llama.from_pretrained(
+                    repo_id=alt_model_id,
+                    filename=alt_model_file,
+                    n_gpu_layers=-1,
+                    n_ctx=4096,
+                    chat_format="llama-2",
+                    temperature=self.temperature,
+                    verbose=False,
+                )
+
             case "llama2-7b-pipe" | "llama2-13b-pipe" | "llama2-70b-pipe":
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
@@ -274,7 +321,13 @@ class LLM:
                     cache_dir=os.environ["TRANSFORMERS_CACHE"],
                 )
 
-            case "gpt-4" | "gpt-4-turbo":
+            case (
+                "gpt-4" 
+                | "gpt-4-turbo"                 
+                | "gpt-4o-2024-05-13"
+                | "gpt-4o-2024-08-06"
+                | "gpt-4o-2024-11-20"
+            ):
                 self.temperature = max(0.0, min(self.temperature, 2.0))
                 self.model = None
 
@@ -443,7 +496,7 @@ class LLM:
             ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 # create quantization config
-                if str(self.device) in ["mps", "cpu"]:
+                if str(self.device) in ["mps", "cpu"] or self.llm_type == "llama2-7b":
                     config = None
                 else:
                     config = BitsAndBytesConfig(
@@ -884,6 +937,13 @@ class LLM:
                 | "codellama-7b-quant-5bit"
                 | "codellama-7b-quant-6bit"
                 | "codellama-7b-quant-8bit"
+                | "llama2-7b-quant"
+                | "llama2-7b-quant-2bit"
+                | "llama2-7b-quant-3bit"
+                | "llama2-7b-quant-4bit"
+                | "llama2-7b-quant-5bit"
+                | "llama2-7b-quant-6bit"
+                | "llama2-7b-quant-8bit"
             ):
                 formatted_messages = f"""<s>[INST] <<SYS>>
                     {system_prompt}
@@ -976,19 +1036,20 @@ class LLM:
                     1,
                 )
 
-            case "gpt-4" | "gpt-4o" | "gpt-4o-mini" | "gpt-4-turbo":
+            case (
+                "gpt-4"
+                | "gpt-4o"
+                | "gpt-4o-2024-05-13"
+                | "gpt-4o-2024-08-06"
+                | "gpt-4o-2024-11-20"
+                | "gpt-4o-mini"
+                | "gpt-4-turbo"
+            ):
                 messages = [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ]
-                if "turbo" in self.llm_type:
-                    model = "gpt-4-turbo"
-                elif "mini" in self.llm_type:
-                    model = "gpt-4o-mini"
-                elif "gpt-4o" in self.llm_type:
-                    model = "gpt-4o"
-                else:
-                    model = "gpt-4o-mini"
+                model = self.llm_type
 
                 client = OpenAI(
                     api_key=os.environ.get("OPENAI_API_KEY"),
@@ -1355,6 +1416,13 @@ class LLM:
                 | "codellama-7b-quant-5bit"
                 | "codellama-7b-quant-6bit"
                 | "codellama-7b-quant-8bit"
+                | "llama2-7b-quant"
+                | "llama2-7b-quant-2bit"
+                | "llama2-7b-quant-3bit"
+                | "llama2-7b-quant-4bit"
+                | "llama2-7b-quant-5bit"
+                | "llama2-7b-quant-6bit"
+                | "llama2-7b-quant-8bit"
             ):
                 formatted_messages = self.format_prompt(
                     system_prompt, user_prompt, self.llm_type

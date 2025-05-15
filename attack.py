@@ -24,9 +24,12 @@ from framework.utils import log_results
 from framework.scenarios import Scenarios
 
 
-if not os.path.isdir(str(Path.home() / "data")):
-    os.mkdir(str(Path.home() / "data"))
-os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
+if not os.path.isdir("/mnt/NVME_A/"):
+    if not os.path.isdir(str(Path.home() / "data")):
+        os.mkdir(str(Path.home() / "data"))
+    os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
+else:
+    os.environ["TRANSFORMERS_CACHE"] = "/mnt/NVME_A/"
 
 
 def main(

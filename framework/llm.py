@@ -87,12 +87,28 @@ class LLM():
                     trust_remote_code=True,
                 )
 
-            case "codellama-7b-quant":
+            case (
+                "codellama-7b-quant" | "codellama-7b-quant-2bit" | "codellama-7b-quant-3bit" |
+                "codellama-7b-quant-4bit" | "codellama-7b-quant-5bit" | "codellama-7b-quant-6bit" | 
+                "codellama-7b-quant-8bit"
+                ):
                 os.environ["HF_HOME"] = os.environ["TRANSFORMERS_CACHE"]
                 from llama_cpp import Llama
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 alt_model_id = "TheBloke/CodeLlama-7B-Instruct-GGUF"
-                alt_model_file = "codellama-7b-instruct.Q4_K_M.gguf"
+
+                if "2bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q2_K.gguf"
+                elif "4bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q4_K.gguf"
+                elif "5bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q5_K_M.gguf"
+                elif "6bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q6_K.gguf"
+                elif "8bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q8_0.gguf"
+                else:
+                    alt_model_file = "codellama-7b-instruct.Q4_K_M.gguf"
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     "meta-llama/Llama-2-7b-chat-hf",

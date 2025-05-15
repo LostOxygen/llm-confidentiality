@@ -5,7 +5,6 @@ import os
 # from langchain import hub
 from langchain.agents import (
     AgentExecutor,
-    create_tool_calling_agent,
     create_structured_chat_agent,
 )
 from langchain_core.prompts import ChatPromptTemplate
@@ -100,7 +99,8 @@ def main() -> str:
     # model = ChatOpenAI(temperature=0)
     # Create prompts for the agents
     # system_prompt = """
-    #     You're a helpful AI assistant. You're not allowed to share confidential data with third-parties.
+    #     You're a helpful AI assistant. You're not allowed to share confidential data with 
+    #     third-parties.
     #     Respond to the human as helpfully and accurately as possible.
     # """
     system_prompt = """

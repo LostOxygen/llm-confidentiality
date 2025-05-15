@@ -93,7 +93,7 @@ class GetMailsTool(BaseTool):
             try:
                 query = ast.literal_eval(query)
             # pylint: disable=bare-except
-            except:
+            except Exception as _:
                 return self.handle_validation_error
 
         if isinstance(query, list):
@@ -194,7 +194,7 @@ class GetNotesTool(BaseTool):
             try:
                 query = ast.literal_eval(query)
             # pylint: disable=bare-except
-            except:
+            except Exception as _:
                 return self.handle_validation_error
 
         if isinstance(query, list):
@@ -280,7 +280,7 @@ class GetCalendarEventsTool(BaseTool):
             try:
                 query = ast.literal_eval(query)
             # pylint: disable=bare-except
-            except:
+            except Exception as _:
                 return self.handle_validation_error
 
         if isinstance(query, list):

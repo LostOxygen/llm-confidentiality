@@ -20,18 +20,16 @@ from huggingface_hub import login
 from datasets import Dataset
 from transformers import TrainingArguments
 from trl import SFTTrainer
-#from unsloth.chat_templates import get_chat_template
+
+# from unsloth.chat_templates import get_chat_template
 from unsloth import FastLanguageModel, is_bfloat16_supported
 
 from framework.colors import TColors
-from framework.dataset import (
-    ToolUseDataset,
-    DatasetState
-)
+from framework.dataset import ToolUseDataset, DatasetState
 
 os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 os.environ["WANDB_WATCH"] = "false"
-os.environ["WANDB_PROJECT"]="llm-finetuning"
+os.environ["WANDB_PROJECT"] = "llm-finetuning"
 
 # number of attack samples per attack type and main iteration
 DATA_PATH: Final[str] = "./datasets/tool_use_train.json"
@@ -61,19 +59,20 @@ CONFIG: Final[dict] = {
     },
     "trainer": {
         "max_seq_length": 4096,
-        "dataset_text_field": "prompts", # this is the training field name
+        "dataset_text_field": "prompts",  # this is the training field name
         "packing": True,
         "dataset_num_proc": 2,
         "logging_steps": 1,
         "seed": 1337,
-    }
+    },
 }
 
+
 def main(
-        llm_type: str,
-        iterations: int,
-        name_suffix: str,
-    ) -> None:
+    llm_type: str,
+    iterations: int,
+    name_suffix: str,
+) -> None:
     """
     Main function to start the LLM finetuning.
 
@@ -98,11 +97,18 @@ def main(
             print(f"{TColors.ENDC}")
 
     except FileNotFoundError:
-        print(f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
-              f"file and put it into the root directory.{TColors.ENDC}")
+        print(
+            f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
+            f"file and put it into the root directory.{TColors.ENDC}"
+        )
         if llm_type in [
-                "llama2", "llama2-7b", "llama2-13b", "llama2-70b", "llama3-8b", "llama3-70b"
-            ]:
+            "llama2",
+            "llama2-7b",
+            "llama2-13b",
+            "llama2-70b",
+            "llama3-8b",
+            "llama3-70b",
+        ]:
             sys.exit(1)
 
     # set the devices correctly
@@ -112,13 +118,15 @@ def main(
     elif torch.backends.mps.is_available():
         device = torch.device("mps")
     else:
-        print(f"{TColors.WARNING}Warning{TColors.ENDC}: Device {TColors.OKCYAN}{device} " \
-              f"{TColors.ENDC}is not available. Setting device to CPU instead.")
+        print(
+            f"{TColors.WARNING}Warning{TColors.ENDC}: Device {TColors.OKCYAN}{device} "
+            f"{TColors.ENDC}is not available. Setting device to CPU instead."
+        )
         device = torch.device("cpu")
 
     # setting the suffixes
     suffix: str = "finetuned"
-    name_suffix: str = "-"+name_suffix if name_suffix != "" else ""
+    name_suffix: str = "-" + name_suffix if name_suffix != "" else ""
     # combine the finale output save name
     save_name: str = llm_type + "-" + suffix + name_suffix
 
@@ -126,70 +134,122 @@ def main(
     CONFIG["training"]["max_steps"] = iterations
 
     # print system information
-    print("\n"+f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information" + \
-          f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-23))
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
-          str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: " \
-          f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
-          f"{torch.cuda.device_count()} GPUs on user: {getpass.getuser()}")
+    print(
+        "\n"
+        + f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information"
+        + f"{TColors.ENDC} "
+        + "#" * (os.get_terminal_size().columns - 23)
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: "
+        + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"))
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: "
+        f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and "
+        f"{torch.cuda.device_count()} GPUs on user: {getpass.getuser()}"
+    )
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Device{TColors.ENDC}: {device}")
     if (device == "cuda" or torch.device("cuda")) and torch.cuda.is_available():
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
-              f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: "
+            f"{torch.cuda.mem_get_info()[1] // 1024**2} MB"
+        )
     elif (device == "mps" or torch.device("mps")) and torch.backends.mps.is_available():
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Shared Memory{TColors.ENDC}: " \
-              f"{psutil.virtual_memory()[0] // 1024**2} MB")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}Shared Memory{TColors.ENDC}: "
+            f"{psutil.virtual_memory()[0] // 1024**2} MB"
+        )
     else:
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}CPU Memory{TColors.ENDC}: " \
-              f"{psutil.virtual_memory()[0] // 1024**2} MB")
-    print(f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}Parameters" + \
-          f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-14))
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}CPU Memory{TColors.ENDC}: "
+            f"{psutil.virtual_memory()[0] // 1024**2} MB"
+        )
+    print(
+        f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}Parameters"
+        + f"{TColors.ENDC} "
+        + "#" * (os.get_terminal_size().columns - 14)
+    )
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {llm_type}")
 
     # print the finetuning parameters
-    print(f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Finetuning Parameters " \
-          f"{TColors.ENDC}" + "#"*int(os.get_terminal_size().columns-25))
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}lora_alpha{TColors.ENDC}: " \
-          f"{CONFIG['lora']['lora_alpha']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}lora_dropout{TColors.ENDC}: " \
-          f"{CONFIG['lora']['lora_dropout']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}r-value{TColors.ENDC}: " \
-          f"{CONFIG['lora']['r']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}gradient_accumulaton_steps{TColors.ENDC}: " \
-          f"{CONFIG['training']['max_steps']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: " \
-          f"{CONFIG['training']['learning_rate']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}max_steps{TColors.ENDC}: " \
-          f"{CONFIG['training']['max_steps']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}max_seq_length{TColors.ENDC}: " \
-          f"{CONFIG['trainer']['max_seq_length']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}packing{TColors.ENDC}: " \
-          f"{CONFIG['trainer']['packing']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}per_device_train_batch_size{TColors.ENDC}: " \
-          f"{CONFIG['training']['per_device_train_batch_size']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}num_train_epochs{TColors.ENDC}: " \
-          f"{CONFIG['training']['num_train_epochs']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}optim{TColors.ENDC}: " \
-            f"{CONFIG['training']['optim']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}weight_decay{TColors.ENDC}: " \
-            f"{CONFIG['training']['weight_decay']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}warmup_steps{TColors.ENDC}: " \
-            f"{CONFIG['training']['warmup_steps']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}lr_scheduler_type{TColors.ENDC}: " \
-            f"{CONFIG['training']['lr_scheduler_type']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}seed{TColors.ENDC}: " \
-            f"{CONFIG['trainer']['seed']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}output_dir{TColors.ENDC}: " \
-            f"{CONFIG['training']['output_dir']}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}dataset_num_proc{TColors.ENDC}: " \
-            f"{CONFIG['trainer']['dataset_num_proc']}")
-    print("#"*os.get_terminal_size().columns+"\n")
+    print(
+        f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Finetuning Parameters "
+        f"{TColors.ENDC}" + "#" * int(os.get_terminal_size().columns - 25)
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}lora_alpha{TColors.ENDC}: "
+        f"{CONFIG['lora']['lora_alpha']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}lora_dropout{TColors.ENDC}: "
+        f"{CONFIG['lora']['lora_dropout']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}r-value{TColors.ENDC}: {CONFIG['lora']['r']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}gradient_accumulaton_steps{TColors.ENDC}: "
+        f"{CONFIG['training']['max_steps']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: "
+        f"{CONFIG['training']['learning_rate']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}max_steps{TColors.ENDC}: "
+        f"{CONFIG['training']['max_steps']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}max_seq_length{TColors.ENDC}: "
+        f"{CONFIG['trainer']['max_seq_length']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}packing{TColors.ENDC}: "
+        f"{CONFIG['trainer']['packing']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}per_device_train_batch_size{TColors.ENDC}: "
+        f"{CONFIG['training']['per_device_train_batch_size']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}num_train_epochs{TColors.ENDC}: "
+        f"{CONFIG['training']['num_train_epochs']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}optim{TColors.ENDC}: "
+        f"{CONFIG['training']['optim']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}weight_decay{TColors.ENDC}: "
+        f"{CONFIG['training']['weight_decay']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}warmup_steps{TColors.ENDC}: "
+        f"{CONFIG['training']['warmup_steps']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}lr_scheduler_type{TColors.ENDC}: "
+        f"{CONFIG['training']['lr_scheduler_type']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}seed{TColors.ENDC}: "
+        f"{CONFIG['trainer']['seed']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}output_dir{TColors.ENDC}: "
+        f"{CONFIG['training']['output_dir']}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}dataset_num_proc{TColors.ENDC}: "
+        f"{CONFIG['trainer']['dataset_num_proc']}"
+    )
+    print("#" * os.get_terminal_size().columns + "\n")
 
     if llm_type == "llama3-8b":
-        model_name="unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit"
+        model_name = "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit"
     elif llm_type == "llama3-70b":
-        model_name="unsloth/Meta-Llama-3.1-70B-Instruct-bnb-4bit"
+        model_name = "unsloth/Meta-Llama-3.1-70B-Instruct-bnb-4bit"
     else:
         print(f"{TColors.FAIL}LLM type not supported.{TColors.ENDC}")
         sys.exit(1)
@@ -208,20 +268,28 @@ def main(
         lora_alpha=CONFIG["lora"]["lora_alpha"],
         lora_dropout=CONFIG["lora"]["lora_dropout"],
         target_modules=[
-            "q_proj", "k_proj", "v_proj", "up_proj", "down_proj", "o_proj", "gate_proj"
-            ],
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "up_proj",
+            "down_proj",
+            "o_proj",
+            "gate_proj",
+        ],
         use_rslora=True,
         use_gradient_checkpointing="unsloth",
     )
 
     # load the dataset
-    assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
+    assert os.path.isfile(DATA_PATH), (
+        f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
+    )
     prompt_dataset = ToolUseDataset(state=DatasetState.TRAIN)
     dataset = Dataset.from_dict({"prompts": prompt_dataset.get_whole_dataset_as_list()})
 
     print(f">> {TColors.OKBLUE}Normal Finetuning for {iterations} steps{TColors.ENDC}")
 
-    trainer=SFTTrainer(
+    trainer = SFTTrainer(
         model=model,
         tokenizer=tokenizer,
         train_dataset=dataset,
@@ -232,8 +300,12 @@ def main(
         args=TrainingArguments(
             learning_rate=CONFIG["training"]["learning_rate"],
             lr_scheduler_type=CONFIG["training"]["lr_scheduler_type"],
-            per_device_train_batch_size=CONFIG["training"]["per_device_train_batch_size"],
-            gradient_accumulation_steps=CONFIG["training"]["gradient_accumulation_steps"],
+            per_device_train_batch_size=CONFIG["training"][
+                "per_device_train_batch_size"
+            ],
+            gradient_accumulation_steps=CONFIG["training"][
+                "gradient_accumulation_steps"
+            ],
             num_train_epochs=CONFIG["training"]["num_train_epochs"],
             fp16=not is_bfloat16_supported(),
             bf16=is_bfloat16_supported(),
@@ -250,7 +322,7 @@ def main(
 
     # saving to GGUF for ollama
     model.save_pretrained_gguf(
-        OUTPUT_DIR+save_name,
+        OUTPUT_DIR + save_name,
         tokenizer,
         # https://docs.unsloth.ai/basics/saving-models/saving-to-gguf
         quantization_method=["q4_k_m"],
@@ -258,21 +330,38 @@ def main(
 
     print(f"{TColors.OKGREEN}Finetuning finished.{TColors.ENDC}")
     end = time.perf_counter()
-    duration = (round(end - start) / 60.) / 60.
+    duration = (round(end - start) / 60.0) / 60.0
     print(f"{TColors.HEADER}Computation Time: {duration}{TColors.ENDC}")
 
-    print("\n"+f"## {TColors.BOLD}{TColors.HEADER}INFO:{TColors.ENDC} do not forget to " \
-          f"create the ollama model with: {TColors.OKBLUE}ollama create llama3-fine -f " \
-          f"./modelfiles/llama3.1-8/70b-modelfile")
+    print(
+        "\n" + f"## {TColors.BOLD}{TColors.HEADER}INFO:{TColors.ENDC} do not forget to "
+        f"create the ollama model with: {TColors.OKBLUE}ollama create llama3-fine -f "
+        f"./modelfiles/llama3.1-8/70b-modelfile"
+    )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
-    parser.add_argument("--llm_type", "-llm", type=str, default="llama3-8b",
-                        help="specifies the opponent LLM type")
-    parser.add_argument("--iterations", "-i", type=int, default=1000,
-                        help="specifies the number of iterations to finetune the LLM")
-    parser.add_argument("--name_suffix", "-n", help="adds a name suffix for the finetuned model",
-                        default="", type=str)
+    parser.add_argument(
+        "--llm_type",
+        "-llm",
+        type=str,
+        default="llama3-8b",
+        help="specifies the opponent LLM type",
+    )
+    parser.add_argument(
+        "--iterations",
+        "-i",
+        type=int,
+        default=1000,
+        help="specifies the number of iterations to finetune the LLM",
+    )
+    parser.add_argument(
+        "--name_suffix",
+        "-n",
+        help="adds a name suffix for the finetuned model",
+        default="",
+        type=str,
+    )
     args = parser.parse_args()
     main(**vars(args))

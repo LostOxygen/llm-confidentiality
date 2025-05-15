@@ -1,4 +1,5 @@
 """Langchain benchmark test script"""
+
 import os
 import sys
 from pathlib import Path
@@ -26,10 +27,11 @@ if not os.path.isdir(str(Path.home() / "data")):
     os.mkdir(str(Path.home() / "data"))
 os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 
+
 def main(
-        llm_type: str,
-        temperature: float,
-        device: str,
+    llm_type: str,
+    temperature: float,
+    device: str,
 ) -> None:
     """
     Main hook for benchmarking llms via langchain
@@ -41,7 +43,7 @@ def main(
 
     Returns:
         None
-    
+
     """
 
     # paste the OpenAI key into the key.txt file and put into the root directory
@@ -54,8 +56,10 @@ def main(
             print(f"{TColors.OKGREEN}OpenAI API key loaded.{TColors.ENDC}")
 
     except FileNotFoundError:
-        print(f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
-                f"file and put it into the root directory.{TColors.ENDC}")
+        print(
+            f"{TColors.FAIL}Please paste your OpenAI API key into the key.txt "
+            f"file and put it into the root directory.{TColors.ENDC}"
+        )
 
     # now same for langsmith api key
     try:
@@ -67,8 +71,10 @@ def main(
             print(f"{TColors.OKGREEN}Langsmith API key loaded.{TColors.ENDC}")
 
     except FileNotFoundError:
-        print(f"{TColors.FAIL}Please paste your Langsmith API key into the langsmith_key.txt "
-                f"file and put it into the root directory.{TColors.ENDC}")
+        print(
+            f"{TColors.FAIL}Please paste your Langsmith API key into the langsmith_key.txt "
+            f"file and put it into the root directory.{TColors.ENDC}"
+        )
     # and again for huggingfce
     try:
         with open(file="hf_token.txt", mode="r", encoding="utf-8") as f:
@@ -81,34 +87,55 @@ def main(
             print(f"{TColors.ENDC}")
 
     except FileNotFoundError:
-        print(f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
-              f"file and put it into the root directory.{TColors.ENDC}")
+        print(
+            f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
+            f"file and put it into the root directory.{TColors.ENDC}"
+        )
         if llm_type.startswith("llama"):
             sys.exit(1)
 
-    print("\n"+f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information" + \
-            f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-23))
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
-          str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: " \
-          f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
-          f"{torch.cuda.device_count()} GPUs on user: {getpass.getuser()}")
+    print(
+        "\n"
+        + f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information"
+        + f"{TColors.ENDC} "
+        + "#" * (os.get_terminal_size().columns - 23)
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: "
+        + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"))
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: "
+        f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and "
+        f"{torch.cuda.device_count()} GPUs on user: {getpass.getuser()}"
+    )
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Device{TColors.ENDC}: {device}")
     if device == "cuda" and torch.cuda.is_available():
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
-              f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: "
+            f"{torch.cuda.mem_get_info()[1] // 1024**2} MB"
+        )
     elif device == "mps" and torch.backends.mps.is_available():
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Shared Memory{TColors.ENDC}: " \
-              f"{psutil.virtual_memory()[0] // 1024**2} MB")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}Shared Memory{TColors.ENDC}: "
+            f"{psutil.virtual_memory()[0] // 1024**2} MB"
+        )
     else:
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}CPU Memory{TColors.ENDC}: " \
-              f"{psutil.virtual_memory()[0] // 1024**2} MB")
-    print(f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}Parameters" + \
-          f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-14))
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: " \
-          f"{TColors.HEADER}{llm_type}{TColors.ENDC}")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}CPU Memory{TColors.ENDC}: "
+            f"{psutil.virtual_memory()[0] // 1024**2} MB"
+        )
+    print(
+        f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}Parameters"
+        + f"{TColors.ENDC} "
+        + "#" * (os.get_terminal_size().columns - 14)
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: "
+        f"{TColors.HEADER}{llm_type}{TColors.ENDC}"
+    )
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Temperature{TColors.ENDC}: {temperature}")
-    print("#"*os.get_terminal_size().columns+"\n")
+    print("#" * os.get_terminal_size().columns + "\n")
 
     assert llm_type.startswith("llama3"), "Only LLaMA3 models are currently supported."
     # create the LLM
@@ -164,7 +191,7 @@ def main(
         [
             ("system", system),
             ("human", "{question} \n {agent_scratchpad}"),
-            #MessagesPlaceholder(variable_name="agent_scratchpad"),  # Workspace for the agent
+            # MessagesPlaceholder(variable_name="agent_scratchpad"),  # Workspace for the agent
         ]
     )
 
@@ -173,7 +200,6 @@ def main(
 
     client = Client()  # Launch langsmith client for cloning datasets
     today = datetime.date.today().isoformat()
-
 
     for task in registry.tasks:
         if task.type != "ToolUsageTask":
@@ -214,13 +240,29 @@ def main(
             },
         )
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="llm-confidentiality")
-    parser.add_argument("--llm_type", "-llm", type=str, default="llama3-8b",
-                        help="specifies the opponent LLM type")
-    parser.add_argument("--temperature", "-t", type=float, default=0.0,
-                        help="specifies the opponent LLM temperature")
-    parser.add_argument("--device", "-dx", type=str, default="cpu",
-                        help="specifies the device to run the computations on (cpu, cuda, mps)")
+    parser.add_argument(
+        "--llm_type",
+        "-llm",
+        type=str,
+        default="llama3-8b",
+        help="specifies the opponent LLM type",
+    )
+    parser.add_argument(
+        "--temperature",
+        "-t",
+        type=float,
+        default=0.0,
+        help="specifies the opponent LLM temperature",
+    )
+    parser.add_argument(
+        "--device",
+        "-dx",
+        type=str,
+        default="cpu",
+        help="specifies the device to run the computations on (cpu, cuda, mps)",
+    )
     args = parser.parse_args()
     main(**vars(args))

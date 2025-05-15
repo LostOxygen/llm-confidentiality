@@ -1,4 +1,5 @@
 """test"""
+
 from langchain_ollama import ChatOllama
 from langchain.agents import (
     AgentExecutor,
@@ -19,36 +20,36 @@ from framework.attacks import identity
 from framework.defenses import identity_prompt
 
 notes = GetNotesTool(
-        metadata={
-            "attack_func": identity,
-            "defense_func": identity_prompt,
-            "device": "cuda",
-        },
-    )
+    metadata={
+        "attack_func": identity,
+        "defense_func": identity_prompt,
+        "device": "cuda",
+    },
+)
 
 mail = GetMailsTool(
-        metadata={
-            "attack_func": identity,
-            "defense_func": identity_prompt,
-            "device": "cuda",
-        },
-    )
+    metadata={
+        "attack_func": identity,
+        "defense_func": identity_prompt,
+        "device": "cuda",
+    },
+)
 
 calendar = GetCalendarEventsTool(
-        metadata={
-            "attack_func": identity,
-            "defense_func": identity_prompt,
-            "device": "cuda",
-        },
-    )
+    metadata={
+        "attack_func": identity,
+        "defense_func": identity_prompt,
+        "device": "cuda",
+    },
+)
 
 cloud = GetCloudFilesTool(
-        metadata={
-            "attack_func": identity,
-            "defense_func": identity_prompt,
-            "device": "cuda",
-        },
-    )
+    metadata={
+        "attack_func": identity,
+        "defense_func": identity_prompt,
+        "device": "cuda",
+    },
+)
 
 tools = [notes, mail, calendar, cloud]
 
@@ -73,10 +74,10 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 agent = create_tool_calling_agent(
-        tools=tools,
-        llm=llm,
-        prompt=prompt,
-    )
+    tools=tools,
+    llm=llm,
+    prompt=prompt,
+)
 
 agent_executor = AgentExecutor(
     agent=agent,

@@ -1,4 +1,5 @@
 """library for defense implementations and helper functions"""
+
 # pylint: disable=unused-argument
 from typing import Final, List, Optional
 import random
@@ -10,31 +11,45 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 from .colors import TColors
 
-DEFENSES_LIST: Final[List[str]] = ["seq_enclosure", "xml_tagging", "heuristic_defense",
-                                   "ppl_detection", "prompt_guard"]
+DEFENSES_LIST: Final[List[str]] = [
+    "seq_enclosure",
+    "xml_tagging",
+    "heuristic_defense",
+    "ppl_detection",
+    "prompt_guard",
+]
 
 
 def match_defense(defense: str) -> callable:
     """helper function to match the defense string with its corresponding function"""
     match defense:
-        case "seq_enclosure": defense_func = seq_enclosure
-        case "xml_tagging": defense_func = xml_tagging
-        case "heuristic_defense": defense_func = heuristic_defense
-        case "llm_eval": defense_func = llm_eval
-        case "ppl_detection": defense_func = ppl_detection
-        case "prompt_guard": defense_func = prompt_guard
-        case "sandwiching": defense_func = sandwiching
-        case ("None" | "none"): defense_func = identity_prompt
+        case "seq_enclosure":
+            defense_func = seq_enclosure
+        case "xml_tagging":
+            defense_func = xml_tagging
+        case "heuristic_defense":
+            defense_func = heuristic_defense
+        case "llm_eval":
+            defense_func = llm_eval
+        case "ppl_detection":
+            defense_func = ppl_detection
+        case "prompt_guard":
+            defense_func = prompt_guard
+        case "sandwiching":
+            defense_func = sandwiching
+        case "None" | "none":
+            defense_func = identity_prompt
         case _:
-            print(f"{TColors.FAIL}Defense type {defense} " \
-                  f"is not supported.{TColors.ENDC}")
+            print(
+                f"{TColors.FAIL}Defense type {defense} is not supported.{TColors.ENDC}"
+            )
             print(f"{TColors.OKCYAN}Used identity as default defense{TColors.ENDC}")
             defense_func = identity_prompt
 
     return defense_func
 
 
-def identity_prompt(prompt: str, device: Optional[str]="cpu") -> str:
+def identity_prompt(prompt: str, device: Optional[str] = "cpu") -> str:
     """
     Uses the prompt as is without any modifications.
     (This is used when defense is set to 'None')
@@ -42,10 +57,10 @@ def identity_prompt(prompt: str, device: Optional[str]="cpu") -> str:
     return prompt
 
 
-def seq_enclosure(prompt: str, device: Optional[str]="cpu") -> str:
+def seq_enclosure(prompt: str, device: Optional[str] = "cpu") -> str:
     """
     Encloses the prompt in a sequence of random characters.
-    
+
     Parameters:
         prompt (str): the prompt to be enclosed
         device (str): the device to run the model on
@@ -65,10 +80,10 @@ def seq_enclosure(prompt: str, device: Optional[str]="cpu") -> str:
     return defense_prompt
 
 
-def xml_tagging(prompt: str, device: Optional[str]="cpu") -> str:
+def xml_tagging(prompt: str, device: Optional[str] = "cpu") -> str:
     """
     Encloses the user input in prompts in XML tags to help the LLM evade adversarial inputs.
-    
+
     Parameters:
         prompt (str): the prompt to be enclosed
         device (str): the device to run the model on
@@ -85,10 +100,10 @@ def xml_tagging(prompt: str, device: Optional[str]="cpu") -> str:
     return defense_prompt
 
 
-def heuristic_defense(prompt: str, device: Optional[str]="cpu") -> str:
+def heuristic_defense(prompt: str, device: Optional[str] = "cpu") -> str:
     """
     Uses rule based heuristics to detect and remove adversarial prompt inputs.
-    
+
     Parameters:
         prompt (str): the prompt to be checked
         device (str): the device to run the model on
@@ -106,10 +121,10 @@ def heuristic_defense(prompt: str, device: Optional[str]="cpu") -> str:
     return prompt
 
 
-def sandwiching(prompt: str, device: Optional[str]="cpu") -> str:
+def sandwiching(prompt: str, device: Optional[str] = "cpu") -> str:
     """
     Encloses the user input prompt between two other prompts to help the LLM evade advs. inputs.
-    
+
     Parameters:
         prompt (str): the prompt to be enclosed
         device (str): the device to run the model on
@@ -121,10 +136,10 @@ def sandwiching(prompt: str, device: Optional[str]="cpu") -> str:
     raise NotImplementedError("sandwiching() is not implemented yet!")
 
 
-def llm_eval(prompt: str, device: Optional[str]="cpu") -> str:
+def llm_eval(prompt: str, device: Optional[str] = "cpu") -> str:
     """
     Uses a separate LLM to evaluate the prompt and remove adversarial inputs.
-    
+
     Parameters:
         prompt (str): the prompt to be evaluated
         device (str): the device to run the model on
@@ -142,21 +157,25 @@ def llm_eval(prompt: str, device: Optional[str]="cpu") -> str:
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": prompt},
     ]
-    completion = ChatCompletion.create(model="gpt-3.5-turbo", messages=messages, temperature=0.0)
+    completion = ChatCompletion.create(
+        model="gpt-3.5-turbo", messages=messages, temperature=0.0
+    )
     response: str = completion.choices[0].message.content
 
     if "ADVERSARIAL PROMPT DETECTED" in response:
-        return "The message entered was detected as malicious and "\
-               "therefore removed. Do not respond."
+        return (
+            "The message entered was detected as malicious and "
+            "therefore removed. Do not respond."
+        )
 
     return prompt
 
 
-def ppl_detection(prompt: str, device: Optional[str]="cpu") -> str:
+def ppl_detection(prompt: str, device: Optional[str] = "cpu") -> str:
     """
     Uses a separate LLM (GPT2) to calculate the perplexity of the message. If the perplexity
     is above a certain threshold we assume malicious content and therefore remove the message.
-    
+
     Parameters:
         prompt (str): the prompt to be evaluated
         device (str): the device to run the model on
@@ -173,13 +192,15 @@ def ppl_detection(prompt: str, device: Optional[str]="cpu") -> str:
     del model
     del tokenizer
     if ppl > 1000:
-        return "The message entered was detected as malicious and "\
-               "therefore removed. Do not respond."
+        return (
+            "The message entered was detected as malicious and "
+            "therefore removed. Do not respond."
+        )
 
     return prompt
 
 
-def prompt_guard(prompt: str, device: Optional[str]="cpu") -> str:
+def prompt_guard(prompt: str, device: Optional[str] = "cpu") -> str:
     """
     Uses Meta's PromptGuard model to detect whether the prompt is adversarial or not.
     https://huggingface.co/meta-llama/Prompt-Guard-86M
@@ -199,7 +220,9 @@ def prompt_guard(prompt: str, device: Optional[str]="cpu") -> str:
     )
     result = classifier(prompt)[0]["label"].lower()
     if result in ["jailbreak", "injection", "indirect"]:
-        return f"The message entered was detected as {result} and "\
-               "therefore removed. Do not respond."
+        return (
+            f"The message entered was detected as {result} and "
+            "therefore removed. Do not respond."
+        )
     else:
         return prompt

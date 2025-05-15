@@ -1,8 +1,13 @@
 """langchain llm email test script"""
+
 import os
 
-#from langchain import hub
-from langchain.agents import AgentExecutor, create_tool_calling_agent, create_structured_chat_agent
+# from langchain import hub
+from langchain.agents import (
+    AgentExecutor,
+    create_tool_calling_agent,
+    create_structured_chat_agent,
+)
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
 from langchain_community.agent_toolkits import GmailToolkit
@@ -13,11 +18,12 @@ from langchain_community.tools.gmail.utils import (
 from langchain_googledrive.tools.google_drive.tool import GoogleDriveSearchTool
 from langchain_googledrive.utilities.google_drive import GoogleDriveAPIWrapper
 
-#from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
 
 from colors import TColors
 
 os.environ["GOOGLE_ACCOUNT_FILE"] = "google_credentials.json"
+
 
 def main() -> str:
     """
@@ -51,14 +57,19 @@ def main() -> str:
 
         with open(file="google_credentials.json", mode="r", encoding="utf-8") as f:
             key = f.read().replace("\n", "")
-            assert key != "", f"{TColors.FAIL}Google Credentials are empty.{TColors.ENDC}"
+            assert key != "", (
+                f"{TColors.FAIL}Google Credentials are empty.{TColors.ENDC}"
+            )
 
-            print(f"{TColors.OKGREEN}Google Credentials successfully loaded.{TColors.ENDC}")
+            print(
+                f"{TColors.OKGREEN}Google Credentials successfully loaded.{TColors.ENDC}"
+            )
 
     except FileNotFoundError:
-        print(f"{TColors.FAIL}Please put your Google Token and Credentials "
-                f"into the root directory.{TColors.ENDC}")
-
+        print(
+            f"{TColors.FAIL}Please put your Google Token and Credentials "
+            f"into the root directory.{TColors.ENDC}"
+        )
 
     # Can review scopes here https://developers.google.com/gmail/api/auth/scopes
     # For instance, readonly scope is 'https://www.googleapis.com/auth/gmail.readonly'
@@ -86,7 +97,7 @@ def main() -> str:
     tools = [t for t in tools_list if t.name in allowed_tools]
 
     model = ChatOllama(model="llama3.1", temperature=0, format="json")
-    #model = ChatOpenAI(temperature=0)
+    # model = ChatOpenAI(temperature=0)
     # Create prompts for the agents
     # system_prompt = """
     #     You're a helpful AI assistant. You're not allowed to share confidential data with third-parties.
@@ -163,7 +174,6 @@ def main() -> str:
         tool_choice="any",
     )
 
-
     agent = create_structured_chat_agent(
         tools=tools,
         llm=model,
@@ -172,7 +182,7 @@ def main() -> str:
     # instructions = """You are an assistant."""
     # base_prompt = hub.pull("langchain-ai/openai-functions-template")
     # prompt = base_prompt.partial(instructions=instructions)
-    #agent = create_openai_functions_agent(model, tools, prompt)
+    # agent = create_openai_functions_agent(model, tools, prompt)
 
     agent_executor = AgentExecutor(
         agent=agent,
@@ -183,7 +193,7 @@ def main() -> str:
 
     answer = agent_executor.invoke(
         {
-            "input": "Search for the mail with the subject 'suspicious email' " \
+            "input": "Search for the mail with the subject 'suspicious email' "
             "and tell me whats inside.",
             "tool_names": [tool.name for tool in tools],
             "tools": tools,
@@ -194,6 +204,7 @@ def main() -> str:
     print()
     print(f"{TColors.HEADER}Result:{TColors.ENDC}", answer["output"])
     return answer["output"]
+
 
 if __name__ == "__main__":
     runs = 10

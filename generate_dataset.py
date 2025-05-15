@@ -27,17 +27,17 @@ os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 
 
 def main(
-        dataset_size: int,
-        llm_type: str,
-        name_suffix: str,
-        device: str,
-        dataset_type: str,
-        is_test: bool,
-    ) -> None:
+    dataset_size: int,
+    llm_type: str,
+    name_suffix: str,
+    device: str,
+    dataset_type: str,
+    is_test: bool,
+) -> None:
     """
     Main function to start the llm-confidentiality testing procedures.
 
-    Parameters: 
+    Parameters:
         attack: List[str] - specifies a list of attacks against the LLM
         dataset_size: int - specifies the size of the resulting dataset
         llm_type: str - specifies the opponent LLM type
@@ -58,44 +58,73 @@ def main(
     elif torch.backends.mps.is_available():
         device = torch.device("mps")
     else:
-        print(f"{TColors.WARNING}Warning{TColors.ENDC}: Device {TColors.OKCYAN}{device} " \
-              f"{TColors.ENDC}is not available. Setting device to CPU instead.")
+        print(
+            f"{TColors.WARNING}Warning{TColors.ENDC}: Device {TColors.OKCYAN}{device} "
+            f"{TColors.ENDC}is not available. Setting device to CPU instead."
+        )
         device = torch.device("cpu")
 
     # add '-' in front of the name suffix
     if name_suffix != "" and not name_suffix.startswith("-"):
         name_suffix = "-" + name_suffix
 
-    print("\n"+f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information" + \
-          f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-23))
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
-          str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: " \
-          f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
-          f"{torch.cuda.device_count()} GPUs on user: {getpass.getuser()}")
+    print(
+        "\n"
+        + f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information"
+        + f"{TColors.ENDC} "
+        + "#" * (os.get_terminal_size().columns - 23)
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: "
+        + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"))
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: "
+        f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and "
+        f"{torch.cuda.device_count()} GPUs on user: {getpass.getuser()}"
+    )
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Device{TColors.ENDC}: {device}")
     if (device == "cuda" or torch.device("cuda")) and torch.cuda.is_available():
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
-              f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: "
+            f"{torch.cuda.mem_get_info()[1] // 1024**2} MB"
+        )
     elif (device == "mps" or torch.device("mps")) and torch.backends.mps.is_available():
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Shared Memory{TColors.ENDC}: " \
-              f"{psutil.virtual_memory()[0] // 1024**2} MB")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}Shared Memory{TColors.ENDC}: "
+            f"{psutil.virtual_memory()[0] // 1024**2} MB"
+        )
     else:
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}CPU Memory{TColors.ENDC}: " \
-              f"{psutil.virtual_memory()[0] // 1024**2} MB")
-    print(f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}Parameters" + \
-          f"{TColors.ENDC} " + "#"*(os.get_terminal_size().columns-14))
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Dataset Type{TColors.ENDC}: {dataset_type}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Dataset Size{TColors.ENDC}: {dataset_size}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM Type{TColors.ENDC}: " \
-          f"{TColors.HEADER}{llm_type}{TColors.OKCYAN}{name_suffix}{TColors.ENDC}")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}CPU Memory{TColors.ENDC}: "
+            f"{psutil.virtual_memory()[0] // 1024**2} MB"
+        )
+    print(
+        f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}Parameters"
+        + f"{TColors.ENDC} "
+        + "#" * (os.get_terminal_size().columns - 14)
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}Dataset Type{TColors.ENDC}: {dataset_type}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}Dataset Size{TColors.ENDC}: {dataset_size}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}LLM Type{TColors.ENDC}: "
+        f"{TColors.HEADER}{llm_type}{TColors.OKCYAN}{name_suffix}{TColors.ENDC}"
+    )
     if is_test:
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Dataset State{TColors.ENDC}: " \
-              f"{TColors.OKGREEN}Test{TColors.ENDC}")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}Dataset State{TColors.ENDC}: "
+            f"{TColors.OKGREEN}Test{TColors.ENDC}"
+        )
     else:
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}Dataset State{TColors.ENDC}: " \
-              f"{TColors.OKGREEN}Train{TColors.ENDC}")
-    print("#"*os.get_terminal_size().columns+"\n")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}Dataset State{TColors.ENDC}: "
+            f"{TColors.OKGREEN}Train{TColors.ENDC}"
+        )
+    print("#" * os.get_terminal_size().columns + "\n")
 
     # initialize the LLM
     llm: Type[LLM] = LLM(
@@ -121,12 +150,12 @@ def main(
         progress_bar = pkbar.Pbar(
             target=dataset_size,
             width=50,
-            name=f"{TColors.OKBLUE}Generating Tool-Use Dataset{TColors.ENDC}"
+            name=f"{TColors.OKBLUE}Generating Tool-Use Dataset{TColors.ENDC}",
         )
 
         for tool in tools:
             dataset_counter = 0
-            while dataset_counter < dataset_size//len(tools):
+            while dataset_counter < dataset_size // len(tools):
                 system_prompt = """
                     Respond to the human as helpfully and accurately as possible. You have access to the following tools:
 
@@ -194,7 +223,6 @@ def main(
                     Begin! Reminder to ALWAYS respond with a valid json blob of a single action and always end with the Final Answer.
                     After receiving a tool response, remember to answer with Final Answer and use the tools response as its action_input.
                 """
-
 
                 match tool:
                     case "Email":
@@ -293,7 +321,9 @@ def main(
                         if topic is None:
                             continue
                         topic = topic.group(1)
-                        description = re.search(r"#DESCRIPTION: (.*)", response, re.DOTALL)
+                        description = re.search(
+                            r"#DESCRIPTION: (.*)", response, re.DOTALL
+                        )
                         if description is None:
                             continue
                         description = description.group(1)
@@ -457,17 +487,19 @@ def main(
                 progress_bar.update(len(dataset))
                 dataset_counter += 1
 
-
     elif dataset_type in [
-            "system_prompt", "systemprompt", "SystemPrompt", "system-prompt"
-        ]:
+        "system_prompt",
+        "systemprompt",
+        "SystemPrompt",
+        "system-prompt",
+    ]:
         # initialize the dataset
         dataset: PromptDataset = PromptDataset(state=DatasetState.TRAIN)
 
         progress_bar = pkbar.Pbar(
             target=dataset_size,
             width=50,
-            name=f"{TColors.OKBLUE}Generating System Prompt Dataset{TColors.ENDC}"
+            name=f"{TColors.OKBLUE}Generating System Prompt Dataset{TColors.ENDC}",
         )
 
         while len(dataset) < dataset_size:
@@ -510,9 +542,8 @@ def main(
             dataset.add_prompt(response)
             progress_bar.update(len(dataset))
 
-
     end = time.perf_counter()
-    duration = (round(end - start) / 60.) / 60.
+    duration = (round(end - start) / 60.0) / 60.0
     print(f"{TColors.HEADER}\nComputation Time: {duration}{TColors.ENDC}")
 
     return 0
@@ -520,17 +551,47 @@ def main(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="dataset-genration")
-    parser.add_argument("--dataset_size", "-ds", type=int, default=1000,
-                        help="specifies the size of the resulting dataset")
-    parser.add_argument("--llm_type", "-llm", type=str, default="llama3-8b",
-                        help="specifies the LLM to generate the dataset")
-    parser.add_argument("--name_suffix", "-n", help="adds a name suffix for loading custom models",
-                        default="", type=str)
-    parser.add_argument("--device", "-dx", type=str, default="cpu",
-                        help="specifies the device to run the computations on (cpu, cuda, mps)")
-    parser.add_argument("--dataset_type", "-dt", type=str, default="tool_usage",
-                        help="specifies the type of dataset (tool_usage, system_prompt)")
-    parser.add_argument("--is_test", "-it", action="store_true", default=False,
-                        help="specifies whether the dataset will be train or test")
+    parser.add_argument(
+        "--dataset_size",
+        "-ds",
+        type=int,
+        default=1000,
+        help="specifies the size of the resulting dataset",
+    )
+    parser.add_argument(
+        "--llm_type",
+        "-llm",
+        type=str,
+        default="llama3-8b",
+        help="specifies the LLM to generate the dataset",
+    )
+    parser.add_argument(
+        "--name_suffix",
+        "-n",
+        help="adds a name suffix for loading custom models",
+        default="",
+        type=str,
+    )
+    parser.add_argument(
+        "--device",
+        "-dx",
+        type=str,
+        default="cpu",
+        help="specifies the device to run the computations on (cpu, cuda, mps)",
+    )
+    parser.add_argument(
+        "--dataset_type",
+        "-dt",
+        type=str,
+        default="tool_usage",
+        help="specifies the type of dataset (tool_usage, system_prompt)",
+    )
+    parser.add_argument(
+        "--is_test",
+        "-it",
+        action="store_true",
+        default=False,
+        help="specifies whether the dataset will be train or test",
+    )
     args = parser.parse_args()
     main(**vars(args))

@@ -1,12 +1,15 @@
 """API class implementation to interact with the ChatVisuzalization class"""
+
 from datetime import datetime
 from typing import Final, List
 import os
 
 PATH: Final[str] = "/tmp/llm_chat/"
 
+
 class ChatAPI:
     """API class to interact with the ChatVisualization class via temp files"""
+
     def __init__(self):
         pass
 
@@ -21,9 +24,8 @@ class ChatAPI:
         final_msg = f"MSG|{user}|{message}|{timestamp}@"
         final_msg.encode("utf-8")
 
-        with open(PATH+"chat_log.txt", "a", encoding="utf-8") as chat_file:
+        with open(PATH + "chat_log.txt", "a", encoding="utf-8") as chat_file:
             chat_file.write(final_msg)
-
 
     @staticmethod
     def add_input_message(message: str) -> None:
@@ -35,34 +37,34 @@ class ChatAPI:
         message += "\n"
         message.encode("utf-8")
 
-        with open(PATH+"chat_input_log.txt", "a", encoding="utf-8") as chat_file:
+        with open(PATH + "chat_input_log.txt", "a", encoding="utf-8") as chat_file:
             chat_file.write(message)
 
-
     @staticmethod
-    def get_first_message(file_name: str = "chat_input_log.txt", split_char: str = "\n") -> str:
+    def get_first_message(
+        file_name: str = "chat_input_log.txt", split_char: str = "\n"
+    ) -> str:
         """returns the first (oldest) message in the input chat log and removes it from the log"""
-        with open(PATH+file_name, "r", encoding="utf-8") as chat_file:
+        with open(PATH + file_name, "r", encoding="utf-8") as chat_file:
             # read the whole file and split it by the split_char
             complete_log = chat_file.read()
 
             # remove the first line from the log
-            first_line = complete_log[:complete_log.find(split_char)]
-            remaining_log = complete_log[complete_log.find(split_char)+2:]
+            first_line = complete_log[: complete_log.find(split_char)]
+            remaining_log = complete_log[complete_log.find(split_char) + 2 :]
 
-        with open(PATH+file_name, "w", encoding="utf-8") as chat_file:
+        with open(PATH + file_name, "w", encoding="utf-8") as chat_file:
             chat_file.write(remaining_log)
 
         return first_line
 
-
     @staticmethod
     def get_all_messages(file_name: str = "chat_input_log.txt") -> List[str]:
         """returns all messages in the input chat log and clears the log"""
-        with open(PATH+file_name, "r", encoding="utf-8") as chat_file:
+        with open(PATH + file_name, "r", encoding="utf-8") as chat_file:
             complete_log = chat_file.readlines()
 
-        with open(PATH+file_name, "w", encoding="utf-8") as chat_file:
+        with open(PATH + file_name, "w", encoding="utf-8") as chat_file:
             chat_file.write("")
 
         return complete_log

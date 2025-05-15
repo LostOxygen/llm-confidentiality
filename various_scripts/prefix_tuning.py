@@ -19,13 +19,9 @@ from huggingface_hub import login
 from transformers import (
     AutoTokenizer,
     default_data_collator,
-    get_linear_schedule_with_warmup
+    get_linear_schedule_with_warmup,
 )
-from peft import (
-    get_peft_model,
-    PrefixTuningConfig,
-    TaskType
-)
+from peft import get_peft_model, PrefixTuningConfig, TaskType
 from datasets import Dataset
 import torch
 from torch.utils.data import DataLoader
@@ -33,21 +29,17 @@ from accelerate import Accelerator
 
 from framework.colors import TColors
 from framework.attacks import (
-        ATTACK_LIST,
-        payload_splitting,
-        obfuscation,
-        jailbreak,
-        translation,
-        chatml_abuse,
-        masking,
-        typoglycemia,
-        advs_suffix
-    )
-from framework.dataset import (
-    PromptDataset,
-    ResponseDataset,
-    DatasetState
+    ATTACK_LIST,
+    payload_splitting,
+    obfuscation,
+    jailbreak,
+    translation,
+    chatml_abuse,
+    masking,
+    typoglycemia,
+    advs_suffix,
 )
+from framework.dataset import PromptDataset, ResponseDataset, DatasetState
 from framework.llm import LLM
 from framework.prompts import get_random_secret_key
 
@@ -84,16 +76,26 @@ def get_attack_list(attacks: List[str]) -> List[Callable]:
     for attack in attacks:
         # set the attack function
         match attack:
-            case "payload_splitting": attack_funcs.append(payload_splitting)
-            case "obfuscation": attack_funcs.append(obfuscation)
-            case "jailbreak": attack_funcs.append(jailbreak)
-            case "translation": attack_funcs.append(translation)
-            case "chatml_abuse": attack_funcs.append(chatml_abuse)
-            case "masking": attack_funcs.append(masking)
-            case "typoglycemia": attack_funcs.append(typoglycemia)
-            case "advs_suffix": attack_funcs.append(advs_suffix)
+            case "payload_splitting":
+                attack_funcs.append(payload_splitting)
+            case "obfuscation":
+                attack_funcs.append(obfuscation)
+            case "jailbreak":
+                attack_funcs.append(jailbreak)
+            case "translation":
+                attack_funcs.append(translation)
+            case "chatml_abuse":
+                attack_funcs.append(chatml_abuse)
+            case "masking":
+                attack_funcs.append(masking)
+            case "typoglycemia":
+                attack_funcs.append(typoglycemia)
+            case "advs_suffix":
+                attack_funcs.append(advs_suffix)
             case _:
-                print(f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}")
+                print(
+                    f"{TColors.FAIL}Attack type {attack} is not supported.{TColors.ENDC}"
+                )
                 print(f"{TColors.FAIL}Choose from: {ATTACK_LIST}{TColors.ENDC}")
                 sys.exit(1)
 
@@ -109,19 +111,19 @@ def preprocess_function(data) -> dict:
     labels = data["labels"]
     glob_tokenizer.pad_token = glob_tokenizer.eos_token
     model_inputs = glob_tokenizer(
-            inputs,
-            max_length=glob_max_length,
-            padding="max_length",
-            truncation=True,
-            return_tensors="pt"
-        )
+        inputs,
+        max_length=glob_max_length,
+        padding="max_length",
+        truncation=True,
+        return_tensors="pt",
+    )
     label_inputs = glob_tokenizer(
-            labels,
-            max_length=glob_max_length,
-            padding="max_length",
-            truncation=True,
-            return_tensors="pt"
-        )
+        labels,
+        max_length=glob_max_length,
+        padding="max_length",
+        truncation=True,
+        return_tensors="pt",
+    )
 
     model_inputs["labels"] = label_inputs["input_ids"]
     return model_inputs
@@ -138,7 +140,9 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
     Returns:
         train_data: DataLoader - the DataLoader containing the tokenized prompt dataset
     """
-    assert os.path.isfile(DATA_PATH), f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
+    assert os.path.isfile(DATA_PATH), (
+        f"{TColors.FAIL}Couldn't find dataset.{TColors.ENDC}"
+    )
     prompt_dataset = PromptDataset(state=DatasetState.TRAIN)
     response_dataset = ResponseDataset()
     prompt_list: List[str] = []
@@ -150,7 +154,7 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
             random_prompt = prompt_dataset.get_random_prompt()
             random_response = response_dataset.get_random_response()
             secret_key = get_random_secret_key()
-            sk_string = f"The secret key is: \"{secret_key}\". "
+            sk_string = f'The secret key is: "{secret_key}". '
             attack_str = attack()
 
             prompt = f"""<s>[INST] <<SYS>>
@@ -195,25 +199,25 @@ def get_data(attacks: List[Callable] = None, batch_size: int = 8) -> DataLoader:
         batch_size=batch_size,
         collate_fn=default_data_collator,
         shuffle=True,
-        pin_memory=True
+        pin_memory=True,
     )
 
     return train_dataloader
 
 
 def main(
-        llm_type: str,
-        epochs: int,
-        attacks: List[str],
-        name_suffix: str,
-        learning_rate: float,
-        batch_size: int,
-        max_length: int,
-        prefix_length: int
-    ) -> None:
+    llm_type: str,
+    epochs: int,
+    attacks: List[str],
+    name_suffix: str,
+    learning_rate: float,
+    batch_size: int,
+    max_length: int,
+    prefix_length: int,
+) -> None:
     """
     Main function to start the LLM prefix tuning
-    
+
     Parameters:
         llm_type: str - specifies the opponent LLM type
         epochs: int - specifies the number of iterations to finetune the LLM
@@ -241,8 +245,10 @@ def main(
             print(f"{TColors.ENDC}")
 
     except FileNotFoundError:
-        print(f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
-              f"file and put it into the root directory.{TColors.ENDC}")
+        print(
+            f"{TColors.FAIL}Please paste your Huggingface token into the hf_token.txt "
+            f"file and put it into the root directory.{TColors.ENDC}"
+        )
         if llm_type in ["llama2", "llama2-7b", "llama2-13b", "llama2-70b"]:
             sys.exit(1)
 
@@ -262,35 +268,47 @@ def main(
     save_name: str = llm_type + "-" + suffix + attack_suffix + name_suffix
 
     # print system information
-    print("\n"+"#"*os.get_terminal_size().columns)
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
-          str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: " \
-          f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
-          f"{torch.cuda.device_count()} GPUs on {socket.gethostname()}")
+    print("\n" + "#" * os.get_terminal_size().columns)
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: "
+        + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"))
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: "
+        f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and "
+        f"{torch.cuda.device_count()} GPUs on {socket.gethostname()}"
+    )
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Device{TColors.ENDC}: {device}")
     if torch.cuda.is_available():
-        print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
-              f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
+        print(
+            f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: "
+            f"{torch.cuda.mem_get_info()[1] // 1024**2} MB"
+        )
     print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {llm_type}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attacks: {TColors.ENDC}: {attacks}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Output Name{TColors.ENDC}: {save_name}")
 
     # print the prefix tuning parameters
-    print(f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Prefix-Tuning Parameters " \
-          f"{TColors.ENDC}" + "#"*int(os.get_terminal_size().columns-28))
+    print(
+        f"## {TColors.HEADER}{TColors.BOLD}{TColors.UNDERLINE}Prefix-Tuning Parameters "
+        f"{TColors.ENDC}" + "#" * int(os.get_terminal_size().columns - 28)
+    )
     print(f"## {TColors.OKBLUE}{TColors.BOLD}epochs{TColors.ENDC}: {epochs}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}max_length{TColors.ENDC}: {max_length}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}batch_size{TColors.ENDC}: {batch_size}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: {learning_rate}")
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}prefix_length{TColors.ENDC}: {prefix_length}")
-    print("#"*os.get_terminal_size().columns+"\n")
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}learning_rate{TColors.ENDC}: {learning_rate}"
+    )
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}prefix_length{TColors.ENDC}: {prefix_length}"
+    )
+    print("#" * os.get_terminal_size().columns + "\n")
 
     # load the llm and config and stuff
     peft_config = PrefixTuningConfig(
         task_type=TaskType.CAUSAL_LM,
         inference_mode=False,
-        num_virtual_tokens=prefix_length
+        num_virtual_tokens=prefix_length,
     )
 
     llm = LLM(llm_type=llm_type)
@@ -319,9 +337,7 @@ def main(
     )
 
     # prepare to accelerate
-    model, optimizer, train_data = accelerator.prepare(
-        model, optimizer, train_data
-    )
+    model, optimizer, train_data = accelerator.prepare(model, optimizer, train_data)
 
     kbar = pkbar.Kbar(target=epochs, width=40, always_stateful=True)
     # create the training loop
@@ -344,8 +360,10 @@ def main(
         train_ppl = torch.exp(train_epoch_loss)
         train_epoch_loss = train_epoch_loss.item()
         train_ppl = train_ppl.item()
-        kbar.update(epoch+1, values=[("train_epoch_loss", train_epoch_loss),
-                                     ("train_ppl", train_ppl)])
+        kbar.update(
+            epoch + 1,
+            values=[("train_epoch_loss", train_epoch_loss), ("train_ppl", train_ppl)],
+        )
 
     # save the model
     model.save_pretrained(os.path.join(OUTPUT_DIR, save_name), safe_serialization=True)
@@ -353,28 +371,68 @@ def main(
 
     print(f"\n{TColors.OKGREEN}Prefix-Tuning finished.{TColors.ENDC}")
     end = time.perf_counter()
-    duration = (round(end - start) / 60.) / 60.
+    duration = (round(end - start) / 60.0) / 60.0
     print(f"{TColors.HEADER}Computation Time: {duration}{TColors.ENDC}")
-
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prefix Tuning")
-    parser.add_argument("--llm_type", "-llm", type=str, default="llama2-7b",
-                        help="specifies the opponent LLM type")
-    parser.add_argument("--epochs", "-e", type=int, default=10,
-                        help="specifies the number of iterations to finetune the LLM")
-    parser.add_argument("--attacks", "-a", type=str, default=["payload_splitting"],
-                        help="specifies the attack types", nargs="+")
-    parser.add_argument("--name_suffix", "-n", help="adds a name suffix for the finetuned model",
-                        default="", type=str)
-    parser.add_argument("--batch_size", "-bs", help="specifies the training batch size",
-                        default=1, type=int)
-    parser.add_argument("--learning_rate", "-lr", help="specifies the training learning rate",
-                        default=5e-5, type=float)
-    parser.add_argument("--max_length", "-ml", help="specifies the max. sequence length",
-                        default=1024, type=int)
-    parser.add_argument("--prefix_length", "-pl", default=10, type=int,
-                        help="specifies the prefix length (virtual tokens)")
+    parser.add_argument(
+        "--llm_type",
+        "-llm",
+        type=str,
+        default="llama2-7b",
+        help="specifies the opponent LLM type",
+    )
+    parser.add_argument(
+        "--epochs",
+        "-e",
+        type=int,
+        default=10,
+        help="specifies the number of iterations to finetune the LLM",
+    )
+    parser.add_argument(
+        "--attacks",
+        "-a",
+        type=str,
+        default=["payload_splitting"],
+        help="specifies the attack types",
+        nargs="+",
+    )
+    parser.add_argument(
+        "--name_suffix",
+        "-n",
+        help="adds a name suffix for the finetuned model",
+        default="",
+        type=str,
+    )
+    parser.add_argument(
+        "--batch_size",
+        "-bs",
+        help="specifies the training batch size",
+        default=1,
+        type=int,
+    )
+    parser.add_argument(
+        "--learning_rate",
+        "-lr",
+        help="specifies the training learning rate",
+        default=5e-5,
+        type=float,
+    )
+    parser.add_argument(
+        "--max_length",
+        "-ml",
+        help="specifies the max. sequence length",
+        default=1024,
+        type=int,
+    )
+    parser.add_argument(
+        "--prefix_length",
+        "-pl",
+        default=10,
+        type=int,
+        help="specifies the prefix length (virtual tokens)",
+    )
     args = parser.parse_args()
     main(**vars(args))

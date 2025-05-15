@@ -1,8 +1,11 @@
 """helper library for printing colored text"""
+
 from typing import Final
 
-class TColors():
+
+class TColors:
     """Color class with ANSI escape codes for colored text"""
+
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
     OKCYAN = "\033[96m"
@@ -34,7 +37,7 @@ ATTACK_NAMES: Final[dict[str, str]] = {
     "context_termination": "Context Termination",
     "context_switching_separators": "Context Switching Separators",
     "few_shot": "Few-Shot",
-    "cognitive_hacking": "Cognitive Hacking"
+    "cognitive_hacking": "Cognitive Hacking",
 }
 
 DEFENSE_NAMES: Final[dict[str, str]] = {
@@ -45,5 +48,5 @@ DEFENSE_NAMES: Final[dict[str, str]] = {
     "ppl_detection": "PPL Detection",
     "prompt_guard": "PromptGuard",
     "sandwiching": "Sandwiching",
-    "identity_prompt": "Identity"
+    "identity_prompt": "Identity",
 }

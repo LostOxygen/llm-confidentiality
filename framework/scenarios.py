@@ -1,10 +1,12 @@
 """library implementing the different attack scenarios as enums"""
+
 # pylint: disable=invalid-name, line-too-long
 from enum import Enum
 
 
 class Scenarios(Enum):
     """Scenario class providing the different scenarios as strings using Enums"""
+
     CloudPlain = 1
     CalendarPlain = 2
     MailPlain = 3

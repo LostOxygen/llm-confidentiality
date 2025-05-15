@@ -1,8 +1,10 @@
 """agentfactory library"""
+
 # code is inspired by:
 # https://deci.ai/blog/how-to-run-langchain-benchmarks-with-local-llms-from-hugging-face/
 from langchain_benchmarks.tool_usage.agents import apply_agent_executor_adapter
 from langchain.agents import AgentExecutor, create_structured_chat_agent
+
 
 class AgentFactory:
     """
@@ -27,6 +29,7 @@ class AgentFactory:
         and to automatically include the state of the environment in the agent's response at
         the end of each run.
     """
+
     def __init__(self, task, llm, prompt) -> None:
         self.task = task
         self.llm = llm

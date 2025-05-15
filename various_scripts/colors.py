@@ -1,8 +1,11 @@
 """helper library for printing colored text"""
+
 from typing import Final
 
-class TColors():
+
+class TColors:
     """Color class with ANSI escape codes for colored text"""
+
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
     OKCYAN = "\033[96m"
@@ -25,9 +28,7 @@ ATTACK_NAMES: Final[dict[str, str]] = {
     "chatml_abuse": "ChatML-Abuse",
     "masking": "Masking",
     "typoglycemia": "Typoglycemia",
-    "advs_suffix": "Adversarial Suffix"
+    "advs_suffix": "Adversarial Suffix",
 }
 
-BENCHMARK_NAMES: Final[dict[str, str]] = {
-    "hellaswag": "HellaSwag"
-}
+BENCHMARK_NAMES: Final[dict[str, str]] = {"hellaswag": "HellaSwag"}

@@ -23,7 +23,7 @@ from colors import TColors
 
 os.environ["TRANSFORMERS_CACHE"] = str(Path.home() / "data")
 LLM_TYPE = "meta-llama/Llama-2-7b-hf"
-OUTPUT_NAME= "llama2-7b-robust-specific"
+OUTPUT_NAME = "llama2-7b-robust-specific"
 
 
 # setting devies and variables correctly
@@ -33,25 +33,31 @@ else:
     device = "cuda:0"
 
 # print system information
-print("\n"+"#"*os.get_terminal_size().columns)
-print(f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: " + \
-        str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p")))
-print(f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: " \
-        f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and " \
-        f"{torch.cuda.device_count()} GPUs on {socket.gethostname()}")
+print("\n" + "#" * os.get_terminal_size().columns)
+print(
+    f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: "
+    + str(datetime.datetime.now().strftime("%A, %d. %B %Y %I:%M%p"))
+)
+print(
+    f"## {TColors.OKBLUE}{TColors.BOLD}System{TColors.ENDC}: "
+    f"{torch.get_num_threads()} CPU cores with {os.cpu_count()} threads and "
+    f"{torch.cuda.device_count()} GPUs on {socket.gethostname()}"
+)
 print(f"## {TColors.OKBLUE}{TColors.BOLD}Device{TColors.ENDC}: {device}")
 if torch.cuda.is_available():
-    print(f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: " \
-            f"{torch.cuda.mem_get_info()[1] // 1024**2} MB")
+    print(
+        f"## {TColors.OKBLUE}{TColors.BOLD}GPU Memory{TColors.ENDC}: "
+        f"{torch.cuda.mem_get_info()[1] // 1024**2} MB"
+    )
 print(f"## {TColors.OKBLUE}{TColors.BOLD}LLM{TColors.ENDC}: {LLM_TYPE}")
 print(f"## {TColors.OKBLUE}{TColors.BOLD}Output Name{TColors.ENDC}: {OUTPUT_NAME}")
-print("#"*os.get_terminal_size().columns+"\n")
+print("#" * os.get_terminal_size().columns + "\n")
 
 tokenizer = AutoTokenizer.from_pretrained(
-        LLM_TYPE,
-        use_fast=False,
-        cache_dir=os.environ["TRANSFORMERS_CACHE"],
-    )
+    LLM_TYPE,
+    use_fast=False,
+    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+)
 tokenizer.pad_token = tokenizer.unk_token
 
 config = BitsAndBytesConfig(
@@ -70,13 +76,13 @@ peft_config = LoraConfig(
 )
 
 model = AutoModelForCausalLM.from_pretrained(
-        LLM_TYPE,
-        device_map="auto",
-        quantization_config=config,
-        low_cpu_mem_usage=True,
-        trust_remote_code=True,
-        cache_dir=os.environ["TRANSFORMERS_CACHE"],
-    )
+    LLM_TYPE,
+    device_map="auto",
+    quantization_config=config,
+    low_cpu_mem_usage=True,
+    trust_remote_code=True,
+    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+)
 
 # disable caching for finetuning
 model.config.use_cache = False
@@ -105,10 +111,9 @@ trainer = SFTTrainer(
 
 trainer.train()
 trainer.model.save_pretrained(
-        os.path.join("", OUTPUT_NAME),
-        safe_serialization=True,
-        save_adapter=True,
-        save_config=True
-    )
+    os.path.join("", OUTPUT_NAME),
+    safe_serialization=True,
+    save_adapter=True,
+    save_config=True,
+)
 trainer.tokenizer.save_pretrained(os.path.join("", OUTPUT_NAME))
-

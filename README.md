@@ -81,7 +81,8 @@ If you want to run the attacks against a prefix-tuned model with a custom suffix
 ## Supported Large Language Models
 | Model | Parameter Specifier | Link | Compute Instance |
 |-------|------|-----|-----|
-| GPT-4 (o1, o1-mini, turbo)| ```gpt-4o``` / ```gpt-4o-mini``` / ```gpt-4-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
+| GPT-4 (4o, 4o-mini, 4-turbo)| ```gpt-4o``` / ```gpt-4o-mini``` / ```gpt-4-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-4)| OpenAI API |
+| GPT-3.5-Turbo | ```gpt-3.5-turbo``` | [Link](https://platform.openai.com/docs/models/gpt-3.5-turbo)| OpenAI API |
 | LLaMA 2 | ```llama2-7b``` / ```llama2-13b``` / ```llama2-70b``` | [Link](https://huggingface.co/meta-llama) | Local Inference |
 | LLaMA 2 hardened | ```llama2-7b-robust``` / ```llama2-13b-robust``` / ```llama2-70b-robust```|  [Link](https://huggingface.co/meta-llama) | Local Inference |
 | Qwen 2.5 | ```qwen2.5-72b``` | [Link](https://qwenlm.github.io/blog/qwen2.5/) | Local Inference (first: ```ollama pull qwen2.5:72b```) |

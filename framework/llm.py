@@ -157,7 +157,7 @@ class LLM:
                 elif "3bit" in self.llm_type:
                     alt_model_file = "llama-2-7b-chat.Q3_K_M.gguf"
                 elif "4bit" in self.llm_type:
-                    alt_model_file = "llama-2-7b-chat.Q4_K.gguf"
+                    alt_model_file = "llama-2-7b-chat.Q4_K_M.gguf"
                 elif "5bit" in self.llm_type:
                     alt_model_file = "llama-2-7b-chat.Q5_K_M.gguf"
                 elif "6bit" in self.llm_type:

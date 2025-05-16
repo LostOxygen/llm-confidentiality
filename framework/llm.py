@@ -1219,7 +1219,7 @@ class LLM:
                     formatted_messages.replace("<s>", ""), "", 1
                 )
 
-            case (
+            case ( # this is basically the chat function for all ollama models without tools
                 "llama3"
                 | "llama3-8b"
                 | "llama3-70b"
@@ -1245,6 +1245,27 @@ class LLM:
                 | "deepseek-r1-14b"
                 | "deepseek-r1-32b"
                 | "deepseek-r1-70b"
+                | "codellama-7b-fp16"
+                | "codellama-7b-quant-2bit"
+                | "codellama-7b-quant-3bit"
+                | "codellama-7b-quant-4bit"
+                | "codellama-7b-quant-5bit"
+                | "codellama-7b-quant-6bit"
+                | "codellama-7b-quant-8bit"
+                | "llama2-7b-fp16"
+                | "llama2-7b-quant-2bit"
+                | "llama2-7b-quant-3bit"
+                | "llama2-7b-quant-4bit"
+                | "llama2-7b-quant-5bit"
+                | "llama2-7b-quant-6bit"
+                | "llama2-7b-quant-8bit"
+                | "llama3.1-8b-fp16"
+                | "llama3.1-8b-quant-2bit"
+                | "llama3.1-8b-quant-3bit"
+                | "llama3.1-8b-quant-4bit"
+                | "llama3.1-8b-quant-5bit"
+                | "llama3.1-8b-quant-6bit"
+                | "llama3.1-8b-quant-8bit"
             ):
                 prompt = ChatPromptTemplate.from_messages(
                     [
@@ -1456,38 +1477,5 @@ class LLM:
                 # so only the models' actual response remains
                 history = response[0]
                 response = response[0].replace(formatted_messages, "", 1)
-
-            case (
-                "codellama-7b-fp16"
-                | "codellama-7b-quant-2bit"
-                | "codellama-7b-quant-3bit"
-                | "codellama-7b-quant-4bit"
-                | "codellama-7b-quant-5bit"
-                | "codellama-7b-quant-6bit"
-                | "codellama-7b-quant-8bit"
-                | "llama2-7b-fp16"
-                | "llama2-7b-quant-2bit"
-                | "llama2-7b-quant-3bit"
-                | "llama2-7b-quant-4bit"
-                | "llama2-7b-quant-5bit"
-                | "llama2-7b-quant-6bit"
-                | "llama2-7b-quant-8bit"
-                | "llama3.1-8b-fp16"
-                | "llama3.1-8b-quant-2bit"
-                | "llama3.1-8b-quant-3bit"
-                | "llama3.1-8b-quant-4bit"
-                | "llama3.1-8b-quant-5bit"
-                | "llama3.1-8b-quant-6bit"
-                | "llama3.1-8b-quant-8bit"
-            ):
-                formatted_messages = self.format_prompt(
-                    system_prompt, user_prompt, self.llm_type
-                )
-                response = self.model(formatted_messages, max_tokens=2048)
-                history = response
-                response = response["choices"][0]["text"]
-
-            case _:
-                raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
         return (response, history)

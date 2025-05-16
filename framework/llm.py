@@ -34,8 +34,6 @@ from framework.prompts import (
     STOPPING_LIST,
 )
 
-import anthropic
-
 OUTPUT_DIR: Final[str] = "./finetuned_models/"
 MAX_RETRIES: int = 10  # number of retries for GPT based chat requests
 NUM_TOOL_RETRIES: int = 10  # number of retries for tool based chat requests
@@ -91,7 +89,7 @@ class LLM:
                 )
 
             case (
-                "codellama-7b-quant"
+                "codellama-7b-fp16"
                 | "codellama-7b-quant-2bit"
                 | "codellama-7b-quant-3bit"
                 | "codellama-7b-quant-4bit"
@@ -99,46 +97,36 @@ class LLM:
                 | "codellama-7b-quant-6bit"
                 | "codellama-7b-quant-8bit"
             ):
-                os.environ["HF_HOME"] = os.environ["HF_HOME"]
-                from llama_cpp import Llama
-
                 self.temperature = max(0.01, min(self.temperature, 5.0))
-                alt_model_id = "TheBloke/CodeLlama-7B-Instruct-GGUF"
 
                 if "2bit" in self.llm_type:
-                    alt_model_file = "codellama-7b-instruct.Q2_K.gguf"
+                    model_file = "codellama:7b-instruct.q2_K"
                 elif "3bit" in self.llm_type:
-                    alt_model_file = "codellama-7b-instruct.Q3_K_M.gguf"
+                    model_file = "codellama:7b-instruct.q3_K_M"
                 elif "4bit" in self.llm_type:
-                    alt_model_file = "codellama-7b-instruct.Q4_K.gguf"
+                    model_file = "codellama:7b-instruct.q4_K_M"
                 elif "5bit" in self.llm_type:
-                    alt_model_file = "codellama-7b-instruct.Q5_K_M.gguf"
+                    model_file = "codellama:7b-instruct.q5_K_M"
                 elif "6bit" in self.llm_type:
-                    alt_model_file = "codellama-7b-instruct.Q6_K.gguf"
+                    model_file = "codellama:7b-instruct.q6_K"
                 elif "8bit" in self.llm_type:
-                    alt_model_file = "codellama-7b-instruct.Q8_0.gguf"
+                    model_file = "codellama:7b-instruct.q8_0"
                 else:
-                    alt_model_file = "codellama-7b-instruct.Q4_K_M.gguf"
+                    model_file = "codellama:7b-instruct.q4_K_M"
 
-                self.tokenizer = AutoTokenizer.from_pretrained(
-                    "meta-llama/Llama-2-7b-chat-hf",
-                    cache_dir=os.environ["HF_HOME"],
-                    use_fast=False,
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                subprocess.call(
+                    f"ollama pull {model_file}",
+                    shell=True,
                 )
-                self.tokenizer.pad_token = self.tokenizer.unk_token
-
-                self.model: Llama = Llama.from_pretrained(
-                    repo_id=alt_model_id,
-                    filename=alt_model_file,
-                    n_gpu_layers=-1,
-                    n_ctx=4096,
-                    chat_format="llama-2",
+                self.model = ChatOllama(
+                    model=f"{model_file}",
                     temperature=self.temperature,
-                    verbose=False,
                 )
+                self.tokenizer = None
 
             case (
-                "llama2-7b-quant"
+                "llama2-7b-fp16"
                 | "llama2-7b-quant-2bit"
                 | "llama2-7b-quant-3bit"
                 | "llama2-7b-quant-4bit"
@@ -147,39 +135,73 @@ class LLM:
                 | "llama2-7b-quant-8bit"
             ):
                 self.temperature = max(0.01, min(self.temperature, 5.0))
-                alt_model_id = "TheBloke/Llama-2-7B-Chat-GGUF"
 
                 if "2bit" in self.llm_type:
-                    alt_model_file = "llama-2-7b-chat.Q2_K.gguf"
+                    model_file = "llama2:7b-chat-q2_K"
                 elif "3bit" in self.llm_type:
-                    alt_model_file = "llama-2-7b-chat.Q3_K_M.gguf"
+                    model_file = "llama2:7b-chat-q3_K_M"
                 elif "4bit" in self.llm_type:
-                    alt_model_file = "llama-2-7b-chat.Q4_K_M.gguf"
+                    model_file = "llama2:7b-chat-q4_K_M"
                 elif "5bit" in self.llm_type:
-                    alt_model_file = "llama-2-7b-chat.Q5_K_M.gguf"
+                    model_file = "llama2:7b-chat-q5_K_M"
                 elif "6bit" in self.llm_type:
-                    alt_model_file = "llama-2-7b-chat.Q6_K.gguf"
+                    model_file = "llama2:7b-chat-q6_K"
                 elif "8bit" in self.llm_type:
-                    alt_model_file = "llama-2-7b-chat.Q8_0.gguf"
+                    model_file = "llama2:7b-chat-q8_0"
+                elif "fp16" in self.llm_type:
+                    model_file = "llama2:7b-chat-fp16"
                 else:
-                    alt_model_file = "llama-2-7b-chat.Q4_K_M.gguf"
+                    model_file = "llama2:7b-chat-q4_K_M"
 
-                self.tokenizer = AutoTokenizer.from_pretrained(
-                    "meta-llama/Llama-2-7b-chat-hf",
-                    cache_dir=os.environ["HF_HOME"],
-                    use_fast=False,
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                subprocess.call(
+                    f"ollama pull {model_file}",
+                    shell=True,
                 )
-                self.tokenizer.pad_token = self.tokenizer.unk_token
-
-                self.model: Llama = Llama.from_pretrained(
-                    repo_id=alt_model_id,
-                    filename=alt_model_file,
-                    n_gpu_layers=-1,
-                    n_ctx=4096,
-                    chat_format="llama-2",
+                self.model = ChatOllama(
+                    model=f"{model_file}",
                     temperature=self.temperature,
-                    verbose=False,
                 )
+                self.tokenizer = None
+
+            case (
+                "llama3.1-8b-fp16"
+                | "llama3.1-8b-quant-2bit"
+                | "llama3.1-8b-quant-3bit"
+                | "llama3.1-8b-quant-4bit"
+                | "llama3.1-8b-quant-5bit"
+                | "llama3.1-8b-quant-6bit"
+                | "llama3.1-8b-quant-8bit"
+            ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+
+                if "2bit" in self.llm_type:
+                    model_file = "llama3.1:8b-instruct-q2_K"
+                elif "3bit" in self.llm_type:
+                    model_file = "llama3.1:8b-instruct-q3_K_M"
+                elif "4bit" in self.llm_type:
+                    model_file = "llama3.1:8b-instruct-q4_K_M"
+                elif "5bit" in self.llm_type:
+                    model_file = "llama3.1:8b-instruct-q5_K_M"
+                elif "6bit" in self.llm_type:
+                    model_file = "llama3.1:8b-instruct-q6_K"
+                elif "8bit" in self.llm_type:
+                    model_file = "llama3.1:8b-instruct-q8_0"
+                elif "fp16" in self.llm_type:
+                    model_file = "llama3.1:8b-instruct-fp16"
+                else:
+                    model_file = "llama3.1:8b-instruct-q4_K_M"
+
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                subprocess.call(
+                    f"ollama pull {model_file}",
+                    shell=True,
+                )
+                self.model = ChatOllama(
+                    model=f"{model_file}",
+                    temperature=self.temperature,
+                )
+                self.tokenizer = None
 
             case "llama2-7b-pipe" | "llama2-13b-pipe" | "llama2-70b-pipe":
                 self.temperature = max(0.01, min(self.temperature, 5.0))
@@ -771,6 +793,7 @@ class LLM:
                 )
 
             case "anthropic":
+                import anthropic
                 self.temperature = max(0.0, min(self.temperature, 5.0))
                 self.model = anthropic.Anthropic(
                     # defaults to os.environ.get("ANTHROPIC_API_KEY")
@@ -1430,20 +1453,27 @@ class LLM:
                 response = response[0].replace(formatted_messages, "", 1)
 
             case (
-                "codellama-7b-quant"
+                "codellama-7b-fp16"
                 | "codellama-7b-quant-2bit"
                 | "codellama-7b-quant-3bit"
                 | "codellama-7b-quant-4bit"
                 | "codellama-7b-quant-5bit"
                 | "codellama-7b-quant-6bit"
                 | "codellama-7b-quant-8bit"
-                | "llama2-7b-quant"
+                | "llama2-7b-fp16"
                 | "llama2-7b-quant-2bit"
                 | "llama2-7b-quant-3bit"
                 | "llama2-7b-quant-4bit"
                 | "llama2-7b-quant-5bit"
                 | "llama2-7b-quant-6bit"
                 | "llama2-7b-quant-8bit"
+                | "llama3.1-8b-fp16"
+                | "llama3.1-8b-quant-2bit"
+                | "llama3.1-8b-quant-3bit"
+                | "llama3.1-8b-quant-4bit"
+                | "llama3.1-8b-quant-5bit"
+                | "llama3.1-8b-quant-6bit"
+                | "llama3.1-8b-quant-8bit"
             ):
                 formatted_messages = self.format_prompt(
                     system_prompt, user_prompt, self.llm_type

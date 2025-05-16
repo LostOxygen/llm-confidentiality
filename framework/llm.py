@@ -77,7 +77,7 @@ class LLM:
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     "meta-llama/Llama-2-7b-chat-hf",
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                     use_fast=False,
                 )
                 self.tokenizer.pad_token = self.tokenizer.unk_token
@@ -86,7 +86,7 @@ class LLM:
                     "meta-llama/Llama-2-7b-chat-hf",
                     device_map="cuda",
                     low_cpu_mem_usage=True,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                     trust_remote_code=True,
                 )
 
@@ -99,7 +99,7 @@ class LLM:
                 | "codellama-7b-quant-6bit"
                 | "codellama-7b-quant-8bit"
             ):
-                os.environ["HF_HOME"] = os.environ["TRANSFORMERS_CACHE"]
+                os.environ["HF_HOME"] = os.environ["HF_HOME"]
                 from llama_cpp import Llama
 
                 self.temperature = max(0.01, min(self.temperature, 5.0))
@@ -122,7 +122,7 @@ class LLM:
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     "meta-llama/Llama-2-7b-chat-hf",
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                     use_fast=False,
                 )
                 self.tokenizer.pad_token = self.tokenizer.unk_token
@@ -146,9 +146,6 @@ class LLM:
                 | "llama2-7b-quant-6bit"
                 | "llama2-7b-quant-8bit"
             ):
-                os.environ["HF_HOME"] = os.environ["TRANSFORMERS_CACHE"]
-                from llama_cpp import Llama
-
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 alt_model_id = "TheBloke/Llama-2-7B-Chat-GGUF"
 
@@ -169,7 +166,7 @@ class LLM:
 
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     "meta-llama/Llama-2-7b-chat-hf",
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                     use_fast=False,
                 )
                 self.tokenizer.pad_token = self.tokenizer.unk_token
@@ -216,14 +213,14 @@ class LLM:
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     model_name,
                     use_fast=False,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
                 self.tokenizer.pad_token = self.tokenizer.unk_token
 
                 gen_config = GenerationConfig.from_pretrained(
                     model_name,
                     token=os.environ["HF_TOKEN"],
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
                 gen_config.max_new_tokens = 2048
                 gen_config.temperature = self.temperature
@@ -268,7 +265,7 @@ class LLM:
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     model_name,
                     use_fast=False,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
                 self.tokenizer.pad_token = self.tokenizer.unk_token
 
@@ -278,7 +275,7 @@ class LLM:
                     quantization_config=config,
                     low_cpu_mem_usage=True,
                     trust_remote_code=True,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
 
             case "orca" | "orca-7b" | "orca-13b" | "orca-70b":
@@ -308,7 +305,7 @@ class LLM:
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     model_name,
                     use_fast=False,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
                 self.tokenizer.pad_token = self.tokenizer.unk_token
 
@@ -318,17 +315,24 @@ class LLM:
                     quantization_config=config,
                     low_cpu_mem_usage=True,
                     trust_remote_code=True,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
 
             case (
                 "gpt-3.5-turbo"
                 | "gpt-3.5-0301"
+                | "gpt-3.5-turbo-instruct"
                 | "gpt-3.5-turbo-0613"
                 | "gpt-3.5-turbo-1106"
                 | "gpt-3.5-turbo-0125"
+                | "gpt-3.5-turbo-16k-0613"
                 | "gpt-4"
+                | "gpt-4-0314"
+                | "gpt-4-0613"
+                | "gpt-4-1106-preview"
+                | "gpt-4-0125-preview"
                 | "gpt-4-turbo"
+                | "gpt-4-turbo-2024-04-09"
                 | "gpt-4o-2024-05-13"
                 | "gpt-4o-2024-08-06"
                 | "gpt-4o-2024-11-20"
@@ -405,7 +409,7 @@ class LLM:
                     low_cpu_mem_usage=True,
                     quantization_config=config,
                     trust_remote_code=True,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                     token=os.environ["HF_TOKEN"],
                 )
 
@@ -418,7 +422,7 @@ class LLM:
                     local_files_only=True,
                     return_dict=True,
                     low_cpu_mem_usage=True,
-                    offload_folder=os.environ["TRANSFORMERS_CACHE"],
+                    offload_folder=os.environ["HF_HOME"],
                     token=os.environ["HF_TOKEN"],
                 )
                 self.model = self.model.merge_and_unload()
@@ -475,7 +479,7 @@ class LLM:
                     low_cpu_mem_usage=True,
                     quantization_config=config,
                     trust_remote_code=True,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                     token=os.environ["HF_TOKEN"],
                 )
 
@@ -488,7 +492,7 @@ class LLM:
                     quantization_config=config,
                     local_files_only=True,
                     token=os.environ["HF_TOKEN"],
-                    offload_folder=os.environ["TRANSFORMERS_CACHE"],
+                    offload_folder=os.environ["HF_HOME"],
                 )
 
             case (
@@ -539,7 +543,7 @@ class LLM:
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     model_name,
                     use_fast=False,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
                 self.tokenizer.pad_token = self.tokenizer.unk_token
 
@@ -549,7 +553,7 @@ class LLM:
                     quantization_config=config,
                     low_cpu_mem_usage=True,
                     trust_remote_code=True,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
 
             case (
@@ -710,7 +714,7 @@ class LLM:
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     model_name,
                     use_fast=False,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
 
                 self.model = AutoModelForCausalLM.from_pretrained(
@@ -719,7 +723,7 @@ class LLM:
                     quantization_config=config,
                     low_cpu_mem_usage=True,
                     trust_remote_code=True,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
 
             case "vicuna-7b" | "vicuna-13b" | "vicuna-33b":
@@ -754,7 +758,7 @@ class LLM:
                 self.tokenizer = AutoTokenizer.from_pretrained(
                     model_name,
                     use_fast=False,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
 
                 self.model = AutoModelForCausalLM.from_pretrained(
@@ -763,7 +767,7 @@ class LLM:
                     quantization_config=config,
                     low_cpu_mem_usage=True,
                     trust_remote_code=True,
-                    cache_dir=os.environ["TRANSFORMERS_CACHE"],
+                    cache_dir=os.environ["HF_HOME"],
                 )
 
             case "anthropic":
@@ -1044,16 +1048,23 @@ class LLM:
             case (
                 "gpt-3.5-turbo"
                 | "gpt-3.5-0301"
+                | "gpt-3.5-turbo-instruct"
                 | "gpt-3.5-turbo-0613"
                 | "gpt-3.5-turbo-1106"
                 | "gpt-3.5-turbo-0125"
+                | "gpt-3.5-turbo-16k-0613"
                 | "gpt-4"
+                | "gpt-4-0314"
+                | "gpt-4-0613"
+                | "gpt-4-1106-preview"
+                | "gpt-4-0125-preview"
                 | "gpt-4o"
                 | "gpt-4o-2024-05-13"
                 | "gpt-4o-2024-08-06"
                 | "gpt-4o-2024-11-20"
                 | "gpt-4o-mini"
                 | "gpt-4-turbo"
+                | "gpt-4-turbo-2024-04-09"
             ):
                 messages = [
                     {"role": "system", "content": system_prompt},

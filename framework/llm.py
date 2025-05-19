@@ -1300,6 +1300,9 @@ class LLM:
 
             case (
                 "llama2"
+                | "llama2-7b-fp16-bloke"
+                | "codellama-7b-fp16-bloke"
+                | "llama3.1-8b-fp16-bloke"
                 | "llama2-7b"
                 | "llama2-13b"
                 | "llama2-70b"
@@ -1386,7 +1389,6 @@ class LLM:
                 | "deepseek-r1-32b"
                 | "deepseek-r1-70b"
                 | "codellama-7b-fp16"
-                | "codellama-7b-fp16-bloke"
                 | "codellama-7b-quant-2bit"
                 | "codellama-7b-quant-3bit"
                 | "codellama-7b-quant-4bit"
@@ -1394,7 +1396,6 @@ class LLM:
                 | "codellama-7b-quant-6bit"
                 | "codellama-7b-quant-8bit"
                 | "llama2-7b-fp16"
-                | "llama2-7b-fp16-bloke"
                 | "llama2-7b-quant-2bit"
                 | "llama2-7b-quant-3bit"
                 | "llama2-7b-quant-4bit"
@@ -1402,7 +1403,6 @@ class LLM:
                 | "llama2-7b-quant-6bit"
                 | "llama2-7b-quant-8bit"
                 | "llama3.1-8b-fp16"
-                | "llama3.1-8b-fp16-bloke"
                 | "llama3.1-8b-quant-2bit"
                 | "llama3.1-8b-quant-3bit"
                 | "llama3.1-8b-quant-4bit"

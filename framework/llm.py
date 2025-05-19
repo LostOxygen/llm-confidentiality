@@ -1079,7 +1079,8 @@ class LLM:
                 | "llama2-70b-robust"
                 | "llama2-7b-prefix"
                 | "llama2-13b-prefix"
-                | "llama2-70b-prefixcodellama-7b-fp16"
+                | "llama2-70b-prefix"
+                | "codellama-7b-fp16"
                 | "codellama-7b-quant-2bit"
                 | "codellama-7b-quant-3bit"
                 | "codellama-7b-quant-4bit"
@@ -1100,6 +1101,26 @@ class LLM:
                 | "llama3.1-8b-quant-5bit"
                 | "llama3.1-8b-quant-6bit"
                 | "llama3.1-8b-quant-8bit"
+                | "codellama-7b-quant-2bit-bloke"
+                | "codellama-7b-quant-3bit-bloke"
+                | "codellama-7b-quant-4bit-bloke"
+                | "codellama-7b-quant-5bit-bloke"
+                | "codellama-7b-quant-6bit-bloke"
+                | "codellama-7b-quant-8bit-bloke"
+                | "llama2-7b-fp16-bloke"
+                | "llama2-7b-quant-2bit-bloke"
+                | "llama2-7b-quant-3bit-bloke"
+                | "llama2-7b-quant-4bit-bloke"
+                | "llama2-7b-quant-5bit-bloke"
+                | "llama2-7b-quant-6bit-bloke"
+                | "llama2-7b-quant-8bit-bloke"
+                | "llama3.1-8b-fp16-bloke"
+                | "llama3.1-8b-quant-2bit-bloke"
+                | "llama3.1-8b-quant-3bit-bloke"
+                | "llama3.1-8b-quant-4bit-bloke"
+                | "llama3.1-8b-quant-5bit-bloke"
+                | "llama3.1-8b-quant-6bit-bloke"
+                | "llama3.1-8b-quant-8bit-bloke"
             ):
                 formatted_messages = f"""<s>[INST] <<SYS>>
                     {system_prompt}
@@ -1338,7 +1359,7 @@ class LLM:
                     formatted_messages.replace("<s>", ""), "", 1
                 )
 
-            case ( # this is basically the chat function for all ollama models without tools
+            case (  # this is basically the chat function for all ollama models without tools
                 "llama3"
                 | "llama3-8b"
                 | "llama3-70b"
@@ -1365,6 +1386,7 @@ class LLM:
                 | "deepseek-r1-32b"
                 | "deepseek-r1-70b"
                 | "codellama-7b-fp16"
+                | "codellama-7b-fp16-bloke"
                 | "codellama-7b-quant-2bit"
                 | "codellama-7b-quant-3bit"
                 | "codellama-7b-quant-4bit"
@@ -1372,6 +1394,7 @@ class LLM:
                 | "codellama-7b-quant-6bit"
                 | "codellama-7b-quant-8bit"
                 | "llama2-7b-fp16"
+                | "llama2-7b-fp16-bloke"
                 | "llama2-7b-quant-2bit"
                 | "llama2-7b-quant-3bit"
                 | "llama2-7b-quant-4bit"
@@ -1379,6 +1402,7 @@ class LLM:
                 | "llama2-7b-quant-6bit"
                 | "llama2-7b-quant-8bit"
                 | "llama3.1-8b-fp16"
+                | "llama3.1-8b-fp16-bloke"
                 | "llama3.1-8b-quant-2bit"
                 | "llama3.1-8b-quant-3bit"
                 | "llama3.1-8b-quant-4bit"

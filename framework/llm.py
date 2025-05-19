@@ -169,6 +169,7 @@ class LLM:
                     chat_format="llama-2",
                     temperature=self.temperature,
                     verbose=False,
+                    cache_dir=os.environ["HF_HOME"],
                 )
 
             case (
@@ -238,6 +239,7 @@ class LLM:
                     chat_format="llama-2",
                     temperature=self.temperature,
                     verbose=False,
+                    cache_dir=os.environ["HF_HOME"],
                 )
 
 

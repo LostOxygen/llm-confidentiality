@@ -100,19 +100,19 @@ class LLM:
                 self.temperature = max(0.01, min(self.temperature, 5.0))
 
                 if "2bit" in self.llm_type:
-                    model_file = "codellama:7b-instruct.q2_K"
+                    model_file = "codellama:7b-instruct-q2_K"
                 elif "3bit" in self.llm_type:
-                    model_file = "codellama:7b-instruct.q3_K_M"
+                    model_file = "codellama:7b-instruct-q3_K_M"
                 elif "4bit" in self.llm_type:
-                    model_file = "codellama:7b-instruct.q4_K_M"
+                    model_file = "codellama:7b-instruct-q4_K_M"
                 elif "5bit" in self.llm_type:
-                    model_file = "codellama:7b-instruct.q5_K_M"
+                    model_file = "codellama:7b-instruct-q5_K_M"
                 elif "6bit" in self.llm_type:
-                    model_file = "codellama:7b-instruct.q6_K"
+                    model_file = "codellama:7b-instruct-q6_K"
                 elif "8bit" in self.llm_type:
-                    model_file = "codellama:7b-instruct.q8_0"
+                    model_file = "codellama:7b-instruct-q8_0"
                 else:
-                    model_file = "codellama:7b-instruct.q4_K_M"
+                    model_file = "codellama:7b-instruct-q4_K_M"
 
                 self.temperature = max(0.01, min(self.temperature, 5.0))
                 subprocess.call(

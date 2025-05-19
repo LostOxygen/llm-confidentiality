@@ -126,6 +126,122 @@ class LLM:
                 self.tokenizer = None
 
             case (
+                "codellama-7b-quant-2bit-bloke"
+                | "codellama-7b-quant-3bit-bloke"
+                | "codellama-7b-quant-4bit-bloke"
+                | "codellama-7b-quant-5bit-bloke"
+                | "codellama-7b-quant-6bit-bloke"
+                | "codellama-7b-quant-8bit-bloke"
+            ):
+                os.environ["HF_HOME"] = os.environ["HF_HOME"]
+                from llama_cpp import Llama
+
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                alt_model_id = "TheBloke/CodeLlama-7B-Instruct-GGUF"
+
+                if "2bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q2_K.gguf"
+                elif "3bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q3_K_M.gguf"
+                elif "4bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q4_K.gguf"
+                elif "5bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q5_K_M.gguf"
+                elif "6bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q6_K.gguf"
+                elif "8bit" in self.llm_type:
+                    alt_model_file = "codellama-7b-instruct.Q8_0.gguf"
+                else:
+                    alt_model_file = "codellama-7b-instruct.Q4_K_M.gguf"
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    "meta-llama/Llama-2-7b-chat-hf",
+                    cache_dir=os.environ["HF_HOME"],
+                    use_fast=False,
+                )
+                self.tokenizer.pad_token = self.tokenizer.unk_token
+
+                self.model: Llama = Llama.from_pretrained(
+                    repo_id=alt_model_id,
+                    filename=alt_model_file,
+                    n_gpu_layers=-1,
+                    n_ctx=4096,
+                    chat_format="llama-2",
+                    temperature=self.temperature,
+                    verbose=False,
+                )
+
+            case (
+                "llama2-7b-fp16-bloke"
+            ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+
+                # complete the model name for chat or normal models
+                model_name = "meta-llama/Llama-2-7b-hf"
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    model_name,
+                    use_fast=False,
+                    cache_dir=os.environ["HF_HOME"],
+                )
+                self.tokenizer.pad_token = self.tokenizer.unk_token
+
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    model_name,
+                    device_map="auto",
+                    low_cpu_mem_usage=True,
+                    trust_remote_code=True,
+                    cache_dir=os.environ["HF_HOME"],
+                )
+
+
+            case (
+                "llama2-7b-quant-2bit-bloke"
+                | "llama2-7b-quant-3bit-bloke"
+                | "llama2-7b-quant-4bit-bloke"
+                | "llama2-7b-quant-5bit-bloke"
+                | "llama2-7b-quant-6bit-bloke"
+                | "llama2-7b-quant-8bit-bloke"
+            ):
+                self.temperature = max(0.01, min(self.temperature, 5.0))
+                os.environ["HF_HOME"] = os.environ["HF_HOME"]
+                from llama_cpp import Llama
+                alt_model_id = "TheBloke/Llama-2-7B-Chat-GGUF"
+
+                if "2bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q2_K.gguf"
+                elif "3bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q3_K_M.gguf"
+                elif "4bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q4_K_M.gguf"
+                elif "5bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q5_K_M.gguf"
+                elif "6bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q6_K.gguf"
+                elif "8bit" in self.llm_type:
+                    alt_model_file = "llama-2-7b-chat.Q8_0.gguf"
+                else:
+                    alt_model_file = "llama-2-7b-chat.Q4_K_M.gguf"
+
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    "meta-llama/Llama-2-7b-chat-hf",
+                    cache_dir=os.environ["HF_HOME"],
+                    use_fast=False,
+                )
+                self.tokenizer.pad_token = self.tokenizer.unk_token
+
+                self.model: Llama = Llama.from_pretrained(
+                    repo_id=alt_model_id,
+                    filename=alt_model_file,
+                    n_gpu_layers=-1,
+                    n_ctx=4096,
+                    chat_format="llama-2",
+                    temperature=self.temperature,
+                    verbose=False,
+                )
+
+
+            case (
                 "llama2-7b-fp16"
                 | "llama2-7b-quant-2bit"
                 | "llama2-7b-quant-3bit"
@@ -163,6 +279,7 @@ class LLM:
                     temperature=self.temperature,
                 )
                 self.tokenizer = None
+
 
             case (
                 "llama3.1-8b-fp16"
@@ -202,6 +319,7 @@ class LLM:
                     temperature=self.temperature,
                 )
                 self.tokenizer = None
+
 
             case "llama2-7b-pipe" | "llama2-13b-pipe" | "llama2-70b-pipe":
                 self.temperature = max(0.01, min(self.temperature, 5.0))
@@ -264,6 +382,7 @@ class LLM:
                     # quantization_config=config,
                     # low_cpu_mem_usage=True,
                 )
+
 
             case "gemma-2b" | "gemma-7b":
                 self.temperature = max(0.01, min(self.temperature, 5.0))
@@ -1477,5 +1596,29 @@ class LLM:
                 # so only the models' actual response remains
                 history = response[0]
                 response = response[0].replace(formatted_messages, "", 1)
+
+            case (
+                "codellama-7b-quant-2bit-bloke"
+                | "codellama-7b-quant-3bit-bloke"
+                | "codellama-7b-quant-4bit-bloke"
+                | "codellama-7b-quant-5bit-bloke"
+                | "codellama-7b-quant-6bit-bloke"
+                | "codellama-7b-quant-8bit-bloke"
+                | "llama2-7b-quant-2bit-bloke"
+                | "llama2-7b-quant-3bit-bloke"
+                | "llama2-7b-quant-4bit-bloke"
+                | "llama2-7b-quant-5bit-bloke"
+                | "llama2-7b-quant-6bit-bloke"
+                | "llama2-7b-quant-8bit-bloke"
+            ):
+                formatted_messages = self.format_prompt(
+                    system_prompt, user_prompt, self.llm_type
+                )
+                response = self.model(formatted_messages, max_tokens=2048)
+                history = response
+                response = response["choices"][0]["text"]
+
+            case _:
+                raise NotImplementedError(f"LLM type {self.llm_type} not implemented")
 
         return (response, history)

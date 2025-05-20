@@ -165,7 +165,7 @@ class LLM:
                     repo_id=alt_model_id,
                     filename=alt_model_file,
                     n_gpu_layers=-1,
-                    n_ctx=2048,
+                    n_ctx=4096,
                     chat_format="llama-2",
                     temperature=self.temperature,
                     verbose=False,
@@ -235,7 +235,7 @@ class LLM:
                     repo_id=alt_model_id,
                     filename=alt_model_file,
                     n_gpu_layers=-1,
-                    n_ctx=2048,
+                    n_ctx=4096,
                     chat_format="llama-2",
                     temperature=self.temperature,
                     verbose=False,
@@ -1640,7 +1640,7 @@ class LLM:
                 formatted_messages = self.format_prompt(
                     system_prompt, user_prompt, self.llm_type
                 )
-                response = self.model(formatted_messages, max_tokens=2048)
+                response = self.model(formatted_messages)
                 history = response
                 response = response["choices"][0]["text"]
 

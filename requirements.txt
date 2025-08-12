@@ -7,7 +7,7 @@ torchaudio==2.5.1
 openai==1.59.9
 accelerate==1.3.0
 tokenizers==0.21.0
-transformers==4.48.1
+transformers==4.53.0
 huggingface-hub==0.27.1
 bitsandbytes @ git+https://github.com/TimDettmers/bitsandbytes
 einops==0.8.0

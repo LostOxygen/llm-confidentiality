@@ -1,5 +1,5 @@
 sentencepiece==0.2.0
-protobuf==5.29.3
+protobuf==5.29.5
 numpy==1.26.4
 torch==2.8.0
 torchvision==0.20.1

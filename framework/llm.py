@@ -1262,7 +1262,7 @@ class LLM:
                 {response}<|im_end|>
                 """
 
-            case "gpt-4-tools" | "gpt-4-turbo-tools":
+            case "gpt-4o-tools" | "gpt-4-tools" | "gpt-4-turbo-tools":
                 prompt = ChatPromptTemplate.from_messages(
                     [
                         ("system", system_prompt),

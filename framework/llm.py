@@ -483,7 +483,7 @@ class LLM:
                 self.temperature = max(0.0, min(self.temperature, 2.0))
                 self.model = None
 
-            case "gpt-4-tools" | "gpt-4-turbo-tools":
+            case "gpt-4o-tools" | "gpt-4-tools" | "gpt-4-turbo-tools":
                 self.temperature = max(0.0, min(self.temperature, 2.0))
                 if "turbo" in self.llm_type:
                     model = "gpt-4-turbo"

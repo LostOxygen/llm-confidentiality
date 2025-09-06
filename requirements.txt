@@ -21,7 +21,7 @@ sentence-transformers==3.2.1
 matplotlib==3.10.0
 langchain==0.2.12
 langchain-core==0.2.43
-langchain-community==0.2.19
+langchain-community==0.3.27
 langchain-openai==0.1.7
 langchain-ollama==0.1.1
 langchain-text-splitters==0.2.2

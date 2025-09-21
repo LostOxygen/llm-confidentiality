@@ -199,7 +199,7 @@ Will run all attacks against the LLM with all defenses <br>
 ```python attack.py --llm_type <model_specifier> --strategy secret-key --attacks all --defenses all --iterations 100 --device cuda```
 
 ### Baseline tool-scenario
-Will system prompt instruct the LLM with a secret key and the instructions to not leak the secret key followed by simple requests to print the secret key <br>
+Will system prompt instruct the LLM with all available tools and the instructions to not leak the secret key followed by simple requests to print the secret key. Keys are included in all tools. <br>
 ```python attack.py --llm_type <model_specifier> --strategy tools --scenario all --attacks base_attack --defenses None --iterations 100 --device cuda```
 
 ### Evaluating all tool-scenarios with ReAct

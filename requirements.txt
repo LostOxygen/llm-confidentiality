@@ -1,13 +1,13 @@
 sentencepiece==0.2.0
-protobuf==5.29.3
+protobuf==5.29.5
 numpy==1.26.4
-torch==2.5.1
+torch==2.8.0
 torchvision==0.20.1
 torchaudio==2.5.1
 openai==1.59.9
 accelerate==1.3.0
 tokenizers==0.21.0
-transformers==4.48.1
+transformers==4.53.0
 huggingface-hub==0.27.1
 bitsandbytes @ git+https://github.com/TimDettmers/bitsandbytes
 einops==0.8.0
@@ -20,8 +20,8 @@ pkbar==0.5
 sentence-transformers==3.2.1
 matplotlib==3.10.0
 langchain==0.2.12
-langchain-core==0.2.28
-langchain-community==0.2.6
+langchain-core==0.2.43
+langchain-community==0.3.27
 langchain-openai==0.1.7
 langchain-ollama==0.1.1
 langchain-text-splitters==0.2.2

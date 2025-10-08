@@ -24,7 +24,7 @@ langchain-core==0.2.43
 langchain-community==0.3.27
 langchain-openai==0.1.7
 langchain-ollama==0.1.1
-langchain-text-splitters==0.2.2
+langchain-text-splitters==1.0.0a1
 langchainhub==0.1.20
 langchain-googledrive==0.2.6
 progressbar2==4.5.0

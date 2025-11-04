@@ -10,6 +10,7 @@ import sys
 import time
 import datetime
 import argparse
+import shutil
 from typing import List
 
 import openai
@@ -179,7 +180,7 @@ def main(
         "\n"
         + f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}System Information"
         + f"{TColors.ENDC} "
-        + "#" * (os.get_terminal_size().columns - 23)
+        + "#" * (shutil.get_terminal_size().columns - 23)
     )
     print(
         f"## {TColors.OKBLUE}{TColors.BOLD}Date{TColors.ENDC}: "
@@ -209,7 +210,7 @@ def main(
     print(
         f"## {TColors.BOLD}{TColors.HEADER}{TColors.UNDERLINE}Parameters"
         + f"{TColors.ENDC} "
-        + "#" * (os.get_terminal_size().columns - 14)
+        + "#" * (shutil.get_terminal_size().columns - 14)
     )
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Attack Type{TColors.ENDC}: {attacks}")
     print(f"## {TColors.OKBLUE}{TColors.BOLD}Defense Type{TColors.ENDC}: {defenses}")
@@ -263,7 +264,7 @@ def main(
             f"## {TColors.OKBLUE}{TColors.BOLD}Creating Responses Dataset{TColors.ENDC}: "
             f"{create_response_dataset}"
         )
-    print("#" * os.get_terminal_size().columns + "\n")
+    print("#" * shutil.get_terminal_size().columns + "\n")
 
     total_successes: dict[int] = {f"{attack}": 0 for attack in attacks}
     total_errors: dict[int] = {f"{attack}": 0 for attack in attacks}

@@ -8,7 +8,7 @@ from openai import OpenAI
 
 from peft import PeftModel
 from langchain.tools import BaseTool
-from langchain.agents.agent import (
+from langchain.agents import (
     AgentExecutor,
     create_tool_calling_agent,
     create_structured_chat_agent,

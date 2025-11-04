@@ -19,10 +19,10 @@ datasets>=3.2.0
 pkbar>=0.5
 sentence-transformers>=3.2.1
 matplotlib>=3.10.0
-langchain<=2.0.0
+langchain<2.0.0
 langchain-benchmarks==0.0.13
 langchain-community==0.0.38
-langchain-core==0.2.39
+langchain-core<0.2.0
 langchain-experimental==0.0.58
 langchain-googledrive==0.1.52
 langchain-ollama==0.1.3

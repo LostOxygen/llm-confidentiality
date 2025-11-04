@@ -19,7 +19,7 @@ datasets>=3.2.0
 pkbar>=0.5
 sentence-transformers>=3.2.1
 matplotlib>=3.10.0
-langchain
+langchain==0.2.12
 langchain-core
 langchain-community
 langchain-openai

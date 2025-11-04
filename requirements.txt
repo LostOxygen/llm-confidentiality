@@ -22,7 +22,7 @@ matplotlib>=3.10.0
 langchain<3.0.0
 langchain-benchmarks==0.0.13
 langchain-community==0.0.38
-langchain-core<0.2.0
+langchain-core
 langchain-experimental==0.0.58
 langchain-googledrive==0.1.52
 langchain-ollama

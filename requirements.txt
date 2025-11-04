@@ -9,11 +9,11 @@ accelerate>=1.3.0
 tokenizers>=0.21.0
 transformers>=4.53.0
 huggingface-hub>=0.30.0
-bitsandbytes @ git+https://github.com/TimDettmers/bitsandbytes
+bitsandbytes
 einops>=0.8.0
 wandb>=0.19.4
 scipy>=1.15.1
-peft @ git+https://github.com/huggingface/peft.git
+peft
 trl>=0.13.0
 datasets>=3.2.0
 pkbar>=0.5

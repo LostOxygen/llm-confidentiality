@@ -74,9 +74,9 @@ def main(
         None
     """
     start = time.perf_counter()  # start timer
-    subprocess.call(
+    subprocess.Popen(
         "ollama serve",
-        shell=False,
+        shell=True,
     )
 
     # paste the OpenAI key into the key.txt file and put into the root directory

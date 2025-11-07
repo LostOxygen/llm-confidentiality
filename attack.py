@@ -3,6 +3,7 @@
 # !/usr/bin/env python3
 
 import os
+import subprocess
 import psutil
 import getpass
 from pathlib import Path
@@ -73,6 +74,10 @@ def main(
         None
     """
     start = time.perf_counter()  # start timer
+    subprocess.call(
+        "ollama serve",
+        shell=False,
+    )
 
     # paste the OpenAI key into the key.txt file and put into the root directory
     try:

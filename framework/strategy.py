@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 import progressbar
 from progressbar import ProgressBar
 
-from langchain.tools import BaseTool
+from langchain_classic.tools import BaseTool
 from framework.utils import log_conversation
 from framework.colors import TColors, ATTACK_NAMES, DEFENSE_NAMES
 from framework.prompts import get_random_secret_key, ATTACK_KEYWORDS

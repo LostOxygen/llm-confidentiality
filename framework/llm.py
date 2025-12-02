@@ -7,8 +7,8 @@ import torch
 from openai import OpenAI
 
 from peft import PeftModel
-from langchain.tools import BaseTool
-from langchain.agents import (
+from langchain_classic.tools import BaseTool
+from langchain_classic.agents import (
     AgentExecutor,
     create_tool_calling_agent,
     create_structured_chat_agent,

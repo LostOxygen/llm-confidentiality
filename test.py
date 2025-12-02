@@ -1,7 +1,7 @@
 """test"""
 
 from langchain_ollama import ChatOllama
-from langchain.agents import (
+from langchain_classic.agents import (
     AgentExecutor,
     create_tool_calling_agent,
     create_structured_chat_agent,

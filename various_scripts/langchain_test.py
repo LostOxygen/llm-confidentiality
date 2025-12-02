@@ -3,12 +3,12 @@
 import os
 
 import openai
-from langchain.agents import tool, AgentExecutor
-from langchain.agents.format_scratchpad.openai_tools import (
+from langchain_classic.agents import tool, AgentExecutor
+from langchain_classic.agents.format_scratchpad.openai_tools import (
     format_to_openai_tool_messages,
 )
-from langchain.agents.output_parsers.openai_tools import OpenAIToolsAgentOutputParser
-from langchain.tools import BaseTool
+from langchain_classic.agents.output_parsers.openai_tools import OpenAIToolsAgentOutputParser
+from langchain_classic.tools import BaseTool
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 

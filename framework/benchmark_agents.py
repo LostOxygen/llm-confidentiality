@@ -3,7 +3,7 @@
 # code is inspired by:
 # https://deci.ai/blog/how-to-run-langchain-benchmarks-with-local-llms-from-hugging-face/
 from langchain_benchmarks.tool_usage.agents import apply_agent_executor_adapter
-from langchain.agents import AgentExecutor, create_structured_chat_agent
+from langchain_classic.agents import AgentExecutor, create_structured_chat_agent
 
 
 class AgentFactory:

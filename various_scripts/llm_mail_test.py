@@ -2,8 +2,8 @@
 
 import os
 
-# from langchain import hub
-from langchain.agents import (
+# from langchain_classic import hub
+from langchain_classic.agents import (
     AgentExecutor,
     create_structured_chat_agent,
 )

@@ -4,7 +4,7 @@ import ast
 from typing import Callable, Type, Union, Optional, Any
 
 from langchain_classic.tools import BaseTool
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic.v1 import BaseModel, Field
 
 from .tool_data import CLOUD_DB, MAIL_INBOX, NOTES, CALENDAR_EVENTS
 

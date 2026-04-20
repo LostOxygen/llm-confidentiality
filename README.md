@@ -2,7 +2,16 @@
 This is the code repository accompanying our paper [Whispers in the Machine: Confidentiality in Agentic Systems](https://arxiv.org/abs/2402.06922).
 >Large language model (LLM)–based agents combine LLMs with external tools to automate tasks such as scheduling meetings, managing documents, or booking travel. While these integrations unlock powerful capabilities, they also create new and more severe attack surfaces. In particular, prompt injection attacks become far more dangerous in the agentic setting: malicious instructions embedded in connected services can misdirect the agent, providing a direct pathway for sensitive data to be exfiltrated. Yet, despite growing real-world incidents, the confidentiality risks of such systems remain poorly understood. To address this gap, we provide a rigorous formalization of confidentiality in LLM-based agents. By abstracting sensitive data as a secret string, we evaluate ten agents across 20 tool scenarios and 14 attack strategies. We find that all agents are vulnerable to at least one attack, and existing defenses fail to provide reliable protection against these threats. Strikingly, we find that the tooling itself can amplify leakage risks.
 
-If you want to cite our work, please use the [this](#citation) BibTeX entry.
+# Citation
+If you want to cite our work, please use the following BibTeX entry:
+```bibtex
+@inproceedings{evertz2026whisper,
+  title={Whispers in the Machine: Confidentiality in Agentic Systems},
+  author={Evertz, Jonathan and Chlosta, Merlin and Sch{\"o}nherr, Lea and Eisenhofer, Thorsten},
+  booktitle={SIG SIDAR Conference on Detection of Intrusions and Malware \& Vulnerability Assessment (DIMVA) 2026},
+  year = {2026},
+  }
+```
 
 ### This framework was developed to study the confidentiality of Large Language Models (LLMs) in integrated systems. The framework contains several features:
 - A set of attacks against LLMs, where the LLM is not allowed to leak a secret key -> [jump to section](#attacks-and-defenses)
@@ -217,15 +226,3 @@ Will run all tool-scenarios without attacks and defenses using the ReAct framewo
 ### Evaluating all tool fine-tuned models in all scenarios with additional attacks and defenses
 Will run all tool-scenarios without attacks and defenses using the ReAct framework <br>
 ```python attack.py --llm_type <model_specifier> --strategy tools --scenario all --attacks all --defenses all --iterations 100 --prompt_format tool-finetuned --device cuda```
-
-
-# Citation
-If you want to cite our work, please use the following BibTeX entry:
-```bibtex
-@article{evertz-24-whispers,
-	title    =  {{Whispers in the Machine: Confidentiality in LLM-integrated Systems}}, 
-	author   =  {Jonathan Evertz and Merlin Chlosta and Lea Schönherr and Thorsten Eisenhofer},
-	year     =  {2024},
-	journal  =  {Computing Research Repository (CoRR)}
-}
-```
